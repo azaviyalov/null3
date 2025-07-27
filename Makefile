@@ -47,9 +47,8 @@ clean: clean-backend clean-frontend
 	rm null3-server || true
 
 release:
+	rm -rf backend/internal/frontend/dist/browser/*
 	$(MAKE) -C frontend build
-	mkdir -p backend/internal/frontend/dist
 	cp -r frontend/dist/frontend/browser/* backend/internal/frontend/dist/browser/
 	$(MAKE) -C backend build
-	rm -rf backend/internal/frontend/dist/browser/*
 	cp backend/bin/server ./null3-server

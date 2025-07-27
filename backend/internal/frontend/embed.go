@@ -4,5 +4,5 @@ import (
 	"embed"
 )
 
-//go:embed dist/browser/**
+//go:embed fs/**
 var FrontendFS embed.FS

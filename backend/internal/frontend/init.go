@@ -12,9 +12,9 @@ import (
 )
 
 func InitModule(e *echo.Echo) {
-	frontendFS, err := fs.Sub(FrontendFS, "dist/browser")
+	frontendFS, err := fs.Sub(FrontendFS, "fs")
 	if err != nil {
-		panic("failed to sub dist/browser: " + err.Error())
+		panic("failed to sub fs: " + err.Error())
 	}
 
 	// Traverse and patch files

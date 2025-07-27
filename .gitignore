@@ -1,13 +1,8 @@
-# Node.js
-node_modules/
-dist/
-.angular/
-
 # Angular build output
 frontend/out-tsc/
-frontend/.angular/cache/
+frontend/.angular
 frontend/node_modules/
-frontend/dist/
+frontend/dist/*
 frontend/.vscode/
 
 # VSCode
@@ -27,7 +22,8 @@ null3.db
 
 # Go
 backend/bin/
-backend/tmp/
+backend/internal/frontend/fs/*
+!backend/internal/frontend/fs/.gitkeep
 backend/null3.db
 backend/coverage.out
 
@@ -44,13 +40,6 @@ backend/coverage.out
 *.zip
 *.bak
 *.tmp
-
-# Ignore build artifacts
-*.exe
-*.dll
-*.so
-*.dylib
-*.test
 
 # Ignore release builds
 null3-server
