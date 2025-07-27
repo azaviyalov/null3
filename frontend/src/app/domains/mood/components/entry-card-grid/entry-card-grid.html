@@ -1,0 +1,18 @@
+<div class="entry-card-grid" [ngStyle]="gridStyle()">
+  @for (
+    entry of entriesOrSkeleton();
+    track trackByEntryOrIndex($index, entry);
+    let i = $index
+  ) {
+    <app-entry-card
+      [entry]="entry"
+      [skeleton]="skeleton()"
+      [showOpen]="showOpen()"
+      [showEdit]="showEdit()"
+      [showDelete]="showDelete()"
+      (open)="entry ? open.emit(entry) : undefined"
+      (edit)="entry ? edit.emit(entry) : undefined"
+      (delete)="entry ? delete.emit(entry) : undefined"
+    />
+  }
+</div>

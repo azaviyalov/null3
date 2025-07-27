@@ -1,0 +1,9 @@
+<h2>Update Mood Entry</h2>
+
+@if (!isLoading()) {
+  <app-entry-form
+    [entry]="entry()"
+    [disabled]="isSubmitting()"
+    (entrySubmit)="submit($event)"
+  />
+}

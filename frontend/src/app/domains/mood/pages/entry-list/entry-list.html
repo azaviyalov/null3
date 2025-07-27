@@ -1,0 +1,20 @@
+<h2>Your mood entries</h2>
+
+<app-entry-card-grid-paginated
+  [skeleton]="isLoading()"
+  [entriesPage]="entriesPage()"
+  [pageSize]="pageSize()"
+  (changePage)="changePage($event)"
+  (open)="openEntry($event)"
+/>
+
+<button
+  matFab
+  color="primary"
+  class="fab-fixed"
+  extended
+  (click)="createEntry()"
+>
+  <mat-icon>add</mat-icon>
+  Add Entry
+</button>

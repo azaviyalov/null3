@@ -1,0 +1,17 @@
+# Ignore artifacts:
+build
+coverage
+# Ignore Angular build output
+out-tsc
+.angular/cache
+node_modules
+dist
+# Ignore VSCode settings
+.vscode
+# Ignore JetBrains IDEs settings
+.idea
+# Ignore logs
+*.log
+# Ignore OS files
+.DS_Store
+Thumbs.db

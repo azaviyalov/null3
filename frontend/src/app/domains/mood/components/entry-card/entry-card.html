@@ -1,0 +1,93 @@
+<mat-card [class.deleted]="entry()?.deletedAt">
+  <mat-card-header>
+    @if (entry(); as e) {
+      <mat-card-title>
+        {{ e.feeling }}
+      </mat-card-title>
+    } @else if (skeleton()) {
+      <mat-card-title class="skeleton-title" />
+    }
+
+    @if (entry(); as e) {
+      <mat-card-subtitle>{{ e.createdAt | date: "medium" }}</mat-card-subtitle>
+    } @else if (skeleton()) {
+      <mat-card-subtitle class="skeleton-subtitle" />
+    }
+  </mat-card-header>
+  <mat-card-content>
+    @if (entry(); as e) {
+      @if (e.note) {
+        <p>{{ e.note }}</p>
+      } @else {
+        <p class="empty-note">No additional notes</p>
+      }
+      @if (showFooter()) {
+        <mat-card-footer>
+          @if (deleted()) {
+            <span class="deleted-label"
+              >Deleted at {{ entry()?.deletedAt | date: "medium" }}</span
+            >
+          } @else if (updated()) {
+            <span class="updated-label"
+              >Updated at {{ entry()?.updatedAt | date: "medium" }}</span
+            >
+          }
+        </mat-card-footer>
+      }
+    } @else if (skeleton()) {
+      <div class="skeleton-content"></div>
+      <div class="skeleton-content short"></div>
+    }
+  </mat-card-content>
+
+  @if (showActions()) {
+    <mat-card-actions align="end">
+      @if (skeleton()) {
+        <div matButton class="skeleton-button" disabled></div>
+        <div matButton class="skeleton-button" disabled></div>
+        <div matButton class="skeleton-button" disabled></div>
+      } @else {
+        @if (showOpen()) {
+          <button
+            type="button"
+            matButton="elevated"
+            class="primary-button"
+            (click)="open.emit()"
+          >
+            Open
+          </button>
+        }
+        @if (showEdit()) {
+          <button
+            type="button"
+            matButton="elevated"
+            class="common-button"
+            (click)="edit.emit()"
+          >
+            Edit
+          </button>
+        }
+        @if (showDelete()) {
+          <button
+            type="button"
+            matButton="elevated"
+            class="danger-button"
+            (click)="delete.emit()"
+          >
+            Delete
+          </button>
+        }
+        @if (showRestore()) {
+          <button
+            type="button"
+            matButton="elevated"
+            class="primary-button"
+            (click)="restore.emit()"
+          >
+            Restore
+          </button>
+        }
+      }
+    </mat-card-actions>
+  }
+</mat-card>

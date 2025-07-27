@@ -1,0 +1,21 @@
+.entry-form {
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.submit-button {
+  align-self: flex-end;
+  min-width: 120px;
+  padding: 12px 24px;
+}
+
+.primary-button {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}

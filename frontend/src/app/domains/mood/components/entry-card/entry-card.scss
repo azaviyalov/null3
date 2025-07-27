@@ -1,0 +1,96 @@
+.empty-note {
+  font-style: italic;
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 50%, transparent);
+}
+
+.deleted {
+  background-color: var(--mat-sys-surface-dim);
+}
+
+.skeleton-card {
+  min-height: 180px;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent) 25%,
+    color-mix(in srgb, var(--mat-sys-on-surface) 4%, transparent) 50%,
+    color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.2s infinite linear;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+.skeleton-title {
+  @extend .skeleton;
+  width: 120px;
+  height: 24px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+.skeleton-subtitle {
+  @extend .skeleton;
+  width: 80px;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.skeleton-content {
+  @extend .skeleton;
+  width: 100%;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.skeleton-content.short {
+  width: 60%;
+}
+
+.skeleton-button {
+  @extend .skeleton;
+  width: 64px;
+  height: 36px;
+  display: inline-block;
+  margin-right: 8px;
+  margin-top: 8px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+mat-card-footer {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 50%, transparent);
+}
+
+mat-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.primary-button {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.common-button {
+  background-color: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface-container-lowest);
+}
+
+.danger-button {
+  background-color: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}

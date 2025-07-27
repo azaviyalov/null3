@@ -1,0 +1,14 @@
+<mat-paginator
+  [length]="entriesPage()?.totalCount ?? defaultCardCount"
+  [pageSize]="pageSize()"
+  [pageSizeOptions]="[5, 10, 25, 100]"
+  (page)="changePage.emit($event)"
+  aria-label="Select page"
+/>
+<app-entry-card-grid
+  [skeleton]="skeleton()"
+  [skeletonCount]="defaultCardCount"
+  [entries]="entriesPage()?.items ?? null"
+  [showOpen]="true"
+  (open)="open.emit($event)"
+/>

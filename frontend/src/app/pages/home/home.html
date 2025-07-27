@@ -1,0 +1,13 @@
+<main class="home-container">
+  <h1>Welcome to null3</h1>
+  <p>Track your mood and reflect on your feelings.</p>
+  <div class="dashboard">
+    <section>
+      <h2 class="">Latest Mood Entries</h2>
+      <app-entry-card-grid
+        [entries]="entriesPage()?.items ?? null"
+        [columns]="2"
+      />
+    </section>
+  </div>
+</main>

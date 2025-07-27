@@ -1,0 +1,25 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard {
+  display: grid;
+}
+
+.entries-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.entry-card {
+  flex: 1 1 200px;
+  max-width: calc(50% - 0.5rem);
+  min-width: 200px;
+  box-sizing: border-box;
+}
+
+.empty-note {
+  font-style: italic;
+}

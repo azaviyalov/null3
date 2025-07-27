@@ -1,0 +1,21 @@
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.toolbar-container {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 1rem;
+}
+
+.active-link {
+  background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+}

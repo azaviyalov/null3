@@ -1,0 +1,9 @@
+.entry-card-grid {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+app-entry-card {
+  min-width: 0;
+}

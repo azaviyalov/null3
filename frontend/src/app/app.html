@@ -1,0 +1,33 @@
+<mat-toolbar>
+  <div class="toolbar-container">
+    <button
+      matButton
+      matRipple
+      routerLink="/"
+      routerLinkActive="active-link"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Home
+    </button>
+    <button
+      matButton
+      matRipple
+      routerLink="/mood/entries"
+      routerLinkActive="active-link"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Mood Entries
+    </button>
+    <button
+      matButton
+      matRipple
+      routerLink="/about"
+      routerLinkActive="active-link"
+    >
+      About
+    </button>
+  </div>
+</mat-toolbar>
+<main class="container">
+  <router-outlet />
+</main>

@@ -1,0 +1,56 @@
+# Node.js
+node_modules/
+dist/
+.angular/
+
+# Angular build output
+frontend/out-tsc/
+frontend/.angular/cache/
+frontend/node_modules/
+frontend/dist/
+frontend/.vscode/
+
+# VSCode
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# Logs
+*.log
+
+# SQLite database
+null3.db
+
+# OS
+.DS_Store
+
+# Go
+backend/bin/
+backend/tmp/
+backend/null3.db
+backend/coverage.out
+
+# Editor
+*.swp
+*.swo
+
+# Environment
+.env
+
+# Misc
+*.tgz
+*.gz
+*.zip
+*.bak
+*.tmp
+
+# Ignore build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Ignore release builds
+null3-server

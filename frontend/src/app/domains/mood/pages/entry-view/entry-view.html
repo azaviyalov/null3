@@ -1,0 +1,16 @@
+<button mat-button (click)="goBack()" class="top-button">Back</button>
+
+@if (errorMessage()) {
+  <p>{{ errorMessage() }}</p>
+} @else {
+  <app-entry-card
+    [entry]="entry()"
+    [skeleton]="isLoading()"
+    [showEdit]="!entry()?.deletedAt"
+    [showDelete]="!entry()?.deletedAt"
+    [showRestore]="!!entry()?.deletedAt"
+    (edit)="editEntry()"
+    (delete)="deleteEntry()"
+    (restore)="restoreEntry()"
+  />
+}
