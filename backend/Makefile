@@ -1,4 +1,4 @@
-.PHONY: prepare build lint clean clean-db build-all
+.PHONY: prepare build lint staticcheck vet clean clean-db build-all
 
 FRONTEND_DIST=internal/frontend/dist
 
@@ -9,8 +9,13 @@ prepare:
 build:
 	go build -ldflags="-s -w" -o bin/server ./cmd/server/main.go
 
-lint:
-	staticcheck ./...
+lint: staticcheck vet
+
+staticcheck:
+	go tool staticcheck ./...
+
+vet:
+	go vet ./...
 
 format:
 	go fmt ./...
