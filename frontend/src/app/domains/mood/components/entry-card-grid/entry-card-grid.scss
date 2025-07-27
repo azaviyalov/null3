@@ -4,6 +4,7 @@
   width: 100%;
 }
 
-app-entry-card {
-  min-width: 0;
+.empty-grid {
+  font-style: italic;
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 50%, transparent);
 }
