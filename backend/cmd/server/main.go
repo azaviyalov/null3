@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,31 +10,15 @@ import (
 	"time"
 
 	"github.com/azaviyalov/null3/backend/internal/core/db"
+	"github.com/azaviyalov/null3/backend/internal/core/env"
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/core/server"
 	"github.com/azaviyalov/null3/backend/internal/frontend"
 	"github.com/azaviyalov/null3/backend/internal/mood"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load environment variables from .env file
-	_ = godotenv.Load()
-
-	// Set config defaults if not set
-	if os.Getenv("PORT") == "" {
-		os.Setenv("PORT", "8080")
-	}
-	if os.Getenv("DATABASE_URL") == "" {
-		os.Setenv("DATABASE_URL", "file:null3.db?_fk=1")
-	}
-	if os.Getenv("ENABLE_FRONTEND_DIST") == "" {
-		os.Setenv("ENABLE_FRONTEND_DIST", "false")
-	}
-	if os.Getenv("API_URL") == "" {
-		os.Setenv("API_URL", fmt.Sprintf("http://localhost:%s/api", os.Getenv("PORT")))
-	}
-
+	env.Setup()
 	logging.Setup()
 
 	// Initialize the database connection
@@ -48,7 +31,7 @@ func main() {
 	mood.InitModule(e, database)
 
 	if os.Getenv("ENABLE_FRONTEND_DIST") == "true" {
-		slog.Info("frontend dist enabled, initializing")
+		slog.Info("frontend dist enabled, initializing", "API_URL", os.Getenv("API_URL"))
 		// Initialize frontend module last to ensure it can serve static files.
 		frontend.InitModule(e)
 	}
@@ -60,7 +43,6 @@ func main() {
 	go func() {
 		slog.Info("starting server",
 			"port", os.Getenv("PORT"),
-			"api_url", os.Getenv("API_URL"),
 		)
 
 		if err := e.Start(":" + os.Getenv("PORT")); err != nil {
