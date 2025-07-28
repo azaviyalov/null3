@@ -21,15 +21,12 @@ func main() {
 	env.Setup()
 	logging.Setup()
 
-	// Initialize the database connection
-	slog.Info("connecting to database", "database_url", os.Getenv("DATABASE_URL"), "database_type", "sqlite")
 	database := db.Connect()
 	db.AutoMigrate(database)
 
 	e := server.NewEchoServer()
 
 	mood.InitModule(e, database)
-
 	if os.Getenv("ENABLE_FRONTEND_DIST") == "true" {
 		slog.Info("serving frontend dist", "API_URL", os.Getenv("API_URL"))
 		frontend.InitModule(e)

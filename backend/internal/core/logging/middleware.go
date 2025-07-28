@@ -21,7 +21,7 @@ func RequestLogger() echo.MiddlewareFunc {
 				req := c.Request()
 				res := c.Response()
 				status := res.Status
-				slog.Info("http_request",
+				slog.Info("HTTP request completed",
 					"method", req.Method,
 					"path", req.URL.Path,
 					"status", status,
