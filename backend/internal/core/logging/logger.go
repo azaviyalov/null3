@@ -23,9 +23,16 @@ func Setup() {
 		os.Exit(1)
 	}
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level:     level,
-		AddSource: true,
-	}))
-	slog.SetDefault(logger)
+	if os.Getenv("LOG_FANCY") == "true" {
+		logger := slog.New(&FancyHandler{level: level, AddSource: true})
+		slog.SetDefault(logger)
+		slog.Debug("fancy logger setup complete", "level", logLevel)
+	} else {
+		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level:     level,
+			AddSource: true,
+		}))
+		slog.SetDefault(logger)
+		slog.Debug("logger setup complete", "level", logLevel)
+	}
 }
