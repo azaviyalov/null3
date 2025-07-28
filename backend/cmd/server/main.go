@@ -22,7 +22,7 @@ func main() {
 	logging.Setup()
 
 	// Initialize the database connection
-	slog.Info("database connecting", "database_url", os.Getenv("DATABASE_URL"), "database_type", "sqlite")
+	slog.Info("connecting to database", "database_url", os.Getenv("DATABASE_URL"), "database_type", "sqlite")
 	database := db.Connect()
 	db.AutoMigrate(database)
 
@@ -31,36 +31,31 @@ func main() {
 	mood.InitModule(e, database)
 
 	if os.Getenv("ENABLE_FRONTEND_DIST") == "true" {
-		slog.Info("frontend dist enabled, initializing", "API_URL", os.Getenv("API_URL"))
-		// Initialize frontend module last to ensure it can serve static files.
+		slog.Info("serving frontend dist", "API_URL", os.Getenv("API_URL"))
 		frontend.InitModule(e)
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	// Start the server in a goroutine to allow graceful shutdown
 	go func() {
-		slog.Info("starting server",
-			"port", os.Getenv("PORT"),
-		)
-
+		slog.Info("starting HTTP server", "port", os.Getenv("PORT"))
 		if err := e.Start(":" + os.Getenv("PORT")); err != nil {
 			if !errors.Is(err, http.ErrServerClosed) {
-				slog.Error("failed to start server", "error", err)
+				slog.Error("server start failed", "error", err)
 				os.Exit(1)
 			}
 		}
 	}()
 
 	<-ctx.Done()
-	slog.Info("shutting down server gracefully")
+	slog.Info("received shutdown signal, shutting down server gracefully")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
-		slog.Error("failed to gracefully shutdown server", "error", err)
+		slog.Error("graceful shutdown failed", "error", err)
 		os.Exit(1)
 	}
 
-	slog.Info("server stopped")
+	slog.Info("server stopped successfully")
 }
