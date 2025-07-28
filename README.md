@@ -50,6 +50,7 @@ Environment variables can be set in the `.env` file.
 - The `DATABASE_URL` variable is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
 - The `PORT` variable is used to set the backend server port. Default is `8080`.
 - The `LOG_LEVEL` variable is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
+- The `ENABLE_CORS` variable can be set to `true` to enable CORS. Default is `false`.
 - The `ENABLE_FRONTEND_DIST` variable can be set to `true` to enable serving the frontend from the backend. Default is `false`.
 - The `API_URL` variable is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`.
 

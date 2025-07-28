@@ -24,6 +24,9 @@ func Setup() {
 	if os.Getenv("ENABLE_FRONTEND_DIST") == "" {
 		os.Setenv("ENABLE_FRONTEND_DIST", "false")
 	}
+	if os.Getenv("ENABLE_CORS") == "" {
+		os.Setenv("ENABLE_CORS", "false")
+	}
 	if os.Getenv("API_URL") == "" {
 		os.Setenv("API_URL", fmt.Sprintf("http://localhost:%s/api", os.Getenv("PORT")))
 	}

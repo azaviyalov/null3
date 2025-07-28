@@ -13,8 +13,7 @@ func NewEchoServer() *echo.Echo {
 	e.HideBanner = true
 	e.HidePort = true
 
-	// Enable cors only if the frontend is not served from the same server.
-	if os.Getenv("ENABLE_FRONTEND_DIST") != "true" {
+	if os.Getenv("ENABLE_CORS") == "true" {
 		e.Use(middleware.CORS())
 	}
 	e.Use(logging.RequestLogger())
