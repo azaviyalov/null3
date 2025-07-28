@@ -1,10 +1,31 @@
 <h2>Your mood entries</h2>
 
-<app-entry-card-grid-paginated
+<div class="entry-list-header">
+  <mat-button-toggle-group
+    [value]="deletedSwitch() ? 'deleted' : 'active'"
+    hideSingleSelectionIndicator="true"
+    (change)="setDeletedState($event.value)"
+  >
+    <mat-button-toggle value="active">Active</mat-button-toggle>
+    <mat-button-toggle value="deleted">Deleted</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  @if (entriesPage()?.totalCount; as totalCount) {
+    <mat-paginator
+      [length]="totalCount"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="changePage($event)"
+      aria-label="Select page"
+    />
+  }
+</div>
+
+<app-entry-card-grid
   [skeleton]="isLoading()"
-  [entriesPage]="entriesPage()"
-  [pageSize]="pageSize()"
-  (changePage)="changePage($event)"
+  [skeletonCount]="defaultCardCount"
+  [entries]="entriesPage()?.items ?? null"
+  [showOpen]="true"
   (open)="openEntry($event)"
 />
 

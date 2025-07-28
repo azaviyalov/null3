@@ -14,8 +14,11 @@ func NewService(repo *Repository) *Service {
 	}
 }
 
-func (s *Service) ListEntries(userID uint, limit, offset int) (core.PaginatedResponse[Entry], error) {
+func (s *Service) ListEntries(userID uint, limit, offset int, deleted bool) (core.PaginatedResponse[Entry], error) {
 	filter := NewEntryFilter().WithUserID(userID)
+	if deleted {
+		filter = filter.WithDeletedMode(core.DeletedModeDeletedOnly)
+	}
 
 	entries, err := s.repo.ListEntries(filter, limit, offset)
 	if err != nil {

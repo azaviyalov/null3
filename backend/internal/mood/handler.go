@@ -31,6 +31,7 @@ func NewHandler(service *Service) *Handler {
 func (h *Handler) ListEntries(c echo.Context) error {
 	limitParam := c.QueryParam("limit")
 	offsetParam := c.QueryParam("offset")
+	deletedParam := c.QueryParam("deleted")
 
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil || limit <= 0 {
@@ -42,7 +43,12 @@ func (h *Handler) ListEntries(c echo.Context) error {
 		offset = 0 // default offset
 	}
 
-	entries, err := h.service.ListEntries(0, limit, offset) // Assuming userID is 0 for simplicity, replace with actual user ID logic
+	deleted, err := strconv.ParseBool(deletedParam)
+	if err != nil {
+		deleted = false // default to not deleted
+	}
+
+	entries, err := h.service.ListEntries(0, limit, offset, deleted) // Assuming userID is 0 for simplicity, replace with actual user ID logic
 	if err != nil {
 		return echo.ErrInternalServerError.WithInternal(err)
 	}

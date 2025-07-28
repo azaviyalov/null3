@@ -17,8 +17,15 @@ export class EntryApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/mood/entries`;
 
-  getPaged(limit = 10, offset = 0): Observable<PaginatedEntryList> {
-    const params = new HttpParams().set("limit", limit).set("offset", offset);
+  getPaged(
+    limit = 10,
+    offset = 0,
+    deleted = false,
+  ): Observable<PaginatedEntryList> {
+    const params = new HttpParams()
+      .set("limit", limit)
+      .set("offset", offset)
+      .set("deleted", deleted);
 
     return this.http
       .get<PaginatedEntryListView>(this.baseUrl, { params })
