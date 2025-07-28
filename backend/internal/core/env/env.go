@@ -21,8 +21,8 @@ func Setup() {
 	if os.Getenv("LOG_LEVEL") == "" {
 		os.Setenv("LOG_LEVEL", "info")
 	}
-	if os.Getenv("LOG_FANCY") == "" {
-		os.Setenv("LOG_FANCY", "false")
+	if os.Getenv("LOG_FORMAT") == "" {
+		os.Setenv("LOG_FORMAT", "json")
 	}
 	if os.Getenv("ENABLE_FRONTEND_DIST") == "" {
 		os.Setenv("ENABLE_FRONTEND_DIST", "false")

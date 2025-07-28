@@ -23,16 +23,29 @@ func Setup() {
 		os.Exit(1)
 	}
 
-	if os.Getenv("LOG_FANCY") == "true" {
-		logger := slog.New(&FancyHandler{level: level, AddSource: true})
-		slog.SetDefault(logger)
-		slog.Debug("fancy logger setup complete", "level", logLevel)
-	} else {
-		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+	logFormat := os.Getenv("LOG_FORMAT")
+	var loggerHandler slog.Handler
+	switch logFormat {
+	case "json":
+		loggerHandler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 			Level:     level,
 			AddSource: true,
-		}))
-		slog.SetDefault(logger)
-		slog.Debug("logger setup complete", "level", logLevel)
+		})
+	case "text":
+		loggerHandler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level:     level,
+			AddSource: true,
+		})
+	case "fancy":
+		loggerHandler = NewFancyHandler(&slog.HandlerOptions{
+			Level:     level,
+			AddSource: true,
+		})
+	default:
+		fmt.Printf("invalid LOG_FORMAT: %s, must be one of json, text, fancy\n", logFormat)
+		os.Exit(1)
 	}
+	logger := slog.New(loggerHandler)
+	slog.SetDefault(logger)
+	slog.Debug("logger setup complete", "level", logLevel, "format", logFormat)
 }
