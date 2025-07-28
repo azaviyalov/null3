@@ -1,6 +1,6 @@
-@if (entriesPage()?.totalCount) {
+@if (entriesPage()?.totalCount; as totalCount) {
   <mat-paginator
-    [length]="entriesPage()?.totalCount ?? defaultCardCount"
+    [length]="totalCount"
     [pageSize]="pageSize()"
     [pageSizeOptions]="[5, 10, 25, 100]"
     (page)="changePage.emit($event)"
