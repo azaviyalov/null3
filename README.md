@@ -21,7 +21,7 @@ A full-stack web application for mood tracking, built with Go (backend) and Angu
 ## Running the Application
 
 ### Development
-1. Start the backend server:
+1. Start the backend server (no hot-reloading):
    ```bash
    cd backend
    go run cmd/server/main.go
@@ -38,9 +38,12 @@ A full-stack web application for mood tracking, built with Go (backend) and Angu
 1. Build the binary
     ```bash
     make release
-    ENABLE_FRONTEND_DIST=true ./target/release/null3
     ```
-2. Open your browser and navigate to `http://localhost:8080` to access the application.
+2. Run the built binary:
+   ```bash
+   ./null3-server
+   ```
+3. Open your browser and navigate to `http://localhost:8080` to access the application.
 
 ## Configuration
 Environment variables can be set in the `.env` file.
