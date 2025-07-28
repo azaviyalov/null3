@@ -18,8 +18,8 @@ import { EntryCardGrid } from "../../components/entry-card-grid/entry-card-grid"
     MatCardModule,
     MatIconModule,
     MatPaginatorModule,
-    EntryCardGrid
-],
+    EntryCardGrid,
+  ],
   templateUrl: "./entry-list.html",
   styleUrl: "./entry-list.scss",
 })
@@ -71,7 +71,7 @@ export class EntryList implements OnInit {
     this.pageOffset.set(event.pageIndex * event.pageSize);
   }
 
-  setDeletedState(state: 'active' | 'deleted'): void {
+  setDeletedState(state: "active" | "deleted"): void {
     this.deletedSwitch.set(state === "deleted");
     this.pageOffset.set(0);
     this.pageSize.set(10);

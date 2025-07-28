@@ -1,4 +1,4 @@
-.PHONY: all backend frontend prepare-backend prepare-frontend prepare build-backend build-frontend build lint-backend lint-frontend lint format-backend format clean-backend clean-frontend clean release
+.PHONY: all backend frontend prepare-backend prepare-frontend prepare build-backend build-frontend build lint-backend lint-frontend lint format-backend format-frontend format clean-backend clean-frontend clean release
 
 all: build-backend build-frontend
 
@@ -35,7 +35,10 @@ lint: lint-backend lint-frontend
 format-backend:
 	$(MAKE) -C backend format
 
-format: format-backend
+format-frontend:
+	$(MAKE) -C frontend format
+
+format: format-backend format-frontend
 
 clean-backend:
 	$(MAKE) -C backend clean

@@ -1,12 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="handleSubmit()" class="entry-form">
   <mat-form-field class="full-width">
     <mat-label>Feeling</mat-label>
-    <input
-      matInput
-      formControlName="feeling"
-      autocomplete="off"
-      required
-    />
+    <input matInput formControlName="feeling" autocomplete="off" required />
     @if (form.controls["feeling"].hasError("required")) {
       <mat-error>This field is required</mat-error>
     }
@@ -14,11 +9,7 @@
 
   <mat-form-field class="full-width">
     <mat-label>Note (optional)</mat-label>
-    <textarea
-      matInput
-      formControlName="note"
-      rows="4"
-    ></textarea>
+    <textarea matInput formControlName="note" rows="4"></textarea>
   </mat-form-field>
 
   <button

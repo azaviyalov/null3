@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, output, signal } from "@angular/core";
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from "@angular/core";
 import { MatInputModule } from "@angular/material/input";
 import { EditEntryRequest, Entry } from "../../models/entry";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -7,7 +14,12 @@ import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: "app-entry-form",
-  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule],
+  imports: [
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: "./entry-form.html",
   styleUrl: "./entry-form.scss",
 })
