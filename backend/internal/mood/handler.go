@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,12 +21,14 @@ func RegisterRoutes(e *echo.Echo, h *Handler) {
 }
 
 type Handler struct {
-	service *Service
+	service   *Service
+	validator *validator.Validate
 }
 
 func NewHandler(service *Service) *Handler {
 	return &Handler{
-		service: service,
+		service:   service,
+		validator: validator.New(),
 	}
 }
 
@@ -90,6 +93,10 @@ func (h *Handler) CreateEntry(c echo.Context) error {
 		slog.Warn("failed to bind CreateEntry request", "error", err)
 		return echo.ErrBadRequest.WithInternal(err)
 	}
+	if err := h.validator.Struct(req); err != nil {
+		slog.Warn("validation failed for CreateEntry", "error", err)
+		return echo.NewHTTPError(http.StatusBadRequest, "validation failed").WithInternal(err)
+	}
 	resp, err := h.service.CreateEntry(0, req) // Assuming userID is 0 for simplicity, replace with actual user ID logic
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
@@ -116,6 +123,10 @@ func (h *Handler) UpdateEntry(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		slog.Warn("failed to bind UpdateEntry request", "error", err)
 		return echo.ErrBadRequest.WithInternal(err)
+	}
+	if err := h.validator.Struct(req); err != nil {
+		slog.Warn("validation failed for UpdateEntry", "error", err)
+		return echo.NewHTTPError(http.StatusBadRequest, "validation failed").WithInternal(err)
 	}
 
 	resp, err := h.service.UpdateEntry(0, uint(id), req) // Assuming userID is 0 for simplicity, replace with actual user ID logic
