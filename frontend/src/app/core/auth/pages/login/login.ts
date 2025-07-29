@@ -7,6 +7,8 @@ import { MatButtonModule } from "@angular/material/button";
 import { Auth } from "../../services/auth";
 import { LoginRequest } from "../../models/login";
 
+const HOME_ROUTE = "";
+
 @Component({
   selector: "app-login",
   standalone: true,
@@ -47,7 +49,7 @@ export class Login {
     this.auth.login(req).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate([""]);
+        this.router.navigate([HOME_ROUTE]);
       },
       error: () => {
         this.isSubmitting.set(false);
