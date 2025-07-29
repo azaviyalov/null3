@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,12 +15,12 @@ type User struct {
 func JWTMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			header := c.Request().Header.Get("Authorization")
-			if header == "" || !strings.HasPrefix(header, "Bearer ") {
-				err := errors.New("missing or invalid Authorization header")
+			cookie, err := c.Cookie("jwt_token")
+			if err != nil || cookie.Value == "" {
+				err := errors.New("missing or invalid jwt_token cookie")
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
-			tokenStr := strings.TrimPrefix(header, "Bearer ")
+			tokenStr := cookie.Value
 			claims, err := ParseJWT(tokenStr)
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)

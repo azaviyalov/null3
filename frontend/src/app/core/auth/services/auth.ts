@@ -41,7 +41,6 @@ export class Auth {
   login(data: LoginRequest): Observable<void> {
     return this.http.post<LoginResponse>(this.loginUrl, data).pipe(
       tap((response) => {
-        localStorage.setItem("jwt_token", response.token);
         this._user.next(response);
         this._isAuthenticated.next(true);
       }),
@@ -50,20 +49,10 @@ export class Auth {
   }
 
   logout(): void {
-    localStorage.removeItem("jwt_token");
     this._user.next(null);
     this._isAuthenticated.next(false);
   }
-
-  getToken(): string | null {
-    return localStorage.getItem("jwt_token");
-  }
-
   private fetchUser(): Observable<UserResponse | null> {
-    const token = this.getToken();
-    if (!token) {
-      return of(null);
-    }
     return this.http
       .get<UserResponse>(this.meUrl)
       .pipe(catchError(() => of(null)));

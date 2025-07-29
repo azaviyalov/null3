@@ -54,8 +54,9 @@ Environment variables can be set in the `.env` file.
 - The `DATABASE_URL` variable is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
 - The `LOG_LEVEL` variable is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
 - The `LOG_FORMAT` variable is used to set the logging format. Default is `json`. Options are `fancy`, `text` and `json`.
-- The `ENABLE_CORS` variable can be set to `true` to enable CORS. Default is `false`.
 - The `ENABLE_FRONTEND_DIST` variable can be set to `true` to enable serving the frontend from the backend. Default is `false`.
+- The `ENABLE_CORS` variable can be set to `true` to enable CORS. Default is `false`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `true`.
+- The `FRONTEND_URL` variable is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `true`.
 - The `API_URL` variable is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`.
 - The `JWT_SECRET` variable is used to sign JWT tokens. It must be set in `production` environments. Default is `example_secret`.
 
@@ -69,7 +70,6 @@ These environmental variables are for development purposes only, until user mana
 - [ ] Implement user management (registration, login, password reset)
 - [ ] Remove user data set from the environment variables
 - [ ] Add JWT token refresh functionality
-- [ ] Use `httpOnly` cookies for JWT tokens instead of local storage
 - [ ] Add more home page features (e.g., mood statistics, charts)
 - [ ] Improve error handling and logging
 

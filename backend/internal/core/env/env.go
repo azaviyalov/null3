@@ -33,6 +33,9 @@ func Setup() {
 	if os.Getenv("ENABLE_CORS") == "" {
 		os.Setenv("ENABLE_CORS", "false")
 	}
+	if os.Getenv("FRONTEND_URL") == "" {
+		os.Setenv("FRONTEND_URL", "http://localhost:4200")
+	}
 	if os.Getenv("API_URL") == "" {
 		os.Setenv("API_URL", fmt.Sprintf("http://localhost:%s/api", os.Getenv("PORT")))
 	}

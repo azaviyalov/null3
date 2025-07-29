@@ -16,8 +16,12 @@ func NewEchoServer() *echo.Echo {
 	e.HidePort = true
 
 	if os.Getenv("ENABLE_CORS") == "true" {
-		e.Use(middleware.CORS())
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     []string{os.Getenv("FRONTEND_URL")},
+			AllowCredentials: true,
+		}))
 	}
+
 	e.Use(logging.RequestLogger())
 	e.Use(middleware.Recover())
 

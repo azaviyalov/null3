@@ -21,11 +21,6 @@ type UserResponse struct {
 	ID uint `json:"id"`
 }
 
-type LoginResponse struct {
-	UserResponse
-	Token string `json:"token"`
-}
-
 func LoginHandler(c echo.Context) error {
 	slog.Debug("LoginHandler called", "method", c.Request().Method, "path", c.Path())
 	var req LoginRequest
@@ -60,14 +55,22 @@ func LoginHandler(c echo.Context) error {
 		slog.Error("failed to parse USER_ID", "error", err)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
-	loginResponse := LoginResponse{
-		UserResponse: UserResponse{
-			ID: uint(userID),
-		},
-		Token: token,
+	response := UserResponse{
+		ID: uint(userID),
 	}
 
-	return c.JSON(http.StatusOK, loginResponse)
+	cookie := new(http.Cookie)
+	cookie.Name = "jwt_token"
+	cookie.Value = token
+	cookie.HttpOnly = true
+	if os.Getenv("ENV") == "production" {
+		cookie.Secure = true // Use secure cookies in production
+	}
+	cookie.Path = "/"
+	cookie.SameSite = http.SameSiteStrictMode
+	c.SetCookie(cookie)
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func checkLoginCredentialsStub(req LoginRequest) error {
