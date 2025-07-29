@@ -1,4 +1,11 @@
-import { Component, inject, signal } from "@angular/core";
+import {
+  Component,
+  inject,
+  signal,
+  AfterViewInit,
+  ElementRef,
+  viewChild,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -22,10 +29,14 @@ const HOME_ROUTE = "";
   templateUrl: "./login.html",
   styleUrl: "./login.scss",
 })
-export class Login {
+export class Login implements AfterViewInit {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+
+  readonly loginInput = viewChild<ElementRef<HTMLInputElement>>("loginInput");
+  readonly passwordInput =
+    viewChild<ElementRef<HTMLInputElement>>("passwordInput");
 
   readonly form = this.fb.group({
     login: ["", Validators.required],
@@ -34,6 +45,13 @@ export class Login {
 
   readonly error = signal<string | null>(null);
   readonly isSubmitting = signal(false);
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.form.controls["login"].updateValueAndValidity();
+      this.form.controls["password"].updateValueAndValidity();
+    }, 100);
+  }
 
   login(): void {
     if (this.form.invalid) {
