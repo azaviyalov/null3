@@ -40,10 +40,9 @@ func Setup() {
 		if os.Getenv("ENV") == "production" {
 			fmt.Println("Error: JWT_SECRET must be set in production environments.")
 			os.Exit(1)
-		} else {
-			// Default value for non-production environments
-			os.Setenv("JWT_SECRET", "example_secret")
 		}
+		// Default value for non-production environments
+		os.Setenv("JWT_SECRET", "example_secret")
 	}
 	if os.Getenv("JWT_EXPIRATION") == "" {
 		os.Setenv("JWT_EXPIRATION", "24h")
