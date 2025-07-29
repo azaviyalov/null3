@@ -56,12 +56,12 @@ func Setup() {
 		os.Setenv("USER_ID", "1")
 	}
 	if os.Getenv("LOGIN") == "" {
-		os.Setenv("LOGIN", "login")
+		os.Setenv("LOGIN", "admin")
 	}
 	if os.Getenv("PASSWORD") == "" {
 		os.Setenv("PASSWORD", "password")
 	}
 	if os.Getenv("EMAIL") == "" {
-		os.Setenv("EMAIL", "user@example.com")
+		os.Setenv("EMAIL", "admin@example.com")
 	}
 }

@@ -62,9 +62,9 @@ Environment variables can be set in the `.env` file.
 
 These environmental variables are for development purposes only, until user management is implemented.
 - The `USER_ID` variable is used to set the user ID for the user. Default is `1`.
-- The `LOGIN` variable is used to set the login for the user. Default is `user`.
+- The `LOGIN` variable is used to set the login for the user. Default is `admin`.
 - The `PASSWORD` variable is used to set the password for the user. Default is `password`.
-- The `EMAIL` variable is used to set the email for the user. Default is `user@example.com`.
+- The `EMAIL` variable is used to set the email for the user. Default is `admin@example.com`.
 
 ## TODOs
 - [ ] Implement user management (registration, login, password reset)
