@@ -17,7 +17,14 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type LoginResponse User
+type UserResponse struct {
+	ID uint `json:"id"`
+}
+
+type LoginResponse struct {
+	UserResponse
+	Token string `json:"token"`
+}
 
 func LoginHandler(c echo.Context) error {
 	slog.Debug("LoginHandler called", "method", c.Request().Method, "path", c.Path())
@@ -53,12 +60,14 @@ func LoginHandler(c echo.Context) error {
 		slog.Error("failed to parse USER_ID", "error", err)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
-	loginResponseStub := LoginResponse{
-		ID:    uint(userID),
+	loginResponse := LoginResponse{
+		UserResponse: UserResponse{
+			ID: uint(userID),
+		},
 		Token: token,
 	}
 
-	return c.JSON(http.StatusOK, loginResponseStub)
+	return c.JSON(http.StatusOK, loginResponse)
 }
 
 func checkLoginCredentialsStub(req LoginRequest) error {
@@ -89,5 +98,8 @@ func MeHandler(c echo.Context) error {
 		}
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
-	return c.JSON(http.StatusOK, user)
+	meResponse := UserResponse{
+		ID: user.ID,
+	}
+	return c.JSON(http.StatusOK, meResponse)
 }

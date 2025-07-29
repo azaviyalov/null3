@@ -1,10 +1,10 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { map, tap, catchError, filter } from "rxjs/operators";
+import { tap, catchError, filter, ignoreElements } from "rxjs/operators";
 import { environment } from "../../../../environments/environment";
-import { LoginRequest } from "../models/login";
-import { UserInfo } from "../models/user-info";
+import { LoginRequest, LoginResponse } from "../models/login";
+import { UserResponse } from "../models/user";
 
 @Injectable({ providedIn: "root" })
 export class Auth {
@@ -12,7 +12,7 @@ export class Auth {
   private readonly loginUrl = `${environment.apiUrl}/auth/login`;
   private readonly meUrl = `${environment.apiUrl}/auth/me`;
 
-  private _user = new BehaviorSubject<UserInfo | null>(null);
+  private _user = new BehaviorSubject<UserResponse | null>(null);
   private _isAuthenticated = new BehaviorSubject<boolean | null>(null);
 
   init(): void {
@@ -28,7 +28,7 @@ export class Auth {
     });
   }
 
-  get user$(): Observable<UserInfo | null> {
+  get user$(): Observable<UserResponse | null> {
     return this._user.asObservable();
   }
 
@@ -39,13 +39,13 @@ export class Auth {
   }
 
   login(data: LoginRequest): Observable<void> {
-    return this.http.post<UserInfo>(this.loginUrl, data).pipe(
+    return this.http.post<LoginResponse>(this.loginUrl, data).pipe(
       tap((response) => {
         localStorage.setItem("jwt_token", response.token);
         this._user.next(response);
         this._isAuthenticated.next(true);
       }),
-      map(() => void 0),
+      ignoreElements(),
     );
   }
 
@@ -59,11 +59,13 @@ export class Auth {
     return localStorage.getItem("jwt_token");
   }
 
-  private fetchUser(): Observable<UserInfo | null> {
+  private fetchUser(): Observable<UserResponse | null> {
     const token = this.getToken();
     if (!token) {
       return of(null);
     }
-    return this.http.get<UserInfo>(this.meUrl).pipe(catchError(() => of(null)));
+    return this.http
+      .get<UserResponse>(this.meUrl)
+      .pipe(catchError(() => of(null)));
   }
 }
