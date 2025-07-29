@@ -50,8 +50,8 @@ clean: clean-backend clean-frontend
 	rm null3-server || true
 
 release:
-	rm -rf backend/internal/frontend/fs/*
+	rm -rf backend/internal/core/frontend/fs/*
 	$(MAKE) -C frontend build
-	cp -r frontend/dist/frontend/browser/* backend/internal/frontend/fs/
+	cp -r frontend/dist/frontend/browser/* backend/internal/core/frontend/fs/
 	$(MAKE) -C backend build
 	cp backend/bin/server ./null3-server

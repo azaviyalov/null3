@@ -22,8 +22,8 @@ null3.db
 
 # Go
 backend/bin/
-backend/internal/frontend/fs/*
-!backend/internal/frontend/fs/.gitkeep
+backend/internal/core/frontend/fs/*
+!backend/internal/core/frontend/fs/.gitkeep
 backend/null3.db
 backend/coverage.out
 
