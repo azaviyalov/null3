@@ -33,7 +33,7 @@ export class Login {
   readonly error = signal<string | null>(null);
   readonly isSubmitting = signal(false);
 
-  onLogin(): void {
+  login(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

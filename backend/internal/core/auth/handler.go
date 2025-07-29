@@ -73,9 +73,8 @@ func checkLoginCredentialsStub(req LoginRequest) error {
 }
 
 func generateTokenStub() (string, error) {
-	userIDparam := os.Getenv("USER_ID")
-	userID, _ := strconv.ParseUint(userIDparam, 10, 64)
-	token, err := GenerateJWT(uint(userID))
+	userID := os.Getenv("USER_ID")
+	token, err := GenerateJWT(userID)
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", ErrTokenGenerationFailed, err)
 	}

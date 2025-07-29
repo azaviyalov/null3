@@ -49,13 +49,15 @@ This is a pet project, focusing on simplicity and ease of development. Built for
 
 ## Configuration
 Environment variables can be set in the `.env` file.
-- The `DATABASE_URL` variable is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
+- The `ENV` variable is used to set the environment. Default is `production`. Options are `development` and `production`.
 - The `PORT` variable is used to set the backend server port. Default is `8080`.
+- The `DATABASE_URL` variable is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
 - The `LOG_LEVEL` variable is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
 - The `LOG_FORMAT` variable is used to set the logging format. Default is `json`. Options are `fancy`, `text` and `json`.
 - The `ENABLE_CORS` variable can be set to `true` to enable CORS. Default is `false`.
 - The `ENABLE_FRONTEND_DIST` variable can be set to `true` to enable serving the frontend from the backend. Default is `false`.
 - The `API_URL` variable is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`.
+- The `JWT_SECRET` variable is used to sign JWT tokens. It must be set in `production` environments. Default is `example_secret`.
 
 ## TODOs
 - [ ] Implement user authentication

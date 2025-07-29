@@ -8,11 +8,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(userID uint) (string, error) {
+func GenerateJWT(userID string) (string, error) {
 	exp := time.Now().Add(time.Hour)
 	claims := jwt.RegisteredClaims{
 		Issuer:    "null3",
-		Subject:   fmt.Sprintf("%d", userID),
+		Subject:   userID,
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ExpiresAt: jwt.NewNumericDate(exp),
 	}

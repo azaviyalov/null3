@@ -12,6 +12,9 @@ func Setup() {
 	_ = godotenv.Load()
 
 	// Set config defaults if not set
+	if os.Getenv("ENV") == "" {
+		os.Setenv("ENV", "production")
+	}
 	if os.Getenv("PORT") == "" {
 		os.Setenv("PORT", "8080")
 	}
@@ -34,8 +37,13 @@ func Setup() {
 		os.Setenv("API_URL", fmt.Sprintf("http://localhost:%s/api", os.Getenv("PORT")))
 	}
 	if os.Getenv("JWT_SECRET") == "" {
-		// Stronger warning for production
-		os.Setenv("JWT_SECRET", "example_secret") // WARNING: Replace with a secure secret in production!
+		if os.Getenv("ENV") == "production" {
+			fmt.Println("Error: JWT_SECRET must be set in production environments.")
+			os.Exit(1)
+		} else {
+			// Default value for non-production environments
+			os.Setenv("JWT_SECRET", "example_secret")
+		}
 	}
 
 	// These are placeholders until user management is implemented
