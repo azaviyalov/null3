@@ -45,6 +45,9 @@ func Setup() {
 			os.Setenv("JWT_SECRET", "example_secret")
 		}
 	}
+	if os.Getenv("JWT_EXPIRATION") == "" {
+		os.Setenv("JWT_EXPIRATION", "24h")
+	}
 
 	// These are placeholders until user management is implemented
 	if os.Getenv("USER_ID") == "" {
