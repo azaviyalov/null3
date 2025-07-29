@@ -94,13 +94,7 @@ func generateTokenStub() (string, error) {
 }
 
 func MeHandler(c echo.Context) error {
-	user, err := GetUser(c)
-	if err != nil {
-		if errors.Is(err, ErrUserNotAuthenticated) {
-			return echo.ErrUnauthorized.WithInternal(err)
-		}
-		return echo.ErrInternalServerError.WithInternal(err)
-	}
+	user, _ := GetUser(c)
 	meResponse := UserResponse{
 		ID: user.ID,
 	}
