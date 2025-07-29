@@ -53,7 +53,7 @@ export class Login {
       },
       error: () => {
         this.isSubmitting.set(false);
-        this.error.set("Invalid credentials");
+        this.error.set("Failed to login");
       },
     });
   }
