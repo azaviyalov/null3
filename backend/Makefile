@@ -1,6 +1,6 @@
 .PHONY: prepare build lint staticcheck vet clean clean-db build-all
 
-FRONTEND_DIST=internal/frontend/dist
+FRONTEND_DIST=internal/core/frontend/fs
 
 prepare:
 	go mod tidy
@@ -21,7 +21,7 @@ format:
 	go fmt ./...
 
 clean:
-	rm -rf bin/ $(FRONTEND_DIST)/browser/*
+	rm -rf bin/ $(FRONTEND_DIST)/*
 
 clean-db:
 	rm -f null3.db

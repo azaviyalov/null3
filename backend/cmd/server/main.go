@@ -12,9 +12,9 @@ import (
 	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
 	"github.com/azaviyalov/null3/backend/internal/core/env"
+	"github.com/azaviyalov/null3/backend/internal/core/frontend"
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/core/server"
-	"github.com/azaviyalov/null3/backend/internal/frontend"
 	"github.com/azaviyalov/null3/backend/internal/mood"
 )
 
