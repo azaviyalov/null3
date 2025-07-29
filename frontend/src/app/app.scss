@@ -19,3 +19,7 @@ mat-toolbar {
 .active-link {
   background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
 }
+
+.spacer {
+  flex: 1 1 auto;
+}

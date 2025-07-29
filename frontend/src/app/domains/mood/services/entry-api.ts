@@ -9,12 +9,14 @@ import {
   PaginatedEntryListView,
   EditEntryRequest,
 } from "../models/entry";
+import { Auth } from "../../../core/auth/services/auth";
 
 @Injectable({
   providedIn: "root",
 })
 export class EntryApi {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(Auth);
   private readonly baseUrl = `${environment.apiUrl}/mood/entries`;
 
   getPaged(
@@ -26,7 +28,6 @@ export class EntryApi {
       .set("limit", limit)
       .set("offset", offset)
       .set("deleted", deleted);
-
     return this.http
       .get<PaginatedEntryListView>(this.baseUrl, { params })
       .pipe(map(PaginatedEntryList.fromView));

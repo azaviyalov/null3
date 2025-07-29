@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
 	"github.com/azaviyalov/null3/backend/internal/core/env"
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
@@ -26,7 +27,9 @@ func main() {
 
 	e := server.NewEchoServer()
 
+	auth.InitModule(e)
 	mood.InitModule(e, database)
+
 	if os.Getenv("ENABLE_FRONTEND_DIST") == "true" {
 		slog.Info("serving frontend dist", "API_URL", os.Getenv("API_URL"))
 		frontend.InitModule(e)
