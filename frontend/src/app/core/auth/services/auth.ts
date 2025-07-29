@@ -35,13 +35,12 @@ export class Auth {
     return this._isAuthenticated.asObservable();
   }
 
-  login(data: LoginRequest): Observable<void> {
+  login(data: LoginRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(this.loginUrl, data).pipe(
       tap((response) => {
         this._user.next(response);
         this._isAuthenticated.next(true);
       }),
-      ignoreElements(),
     );
   }
 
