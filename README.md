@@ -58,7 +58,7 @@ Environment variables can be set in the `.env` file.
 - The `ENABLE_CORS` variable can be set to `true` to enable CORS. Default is `false`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `true`.
 - The `FRONTEND_URL` variable is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `true`.
 - The `API_URL` variable is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`.
-- The `JWT_SECRET` variable is used to sign JWT tokens. It must be set in `production` environments. Default is `example_secret`.
+- The `JWT_SECRET` variable is used to sign JWT tokens. It must be set in `production` environments. Default is generated randomly in development purposes.
 
 These environmental variables are for development purposes only, until user management is implemented.
 - The `USER_ID` variable is used to set the user ID for the user. Default is `1`.

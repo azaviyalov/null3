@@ -1,6 +1,8 @@
 package env
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -44,8 +46,9 @@ func Setup() {
 			fmt.Println("Error: JWT_SECRET must be set in production environments.")
 			os.Exit(1)
 		}
-		// Default value for non-production environments
-		os.Setenv("JWT_SECRET", "example_secret")
+
+		fmt.Println("Warning: JWT_SECRET not set, generating a random secret for development")
+		os.Setenv("JWT_SECRET", generateRandomSecret())
 	}
 	if os.Getenv("JWT_EXPIRATION") == "" {
 		os.Setenv("JWT_EXPIRATION", "24h")
@@ -64,4 +67,15 @@ func Setup() {
 	if os.Getenv("EMAIL") == "" {
 		os.Setenv("EMAIL", "admin@example.com")
 	}
+}
+
+func generateRandomSecret() string {
+	const secretLen = 32
+	b := make([]byte, secretLen)
+	_, err := rand.Read(b)
+	if err != nil {
+		// fallback: return a static string if random fails
+		return "fallback_secret"
+	}
+	return base64.RawURLEncoding.EncodeToString(b)
 }
