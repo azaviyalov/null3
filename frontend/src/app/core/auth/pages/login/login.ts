@@ -6,6 +6,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { Auth } from "../../services/auth";
 import { LoginRequest } from "../../models/login";
+import { HttpErrorResponse } from "@angular/common/http";
 
 const HOME_ROUTE = "";
 
@@ -51,10 +52,20 @@ export class Login {
         this.isSubmitting.set(false);
         this.router.navigate([HOME_ROUTE]);
       },
-      error: () => {
-        this.isSubmitting.set(false);
-        this.error.set("Failed to login");
-      },
+      error: (err) => this.handleError(err),
     });
+  }
+
+  private handleError(error: HttpErrorResponse): void {
+    this.isSubmitting.set(false);
+    let message = "Failed to login";
+    if (error.status === 0) {
+      message = "Network error. Please check your connection.";
+    } else if (error.status === 401) {
+      message = "Unauthorized: Incorrect login credentials.";
+    } else if (error.status === 500) {
+      message = "Server error. Please try again later.";
+    }
+    this.error.set(message);
   }
 }
