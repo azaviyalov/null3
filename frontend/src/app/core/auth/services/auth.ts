@@ -16,7 +16,7 @@ export class Auth {
   private _isAuthenticated = new BehaviorSubject<boolean | null>(null);
 
   init(): void {
-    this.fetchUser().subscribe({
+    this.fetchCurrentUser().subscribe({
       next: (user) => {
         this._user.next(user);
         this._isAuthenticated.next(user !== null);
@@ -52,7 +52,7 @@ export class Auth {
     this._user.next(null);
     this._isAuthenticated.next(false);
   }
-  private fetchUser(): Observable<UserResponse | null> {
+  private fetchCurrentUser(): Observable<UserResponse | null> {
     return this.http
       .get<UserResponse>(this.meUrl)
       .pipe(catchError(() => of(null)));
