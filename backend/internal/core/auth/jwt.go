@@ -9,7 +9,9 @@ import (
 )
 
 func GenerateJWT(userID string) (string, error) {
-	exp := time.Now().Add(time.Hour)
+	expPeriodParam := os.Getenv("JWT_EXPIRATION")
+	expPeriod, _ := time.ParseDuration(expPeriodParam)
+	exp := time.Now().Add(expPeriod)
 	claims := jwt.RegisteredClaims{
 		Issuer:    "null3",
 		Subject:   userID,
