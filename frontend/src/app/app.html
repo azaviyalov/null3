@@ -1,23 +1,35 @@
 <mat-toolbar>
   <div class="toolbar-container">
-    <button
-      matButton
-      matRipple
-      routerLink="/"
-      routerLinkActive="active-link"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-      Home
-    </button>
-    <button
-      matButton
-      matRipple
-      routerLink="/mood/entries"
-      routerLinkActive="active-link"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-      Mood Entries
-    </button>
+    @if (!user()) {
+      <button
+        matButton
+        matRipple
+        routerLink="/login"
+        routerLinkActive="active-link"
+      >
+        Login
+      </button>
+    }
+    @if (user()) {
+      <button
+        matButton
+        matRipple
+        routerLink="/"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Home
+      </button>
+      <button
+        matButton
+        matRipple
+        routerLink="/mood/entries"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Mood Entries
+      </button>
+    }
     <button
       matButton
       matRipple
@@ -26,6 +38,11 @@
     >
       About
     </button>
+    @if (user()) {
+      <button matButton matRipple (click)="logout()" routerLink="/logout">
+        Logout
+      </button>
+    }
   </div>
 </mat-toolbar>
 <main class="container">

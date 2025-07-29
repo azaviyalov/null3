@@ -33,4 +33,22 @@ func Setup() {
 	if os.Getenv("API_URL") == "" {
 		os.Setenv("API_URL", fmt.Sprintf("http://localhost:%s/api", os.Getenv("PORT")))
 	}
+	if os.Getenv("JWT_SECRET") == "" {
+		// Stronger warning for production
+		os.Setenv("JWT_SECRET", "example_secret") // WARNING: Replace with a secure secret in production!
+	}
+
+	// These are placeholders until user management is implemented
+	if os.Getenv("USER_ID") == "" {
+		os.Setenv("USER_ID", "1")
+	}
+	if os.Getenv("LOGIN") == "" {
+		os.Setenv("LOGIN", "login")
+	}
+	if os.Getenv("PASSWORD") == "" {
+		os.Setenv("PASSWORD", "password")
+	}
+	if os.Getenv("EMAIL") == "" {
+		os.Setenv("EMAIL", "user@example.com")
+	}
 }

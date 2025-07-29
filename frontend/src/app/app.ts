@@ -1,8 +1,10 @@
-import { Component, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatRippleModule } from "@angular/material/core";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { RouterModule } from "@angular/router";
+import { Auth } from "./core/auth/services/auth";
+import { toSignal } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-root",
@@ -12,4 +14,16 @@ import { RouterModule } from "@angular/router";
 })
 export class App {
   protected readonly title = signal("null3");
+
+  private readonly auth = inject(Auth);
+
+  readonly user = toSignal(this.auth.user$, { initialValue: null });
+
+  constructor() {
+    this.auth.init();
+  }
+
+  logout(): void {
+    this.auth.logout();
+  }
 }

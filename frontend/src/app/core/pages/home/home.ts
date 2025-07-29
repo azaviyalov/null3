@@ -3,9 +3,9 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { RouterModule } from "@angular/router";
-import { EntryCardGrid } from "../../domains/mood/components/entry-card-grid/entry-card-grid";
-import { EntryApi } from "../../domains/mood/services/entry-api";
+import { EntryCardGrid } from "../../../domains/mood/components/entry-card-grid/entry-card-grid";
 import { toSignal } from "@angular/core/rxjs-interop";
+import { EntryApi } from "../../../domains/mood/services/entry-api";
 
 @Component({
   selector: "app-home",
