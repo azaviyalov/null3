@@ -59,8 +59,18 @@ Environment variables can be set in the `.env` file.
 - The `API_URL` variable is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`.
 - The `JWT_SECRET` variable is used to sign JWT tokens. It must be set in `production` environments. Default is `example_secret`.
 
+These environmental variables are for development purposes only, until user management is implemented.
+- The `USER_ID` variable is used to set the user ID for the user. Default is `1`.
+- The `LOGIN` variable is used to set the login for the user. Default is `user`.
+- The `PASSWORD` variable is used to set the password for the user. Default is `password`.
+- The `EMAIL` variable is used to set the email for the user. Default is `user@example.com`.
+
 ## TODOs
-- [ ] Implement user authentication
+- [ ] Implement user management (registration, login, password reset)
+- [ ] Remove user data set from the environment variables
+- [ ] Add JWT token refresh functionality
+- [ ] Add more frontend features (e.g., mood statistics, charts)
+- [ ] Improve error handling and logging
 
 ## License
 MIT
