@@ -64,7 +64,7 @@ func LoginHandler(c echo.Context) error {
 	cookie.Value = token
 	cookie.HttpOnly = true
 	if os.Getenv("ENV") == "production" {
-		cookie.Secure = true // Use secure cookies in production
+		cookie.Secure = true
 	}
 	cookie.Path = "/"
 	cookie.SameSite = http.SameSiteStrictMode
