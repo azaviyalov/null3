@@ -2,9 +2,6 @@ import {
   Component,
   inject,
   signal,
-  AfterViewInit,
-  ElementRef,
-  viewChild,
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
@@ -29,14 +26,10 @@ const HOME_ROUTE = "";
   templateUrl: "./login.html",
   styleUrl: "./login.scss",
 })
-export class Login implements AfterViewInit {
+export class Login {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
-
-  readonly loginInput = viewChild<ElementRef<HTMLInputElement>>("loginInput");
-  readonly passwordInput =
-    viewChild<ElementRef<HTMLInputElement>>("passwordInput");
 
   readonly form = this.fb.group({
     login: ["", Validators.required],
@@ -45,12 +38,6 @@ export class Login implements AfterViewInit {
 
   readonly error = signal<string | null>(null);
   readonly isSubmitting = signal(false);
-
-  ngAfterViewInit(): void {
-    // Update validity, so you don't have to click login button twice
-    this.form.controls["login"].updateValueAndValidity();
-    this.form.controls["password"].updateValueAndValidity();
-  }
 
   login(): void {
     if (this.form.invalid) {
