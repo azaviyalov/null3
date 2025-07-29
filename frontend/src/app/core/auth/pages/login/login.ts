@@ -47,6 +47,7 @@ export class Login implements AfterViewInit {
   readonly isSubmitting = signal(false);
 
   ngAfterViewInit(): void {
+    // Update validity, so you don't have to click login button twice
     this.form.controls["login"].updateValueAndValidity();
     this.form.controls["password"].updateValueAndValidity();
   }
