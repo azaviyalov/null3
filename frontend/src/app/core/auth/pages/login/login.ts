@@ -1,8 +1,4 @@
-import {
-  Component,
-  inject,
-  signal,
-} from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
