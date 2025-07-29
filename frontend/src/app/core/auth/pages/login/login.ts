@@ -47,7 +47,7 @@ export class Login {
       password: this.form.value.password!,
     };
     this.auth.login(req).subscribe({
-      next: () => {
+      complete: () => {
         this.isSubmitting.set(false);
         this.router.navigate([HOME_ROUTE]);
       },
