@@ -40,7 +40,7 @@ func JWTMiddleware() echo.MiddlewareFunc {
 func GetUser(c echo.Context) (*User, error) {
 	user := c.Get("user")
 	if user == nil {
-		return nil, fmt.Errorf("user not nil: %w", ErrUserNotAuthenticated)
+		return nil, fmt.Errorf("user is nil: %w", ErrUserNotAuthenticated)
 	}
 	u, ok := user.(*User)
 	if !ok {
