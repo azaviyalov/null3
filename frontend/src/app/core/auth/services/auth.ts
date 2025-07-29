@@ -18,7 +18,12 @@ export class Auth {
   init(): void {
     this.http
       .get<UserResponse>(this.meUrl)
-      .pipe(catchError(() => of(null)))
+      .pipe(
+        catchError((error) => {
+          console.error("Error during authentication initialization:", error);
+          return of(null);
+        }),
+      )
       .subscribe({
         next: (user) => {
           this._user.next(user);
