@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -39,11 +40,11 @@ func JWTMiddleware() echo.MiddlewareFunc {
 func GetUser(c echo.Context) (*User, error) {
 	user := c.Get("user")
 	if user == nil {
-		return nil, ErrUserNotAuthenticated
+		return nil, fmt.Errorf("user not nil: %w", ErrUserNotAuthenticated)
 	}
 	u, ok := user.(*User)
 	if !ok {
-		return nil, ErrUserInvalidType
+		return nil, fmt.Errorf("invalid user type: expected *User, got %T: %w", user, ErrUserInvalidType)
 	}
 	return u, nil
 }
