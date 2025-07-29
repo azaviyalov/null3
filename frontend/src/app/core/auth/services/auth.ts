@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, of } from "rxjs";
 import { tap, catchError, filter, ignoreElements } from "rxjs/operators";
 import { environment } from "../../../../environments/environment";
-import { LoginRequest, LoginResponse } from "../models/login";
+import { LoginRequest } from "../models/login";
 import { UserResponse } from "../models/user";
 
 @Injectable({ providedIn: "root" })
@@ -39,7 +39,7 @@ export class Auth {
   }
 
   login(data: LoginRequest): Observable<void> {
-    return this.http.post<LoginResponse>(this.loginUrl, data).pipe(
+    return this.http.post<UserResponse>(this.loginUrl, data).pipe(
       tap((response) => {
         this._user.next(response);
         this._isAuthenticated.next(true);
