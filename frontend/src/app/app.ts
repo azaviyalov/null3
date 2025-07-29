@@ -2,7 +2,7 @@ import { Component, inject, signal } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatRippleModule } from "@angular/material/core";
 import { MatToolbarModule } from "@angular/material/toolbar";
-import { RouterModule } from "@angular/router";
+import { RouterModule, Router } from "@angular/router";
 import { Auth } from "./core/auth/services/auth";
 import { toSignal } from "@angular/core/rxjs-interop";
 
@@ -16,6 +16,7 @@ export class App {
   protected readonly title = signal("null3");
 
   private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
 
   readonly user = toSignal(this.auth.user$, { initialValue: null });
 
@@ -24,6 +25,8 @@ export class App {
   }
 
   logout(): void {
-    this.auth.logout();
+    this.auth.logout().subscribe({
+      next: () => this.router.navigate(["/login"]),
+    });
   }
 }

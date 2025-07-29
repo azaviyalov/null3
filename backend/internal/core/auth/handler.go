@@ -100,3 +100,18 @@ func MeHandler(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, meResponse)
 }
+
+func LogoutHandler(c echo.Context) error {
+	cookie := new(http.Cookie)
+	cookie.Name = "jwt_token"
+	cookie.Value = ""
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	cookie.MaxAge = -1
+	cookie.SameSite = http.SameSiteLaxMode
+	if os.Getenv("ENV") == "production" {
+		cookie.Secure = true
+	}
+	c.SetCookie(cookie)
+	return c.NoContent(http.StatusNoContent)
+}

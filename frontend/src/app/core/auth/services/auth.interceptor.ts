@@ -27,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
       .pipe(
         catchError((err) => {
           if (err instanceof HttpErrorResponse && err.status === 401) {
-            this.auth.logout();
+            this.auth.clearSession();
           }
           return throwError(() => err);
         }),

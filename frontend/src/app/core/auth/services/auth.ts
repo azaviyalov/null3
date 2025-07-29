@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { tap, catchError, ignoreElements } from "rxjs/operators";
+import { tap, catchError } from "rxjs/operators";
 import { environment } from "../../../../environments/environment";
 import { LoginRequest } from "../models/login";
 import { UserResponse } from "../models/user";
@@ -44,8 +44,17 @@ export class Auth {
     );
   }
 
-  logout(): void {
+  clearSession() {
     this._user.next(null);
     this._isAuthenticated.next(false);
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/auth/logout`, {}).pipe(
+      tap(() => {
+        this._user.next(null);
+        this._isAuthenticated.next(false);
+      }),
+    );
   }
 }
