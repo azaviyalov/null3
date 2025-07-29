@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -16,8 +15,7 @@ func JWTMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cookie, err := c.Cookie("jwt_token")
-			if err != nil || cookie.Value == "" {
-				err := errors.New("missing or invalid jwt_token cookie")
+			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
 			tokenStr := cookie.Value
@@ -27,7 +25,7 @@ func JWTMiddleware() echo.MiddlewareFunc {
 			}
 			userID, err := strconv.ParseUint(claims.Subject, 10, 64)
 			if err != nil {
-				return echo.ErrUnauthorized.WithInternal(errors.New("invalid user id in token"))
+				return echo.ErrUnauthorized.WithInternal(err)
 			}
 			c.Set("user", &User{
 				ID:    uint(userID),
@@ -45,7 +43,7 @@ func GetUser(c echo.Context) (*User, error) {
 	}
 	u, ok := user.(*User)
 	if !ok {
-		return nil, errors.New("user context is not of type *User")
+		return nil, ErrUserInvalidType
 	}
 	return u, nil
 }
