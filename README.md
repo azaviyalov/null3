@@ -4,7 +4,7 @@
 
 A web application for mood tracking, built with Go (backend) and Angular (frontend).
 
-This is a pet project, focusing on simplicity and ease of development. Built for fun. It is not intended for production use (you can use it in production, but do so at your own risk).
+This is a pet project, focusing on simplicity and ease of development. Written for fun. It is not intended for production use (you can use it in production, but do so at your own risk).
 
 ## Features
 - Track and manage mood entries
