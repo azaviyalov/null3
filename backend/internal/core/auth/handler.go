@@ -113,5 +113,5 @@ func LogoutHandler(c echo.Context) error {
 		cookie.Secure = true
 	}
 	c.SetCookie(cookie)
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusOK, map[string]string{"message": "logged out"})
 }
