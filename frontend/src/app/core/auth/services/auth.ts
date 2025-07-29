@@ -16,16 +16,15 @@ export class Auth {
   private _isAuthenticated = new BehaviorSubject<boolean | null>(null);
 
   init(): void {
-    this.fetchCurrentUser().subscribe({
-      next: (user) => {
-        this._user.next(user);
-        this._isAuthenticated.next(user !== null);
-      },
-      error: () => {
-        this._user.next(null);
-        this._isAuthenticated.next(false);
-      },
-    });
+    this.http
+      .get<UserResponse>(this.meUrl)
+      .pipe(catchError(() => of(null)))
+      .subscribe({
+        next: (user) => {
+          this._user.next(user);
+          this._isAuthenticated.next(user !== null);
+        },
+      });
   }
 
   get user$(): Observable<UserResponse | null> {
@@ -51,10 +50,5 @@ export class Auth {
   logout(): void {
     this._user.next(null);
     this._isAuthenticated.next(false);
-  }
-  private fetchCurrentUser(): Observable<UserResponse | null> {
-    return this.http
-      .get<UserResponse>(this.meUrl)
-      .pipe(catchError(() => of(null)));
   }
 }
