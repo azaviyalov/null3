@@ -47,10 +47,8 @@ export class Login implements AfterViewInit {
   readonly isSubmitting = signal(false);
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.form.controls["login"].updateValueAndValidity();
-      this.form.controls["password"].updateValueAndValidity();
-    }, 100);
+    this.form.controls["login"].updateValueAndValidity();
+    this.form.controls["password"].updateValueAndValidity();
   }
 
   login(): void {
