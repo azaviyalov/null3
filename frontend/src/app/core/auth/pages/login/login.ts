@@ -8,7 +8,7 @@ import { Auth } from "../../services/auth";
 import { LoginRequest } from "../../models/login";
 import { HttpErrorResponse } from "@angular/common/http";
 
-const HOME_ROUTE = "";
+const ROOT_ROUTE = "";
 
 @Component({
   selector: "app-login",
@@ -51,7 +51,7 @@ export class Login {
     this.auth.login(req).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate([HOME_ROUTE]);
+        this.router.navigate([ROOT_ROUTE]);
       },
       error: (err) => this.handleError(err),
     });
