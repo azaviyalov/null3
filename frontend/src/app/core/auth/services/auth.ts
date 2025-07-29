@@ -31,10 +31,8 @@ export class Auth {
     return this._user.asObservable();
   }
 
-  get isAuthenticated$(): Observable<boolean> {
-    return this._isAuthenticated
-      .asObservable()
-      .pipe(filter((value) => value !== null));
+  get isAuthenticated$(): Observable<boolean | null> {
+    return this._isAuthenticated.asObservable();
   }
 
   login(data: LoginRequest): Observable<void> {
