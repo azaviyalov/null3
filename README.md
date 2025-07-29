@@ -69,7 +69,8 @@ These environmental variables are for development purposes only, until user mana
 - [ ] Implement user management (registration, login, password reset)
 - [ ] Remove user data set from the environment variables
 - [ ] Add JWT token refresh functionality
-- [ ] Add more frontend features (e.g., mood statistics, charts)
+- [ ] Use `httpOnly` cookies for JWT tokens instead of local storage
+- [ ] Add more home page features (e.g., mood statistics, charts)
 - [ ] Improve error handling and logging
 
 ## License
