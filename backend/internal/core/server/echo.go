@@ -29,11 +29,6 @@ func NewEchoServer() *echo.Echo {
 
 	auth.RegisterAuthRoutes(e)
 
-	// Add a health check endpoint for frontend to check backend status
-	e.GET("/api/healthz", func(c echo.Context) error {
-		return c.JSON(200, echo.Map{"status": "ok"})
-	})
-
 	return e
 }
 
