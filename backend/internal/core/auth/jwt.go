@@ -2,16 +2,13 @@ package auth
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(userID string) (string, error) {
-	expPeriodParam := os.Getenv("JWT_EXPIRATION")
-	expPeriod, _ := time.ParseDuration(expPeriodParam)
-	exp := time.Now().Add(expPeriod)
+func GenerateJWT(config Config, userID string) (string, error) {
+	exp := time.Now().Add(config.JWTExpiration)
 	claims := jwt.RegisteredClaims{
 		Issuer:    "null3",
 		Subject:   userID,
@@ -19,12 +16,12 @@ func GenerateJWT(userID string) (string, error) {
 		ExpiresAt: jwt.NewNumericDate(exp),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	return token.SignedString([]byte(config.JWTSecret))
 }
 
-func ParseJWT(tokenStr string) (*jwt.RegisteredClaims, error) {
+func ParseJWT(config Config, tokenStr string) (*jwt.RegisteredClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(config.JWTSecret), nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrTokenInvalid, err)

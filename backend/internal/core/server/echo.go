@@ -1,23 +1,20 @@
 package server
 
 import (
-	"os"
-
-	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewEchoServer() *echo.Echo {
+func NewEchoServer(config Config) *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
 	e.HidePort = true
 
-	if os.Getenv("ENABLE_CORS") == "true" {
+	if config.EnableCORS {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{os.Getenv("FRONTEND_URL")},
+			AllowOrigins:     []string{config.FrontendURL},
 			AllowCredentials: true,
 		}))
 	}
@@ -26,8 +23,6 @@ func NewEchoServer() *echo.Echo {
 	e.Use(middleware.Recover())
 
 	e.Validator = newCustomValidator()
-
-	auth.RegisterAuthRoutes(e)
 
 	return e
 }

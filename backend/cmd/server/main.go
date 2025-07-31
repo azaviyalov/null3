@@ -11,29 +11,37 @@ import (
 
 	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
-	"github.com/azaviyalov/null3/backend/internal/core/env"
 	"github.com/azaviyalov/null3/backend/internal/core/frontend"
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/core/server"
 	"github.com/azaviyalov/null3/backend/internal/mood"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	env.Setup()
-	logging.Setup()
+	// Load environment variables from .env file
+	_ = godotenv.Load()
 
-	database := db.Connect()
-	db.AutoMigrate(database)
-
-	e := server.NewEchoServer()
-
-	auth.InitModule(e)
-	mood.InitModule(e, database)
-
-	if os.Getenv("ENABLE_FRONTEND_DIST") == "true" {
-		slog.Info("serving frontend dist", "API_URL", os.Getenv("API_URL"))
-		frontend.InitModule(e)
+	config, err := GetConfig()
+	if err != nil {
+		slog.Error("failed to get configuration", "error", err)
+		os.Exit(1)
 	}
+
+	logging.Setup(config.Logging)
+
+	database, err := db.Setup(config.DB)
+	if err != nil {
+		slog.Error("failed to setup database", "error", err)
+		os.Exit(1)
+	}
+
+	e := server.NewEchoServer(config.Server)
+
+	frontend.InitModule(e, config.Frontend)
+	authModule := auth.InitModule(e, config.Auth, config.StubUserConfig)
+
+	mood.InitModule(e, database, authModule)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
@@ -58,4 +66,45 @@ func main() {
 	}
 
 	slog.Info("server stopped successfully")
+}
+
+type Config struct {
+	Auth           auth.Config
+	StubUserConfig auth.StubUserConfig
+	DB             db.Config
+	Frontend       frontend.Config
+	Logging        logging.Config
+	Server         server.Config
+}
+
+func GetConfig() (Config, error) {
+	authConfig, err := auth.GetConfig()
+	if err != nil {
+		return Config{}, err
+	}
+
+	stubUserConfig := auth.GetStubUserConfig()
+
+	dbConfig := db.GetConfig()
+
+	frontendConfig, err := frontend.GetConfig()
+	if err != nil {
+		return Config{}, err
+	}
+
+	loggingConfig := logging.GetConfig()
+
+	serverConfig, err := server.GetConfig()
+	if err != nil {
+		return Config{}, err
+	}
+
+	return Config{
+		Auth:           authConfig,
+		StubUserConfig: stubUserConfig,
+		DB:             dbConfig,
+		Frontend:       frontendConfig,
+		Logging:        loggingConfig,
+		Server:         serverConfig,
+	}, nil
 }
