@@ -18,7 +18,7 @@ func GetConfig() (Config, error) {
 	// Defaults
 	config.Host = "localhost:8080"
 	config.EnableCORS = false
-	config.FrontendURL = "http://localhost:4200" // Default frontend URL when CORS is enabled
+	config.FrontendURL = "http://localhost:4200" // Default frontend URL (used when CORS is enabled)
 
 	if host := os.Getenv("HOST"); host != "" {
 		config.Host = host
