@@ -22,10 +22,11 @@ func GetConfig() (Config, error) {
 	config.JWTExpiration = 24 * time.Hour
 	config.SecureCookies = false
 
-	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret == "" {
+	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
+		config.JWTSecret = jwtSecret
+	} else {
 		fmt.Println("Warning: JWT_SECRET is not set, using randomly generated secret")
-		var err error
-		jwtSecret, err = generateRandomSecret()
+		jwtSecret, err := generateRandomSecret()
 		if err != nil {
 			return Config{}, fmt.Errorf("failed to generate JWT_SECRET: %v", err)
 		}
