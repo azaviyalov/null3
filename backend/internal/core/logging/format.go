@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type Format uint8
+type Format int
 
 const (
 	FormatText Format = iota

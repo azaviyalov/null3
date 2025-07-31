@@ -2,11 +2,10 @@ package logging
 
 import "log/slog"
 
-type Level uint8
+type Level int
 
 const (
-	LevelDefault Level = iota
-	LevelDebug
+	LevelDebug Level = iota - 1
 	LevelInfo
 	LevelWarn
 	LevelError
@@ -14,7 +13,7 @@ const (
 
 func (l Level) IsValid() bool {
 	switch l {
-	case LevelDefault, LevelDebug, LevelInfo, LevelWarn, LevelError:
+	case LevelDebug, LevelInfo, LevelWarn, LevelError:
 		return true
 	}
 	return false
@@ -28,7 +27,7 @@ func (l Level) Level() slog.Level {
 		return slog.LevelWarn
 	case LevelError:
 		return slog.LevelError
-	case LevelDefault, LevelInfo:
+	case LevelInfo:
 		fallthrough
 	default:
 		return slog.LevelInfo
@@ -43,7 +42,7 @@ func (l Level) String() string {
 		return "warn"
 	case LevelError:
 		return "error"
-	case LevelDefault, LevelInfo:
+	case LevelInfo:
 		fallthrough
 	default:
 		return "info"
