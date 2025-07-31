@@ -27,12 +27,6 @@ func GetConfig() (Config, error) {
 		config.EnableFrontendDist = enableFrontendDist
 	}
 
-	if enableFrontendDist := os.Getenv("ENABLE_FRONTEND_DIST"); enableFrontendDist != "" {
-		if enable, err := strconv.ParseBool(enableFrontendDist); err == nil {
-			config.EnableFrontendDist = enable
-		}
-	}
-
 	if config.EnableFrontendDist {
 		if apiURL := os.Getenv("API_URL"); apiURL != "" {
 			config.APIURL = apiURL
