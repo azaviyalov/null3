@@ -47,12 +47,8 @@ func main() {
 	defer stop()
 
 	go func() {
-		slog.Info("starting HTTP server", "port", os.Getenv("PORT"))
-		if err := e.Start(":" + os.Getenv("PORT")); err != nil {
-			if !errors.Is(err, http.ErrServerClosed) {
-				slog.Error("server start failed", "error", err)
-				os.Exit(1)
-			}
+		if err := server.StartServer(e, config.Server); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			os.Exit(1)
 		}
 	}()
 
@@ -64,8 +60,6 @@ func main() {
 		slog.Error("graceful shutdown failed", "error", err)
 		os.Exit(1)
 	}
-
-	slog.Info("server stopped successfully")
 }
 
 type Config struct {
