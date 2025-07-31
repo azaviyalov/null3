@@ -87,6 +87,6 @@ func GetStubUserConfig() StubUserConfig {
 		UserID:   1,
 		Login:    "admin",
 		Password: "password",
-		Email:    "user@example.com",
+		Email:    "admin@example.com",
 	}
 }
