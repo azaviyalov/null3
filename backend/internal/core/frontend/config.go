@@ -32,7 +32,7 @@ func GetConfig() (Config, error) {
 			config.APIURL = apiURL
 		}
 	} else {
-		config.APIURL = ""
+		config.APIURL = "unused" // Placeholder when frontend distribution is not enabled
 	}
 
 	return config, nil
