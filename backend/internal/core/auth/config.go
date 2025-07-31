@@ -44,14 +44,14 @@ func GetConfig() (Config, error) {
 		config.JWTSecret = jwtSecret
 	}
 	if jwtExpirationParam := os.Getenv("JWT_EXPIRATION"); jwtExpirationParam != "" {
-		JWTExpiration, err := time.ParseDuration(jwtExpirationParam)
+		jwtExpiration, err := time.ParseDuration(jwtExpirationParam)
 		if err != nil {
 			return Config{}, fmt.Errorf("invalid JWT_EXPIRATION: %v", err)
 		}
-		if JWTExpiration <= 0 {
+		if jwtExpiration <= 0 {
 			return Config{}, fmt.Errorf("JWT_EXPIRATION must be a positive duration")
 		}
-		config.JWTExpiration = JWTExpiration
+		config.JWTExpiration = jwtExpiration
 	}
 	if secureCookiesParam := os.Getenv("SECURE_COOKIES"); secureCookiesParam != "" {
 		secureCookies, err := strconv.ParseBool(secureCookiesParam)
