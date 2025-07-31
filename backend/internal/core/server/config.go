@@ -36,8 +36,6 @@ func GetConfig() (Config, error) {
 		if frontendURL := os.Getenv("FRONTEND_URL"); frontendURL != "" {
 			config.FrontendURL = frontendURL
 		}
-	} else {
-		config.FrontendURL = "unused" // Placeholder when CORS is not enabled
 	}
 
 	return config, nil

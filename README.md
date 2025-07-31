@@ -52,7 +52,8 @@ Environment variables can be set in the `.env` file.
 - `HOST` is used to set the backend server host. Default is `localhost:8080`.
 - `ENABLE_CORS` is used to enable CORS. Default is `false`.
 - `FRONTEND_URL` is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_CORS` is set to `false`.
-- `JWT_SECRET` is used to sign JWT tokens. Default is generated randomly. Set this in production environments.
+- `PRODUCTION` is used to set the application to production mode. Default is `false`.
+- `JWT_SECRET` is used to sign JWT tokens. Default is generated randomly. Required if `PRODUCTION` is set to `true`.
 - `JWT_EXPIRATION` is used to set the JWT token expiration time in seconds. Default is `24h`. Must be a positive duration.
 - `SECURE_COOKIES` is used to enable secure cookies. Default is `false`. Set to `true` in production environments to ensure cookies are only sent over HTTPS.
 - `DATABASE_URL` is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.

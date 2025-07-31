@@ -10,6 +10,7 @@ import (
 )
 
 type Config struct {
+	Production    bool
 	JWTSecret     string
 	JWTExpiration time.Duration
 	SecureCookies bool
@@ -22,9 +23,19 @@ func GetConfig() (Config, error) {
 	config.JWTExpiration = 24 * time.Hour
 	config.SecureCookies = false
 
+	if productionParam := os.Getenv("PRODUCTION"); productionParam != "" {
+		production, err := strconv.ParseBool(productionParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid value for PRODUCTION: %v", err)
+		}
+		config.Production = production
+	}
 	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
 		config.JWTSecret = jwtSecret
 	} else {
+		if config.Production {
+			return Config{}, fmt.Errorf("JWT_SECRET must be set in production mode")
+		}
 		fmt.Println("Warning: JWT_SECRET is not set, using randomly generated secret")
 		jwtSecret, err := generateRandomSecret()
 		if err != nil {

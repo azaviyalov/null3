@@ -31,8 +31,6 @@ func GetConfig() (Config, error) {
 		if apiURL := os.Getenv("API_URL"); apiURL != "" {
 			config.APIURL = apiURL
 		}
-	} else {
-		config.APIURL = "unused" // Placeholder when frontend distribution is not enabled
 	}
 
 	return config, nil
