@@ -2,7 +2,6 @@ package logging
 
 import "log/slog"
 
-//go:generate go tool stringer -type=Level
 type Level uint8
 
 const (
