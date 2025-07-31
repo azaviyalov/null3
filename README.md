@@ -58,7 +58,7 @@ Environment variables can be set in the `.env` file.
 - `SECURE_COOKIES` is used to enable secure cookies. Default is `false`. Set to `true` in production environments to ensure cookies are only sent over HTTPS.
 - `DATABASE_URL` is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
 - `LOG_LEVEL` is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
-- `LOG_FORMAT` is used to set the logging format. Default is `json`. Options are `fancy`, `text` and `json`.
+- `LOG_FORMAT` is used to set the logging format. Default is `text`. Options are `fancy`, `text` and `json`.
 - `ENABLE_FRONTEND_DIST` is used to enable serving the frontend from the backend. Default is `false`.
 - `API_URL` is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `false`.
 
