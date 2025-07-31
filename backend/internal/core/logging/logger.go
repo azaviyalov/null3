@@ -5,7 +5,7 @@ import (
 )
 
 func Setup(config Config) {
-	handler := config.Format.NewSlogHandler(&slog.HandlerOptions{
+	handler := config.Format.NewSLogHandler(&slog.HandlerOptions{
 		Level:     config.Level,
 		AddSource: true,
 	})

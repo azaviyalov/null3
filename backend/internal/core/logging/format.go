@@ -21,7 +21,7 @@ func (f Format) IsValid() bool {
 	return false
 }
 
-func (f Format) NewSlogHandler(options *slog.HandlerOptions) slog.Handler {
+func (f Format) NewSLogHandler(options *slog.HandlerOptions) slog.Handler {
 	switch f {
 	case FormatJSON:
 		return slog.NewJSONHandler(os.Stdout, options)
