@@ -62,11 +62,12 @@ Environment variables can be set in the `.env` file.
 - `ENABLE_FRONTEND_DIST` is used to enable serving the frontend from the backend. Default is `false`.
 - `API_URL` is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `false`.
 
-These environmental variables are for development purposes only, until user management is implemented.
-- The `USER_ID` variable is used to set the user ID for the user. Default is `1`.
-- The `LOGIN` variable is used to set the login for the user. Default is `admin`.
-- The `PASSWORD` variable is used to set the password for the user. Default is `password`.
-- The `EMAIL` variable is used to set the email for the user. Default is `admin@example.com`.
+## Stub user
+Until user management is implemented, stub user is used:
+- userID: `1`.
+- login: `admin`.
+- password: `password`.
+- email: `admin@example.com`.
 
 ## TODOs
 - [ ] Implement user management (registration, login, password reset)
