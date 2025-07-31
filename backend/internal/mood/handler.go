@@ -12,8 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterRoutes(e *echo.Echo, h *Handler) {
-	jwt := auth.JWTMiddleware()
+func RegisterRoutes(e *echo.Echo, h *Handler, jwt echo.MiddlewareFunc) {
 	e.GET("/api/mood/entries", h.ListEntries, jwt)
 	e.GET("/api/mood/entries/:id", h.GetEntry, jwt)
 	e.POST("/api/mood/entries", h.CreateEntry, jwt)

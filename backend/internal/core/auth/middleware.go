@@ -12,7 +12,7 @@ type User struct {
 	Token string `json:"token"`
 }
 
-func JWTMiddleware() echo.MiddlewareFunc {
+func JWTMiddleware(config Config) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cookie, err := c.Cookie("jwt_token")
@@ -20,7 +20,7 @@ func JWTMiddleware() echo.MiddlewareFunc {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
 			tokenStr := cookie.Value
-			claims, err := ParseJWT(tokenStr)
+			claims, err := ParseJWT(config, tokenStr)
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}

@@ -5,13 +5,17 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
-	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitModule(e *echo.Echo) {
+func InitModule(e *echo.Echo, config Config) {
+	if !config.EnableFrontendDist {
+		e.Logger.Info("Frontend dist is disabled, skipping static file serving")
+		return
+	}
+
 	frontendFS, err := fs.Sub(FrontendFS, "fs")
 	if err != nil {
 		panic("failed to sub fs: " + err.Error())
@@ -34,9 +38,8 @@ func InitModule(e *echo.Echo) {
 		}
 
 		// Patch API URL placeholder
-		apiURL := os.Getenv("API_URL")
 		if bytes.Contains(content, []byte("%%API_URL%%")) {
-			content = bytes.ReplaceAll(content, []byte("%%API_URL%%"), []byte(apiURL))
+			content = bytes.ReplaceAll(content, []byte("%%API_URL%%"), []byte(config.APIURL))
 			patchedFiles[path] = content
 		}
 		return nil
