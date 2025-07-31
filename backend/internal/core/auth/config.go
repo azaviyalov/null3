@@ -19,8 +19,8 @@ func GetConfig() (Config, error) {
 	config := Config{}
 
 	// Defaults
-	config.JWTExpiration = 24 * time.Hour // Default JWT expiration is 24 hours
-	config.SecureCookies = true           // Default to secure cookies
+	config.JWTExpiration = 24 * time.Hour
+	config.SecureCookies = false
 
 	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret == "" {
 		fmt.Println("Warning: JWT_SECRET is not set, using randomly generated secret")

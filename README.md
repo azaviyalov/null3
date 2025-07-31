@@ -49,16 +49,17 @@ This is a pet project, focusing on simplicity and ease of development. Written f
 
 ## Configuration
 Environment variables can be set in the `.env` file.
-- The `ENV` variable is used to set the environment. Default is `production`. Options are `development` and `production`.
-- The `PORT` variable is used to set the backend server port. Default is `8080`.
-- The `DATABASE_URL` variable is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
-- The `LOG_LEVEL` variable is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
-- The `LOG_FORMAT` variable is used to set the logging format. Default is `json`. Options are `fancy`, `text` and `json`.
-- The `ENABLE_FRONTEND_DIST` variable can be set to `true` to enable serving the frontend from the backend. Default is `false`.
-- The `ENABLE_CORS` variable can be set to `true` to enable CORS. Default is `false`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `true`.
-- The `FRONTEND_URL` variable is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `true`.
-- The `API_URL` variable is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`.
-- The `JWT_SECRET` variable is used to sign JWT tokens. It must be set in `production` environments. Default is generated randomly in development purposes.
+- `HOST` is used to set the backend server host. Default is `localhost:8080`.
+- `ENABLE_CORS` is used to enable CORS. Default is `false`.
+- `FRONTEND_URL` is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_CORS` is set to `false`.
+- `JWT_SECRET` is used to sign JWT tokens. Default is generated randomly. Set this in production environments.
+- `JWT_EXPIRATION` is used to set the JWT token expiration time in seconds. Default is `24h`. Must be a positive duration.
+- `SECURE_COOKIES` is used to enable secure cookies. Default is `false`. Set to `true` in production environments to ensure cookies are only sent over HTTPS.
+- `DATABASE_URL` is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
+- `LOG_LEVEL` is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
+- `LOG_FORMAT` is used to set the logging format. Default is `json`. Options are `fancy`, `text` and `json`.
+- `ENABLE_FRONTEND_DIST` is used to enable serving the frontend from the backend. Default is `false`.
+- `API_URL` is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `false`.
 
 These environmental variables are for development purposes only, until user management is implemented.
 - The `USER_ID` variable is used to set the user ID for the user. Default is `1`.

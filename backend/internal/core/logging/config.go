@@ -12,7 +12,7 @@ func GetConfig() Config {
 
 	// Defaults
 	config.Level = LevelInfo
-	config.Format = FormatText
+	config.Format = FormatJSON
 
 	if level := os.Getenv("LOG_LEVEL"); level != "" {
 		config.Level = LevelFromString(level)
