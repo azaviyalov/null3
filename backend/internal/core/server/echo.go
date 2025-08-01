@@ -46,6 +46,7 @@ func StartServer(e *echo.Echo, config Config) error {
 
 	serverErr := make(chan error, 1)
 	go func() {
+		defer close(serverErr)
 		if err := e.Start(config.Address); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
 		}
