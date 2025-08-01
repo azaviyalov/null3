@@ -15,6 +15,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+const shutdownTimeout = 10 * time.Second
+
 func NewEchoServer(config Config) *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
@@ -45,29 +47,28 @@ func StartServer(e *echo.Echo, config Config) error {
 	go func() {
 		if err := e.Start(config.Host); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
-		} else {
-			serverErr <- nil
 		}
+		close(serverErr)
 	}()
 
-	select {
-	case <-quit:
-		slog.Info("received shutdown signal, shutting down server gracefully")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := e.Shutdown(shutdownCtx); err != nil {
-			slog.Error("graceful shutdown failed", "error", err)
-			return err
+	for {
+		select {
+		case <-quit:
+			slog.Info("received shutdown signal, shutting down server gracefully")
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+			defer cancel()
+			if err := e.Shutdown(shutdownCtx); err != nil {
+				slog.Error("graceful shutdown failed", "error", err)
+				return err
+			}
+			slog.Info("server stopped gracefully")
+			return nil
+		case err := <-serverErr:
+			if err != nil {
+				slog.Error("server start failed", "error", err)
+				return err
+			}
 		}
-		slog.Info("server stopped gracefully")
-		return nil
-	case err := <-serverErr:
-		if err != nil {
-			slog.Error("server start failed", "error", err)
-			return err
-		}
-		slog.Info("server stopped successfully")
-		return nil
 	}
 }
 
