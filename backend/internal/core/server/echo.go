@@ -64,10 +64,8 @@ func StartServer(e *echo.Echo, config Config) error {
 			slog.Info("server stopped gracefully")
 			return nil
 		case err := <-serverErr:
-			if err != nil {
-				slog.Error("server start failed", "error", err)
-				return err
-			}
+			slog.Error("server start failed", "error", err)
+			return err
 		}
 	}
 }
