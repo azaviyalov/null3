@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
@@ -41,14 +42,13 @@ func StartServer(e *echo.Echo, config Config) error {
 	slog.Info("starting HTTP server", "host", config.Host)
 
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	serverErr := make(chan error, 1)
 	go func() {
 		if err := e.Start(config.Host); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
 		}
-		close(serverErr)
 	}()
 
 	for {
