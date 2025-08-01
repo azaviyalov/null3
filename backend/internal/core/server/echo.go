@@ -1,10 +1,13 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/go-playground/validator/v10"
@@ -34,14 +37,38 @@ func NewEchoServer(config Config) *echo.Echo {
 
 func StartServer(e *echo.Echo, config Config) error {
 	slog.Info("starting HTTP server", "host", config.Host)
-	if err := e.Start(":" + os.Getenv("PORT")); err != nil {
-		if !errors.Is(err, http.ErrServerClosed) {
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+
+	serverErr := make(chan error, 1)
+	go func() {
+		if err := e.Start(config.Host); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serverErr <- err
+		} else {
+			serverErr <- nil
+		}
+	}()
+
+	select {
+	case <-quit:
+		slog.Info("received shutdown signal, shutting down server gracefully")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := e.Shutdown(shutdownCtx); err != nil {
+			slog.Error("graceful shutdown failed", "error", err)
+			return err
+		}
+		slog.Info("server stopped gracefully")
+		return nil
+	case err := <-serverErr:
+		if err != nil {
 			slog.Error("server start failed", "error", err)
 			return err
 		}
+		slog.Info("server stopped successfully")
+		return nil
 	}
-	slog.Info("server stopped successfully")
-	return nil
 }
 
 type customValidator struct {

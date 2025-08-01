@@ -1,13 +1,8 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"log/slog"
-	"net/http"
 	"os"
-	"os/signal"
-	"time"
 
 	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
@@ -43,21 +38,8 @@ func main() {
 
 	mood.InitModule(e, database, authModule)
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-
-	go func() {
-		if err := server.StartServer(e, config.Server); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			os.Exit(1)
-		}
-	}()
-
-	<-ctx.Done()
-	slog.Info("received shutdown signal, shutting down server gracefully")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
-		slog.Error("graceful shutdown failed", "error", err)
+	if err := server.StartServer(e, config.Server); err != nil {
+		slog.Error("general server failure", "error", err)
 		os.Exit(1)
 	}
 }
