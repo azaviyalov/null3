@@ -49,7 +49,7 @@ This is a pet project, focusing on simplicity and ease of development. Written f
 
 ## Configuration
 Environment variables can be set in the `.env` file.
-- `HOST` is used to set the backend server host. Default is `localhost:8080`.
+- `ADDRESS` is used to set the backend server address. Default is `localhost:8080`.
 - `ENABLE_CORS` is used to enable CORS. Default is `false`.
 - `FRONTEND_URL` is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_CORS` is set to `false`.
 - `PRODUCTION` is used to set the application to production mode. Default is `false`.

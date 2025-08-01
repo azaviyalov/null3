@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Host        string
+	Address     string
 	EnableCORS  bool
 	FrontendURL string
 }
@@ -16,12 +16,12 @@ func GetConfig() (Config, error) {
 	config := Config{}
 
 	// Defaults
-	config.Host = "localhost:8080"
+	config.Address = "localhost:8080"
 	config.EnableCORS = false
 	config.FrontendURL = "http://localhost:4200" // Default frontend URL (used when CORS is enabled)
 
-	if host := os.Getenv("HOST"); host != "" {
-		config.Host = host
+	if address := os.Getenv("ADDRESS"); address != "" {
+		config.Address = address
 	}
 
 	if enableCORSParam := os.Getenv("ENABLE_CORS"); enableCORSParam != "" {

@@ -39,14 +39,14 @@ func NewEchoServer(config Config) *echo.Echo {
 }
 
 func StartServer(e *echo.Echo, config Config) error {
-	slog.Info("starting HTTP server", "host", config.Host)
+	slog.Info("starting HTTP server", "address", config.Address)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	serverErr := make(chan error, 1)
 	go func() {
-		if err := e.Start(config.Host); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := e.Start(config.Address); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
 		}
 	}()
