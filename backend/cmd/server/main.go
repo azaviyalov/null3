@@ -1,13 +1,8 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"log/slog"
-	"net/http"
 	"os"
-	"os/signal"
-	"time"
 
 	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
@@ -43,29 +38,10 @@ func main() {
 
 	mood.InitModule(e, database, authModule)
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-
-	go func() {
-		slog.Info("starting HTTP server", "port", os.Getenv("PORT"))
-		if err := e.Start(":" + os.Getenv("PORT")); err != nil {
-			if !errors.Is(err, http.ErrServerClosed) {
-				slog.Error("server start failed", "error", err)
-				os.Exit(1)
-			}
-		}
-	}()
-
-	<-ctx.Done()
-	slog.Info("received shutdown signal, shutting down server gracefully")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
-		slog.Error("graceful shutdown failed", "error", err)
+	if err := server.StartServer(e, config.Server); err != nil {
+		slog.Error("general server failure", "error", err)
 		os.Exit(1)
 	}
-
-	slog.Info("server stopped successfully")
 }
 
 type Config struct {
