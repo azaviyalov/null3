@@ -51,22 +51,20 @@ func StartServer(e *echo.Echo, config Config) error {
 		}
 	}()
 
-	for {
-		select {
-		case <-quit:
-			slog.Info("received shutdown signal, shutting down server gracefully")
-			shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
-			defer cancel()
-			if err := e.Shutdown(shutdownCtx); err != nil {
-				slog.Error("graceful shutdown failed", "error", err)
-				return err
-			}
-			slog.Info("server stopped gracefully")
-			return nil
-		case err := <-serverErr:
-			slog.Error("server start failed", "error", err)
+	select {
+	case <-quit:
+		slog.Info("received shutdown signal, shutting down server gracefully")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+		defer cancel()
+		if err := e.Shutdown(shutdownCtx); err != nil {
+			slog.Error("graceful shutdown failed", "error", err)
 			return err
 		}
+		slog.Info("server stopped gracefully")
+		return nil
+	case err := <-serverErr:
+		slog.Error("server start failed", "error", err)
+		return err
 	}
 }
 
