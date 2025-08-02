@@ -1,7 +1,6 @@
 package mood
 
 import (
-	"fmt"
 	"log/slog"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
@@ -60,21 +59,21 @@ func (f EntryFilter) Apply(db *gorm.DB) *gorm.DB {
 	return db
 }
 
-func (f EntryFilter) String() string {
-	var idStr, userIDStr string
+func (f EntryFilter) LogValue() slog.Value {
+	var idVal, userIDVal slog.Value
 	if f.ID != nil {
-		idStr = fmt.Sprintf("%d", *f.ID)
+		idVal = slog.Uint64Value(uint64(*f.ID))
 	} else {
-		idStr = "<nil>"
+		idVal = slog.StringValue("<nil>")
 	}
 	if f.UserID != nil {
-		userIDStr = fmt.Sprintf("%d", *f.UserID)
+		userIDVal = slog.Uint64Value(uint64(*f.UserID))
 	} else {
-		userIDStr = "<nil>"
+		userIDVal = slog.StringValue("<nil>")
 	}
-	return fmt.Sprintf("EntryFilter{ID=%s, UserID=%s, DeletedMode=%v}", idStr, userIDStr, f.DeletedMode)
-}
-
-func (f EntryFilter) LogValue() slog.Value {
-	return slog.StringValue(f.String())
+	return slog.GroupValue(
+		slog.Attr{Key: "ID", Value: idVal},
+		slog.Attr{Key: "UserID", Value: userIDVal},
+		slog.String("DeletedMode", f.DeletedMode.String()),
+	)
 }
