@@ -60,20 +60,17 @@ func (f EntryFilter) Apply(db *gorm.DB) *gorm.DB {
 }
 
 func (f EntryFilter) LogValue() slog.Value {
-	var idVal, userIDVal slog.Value
+	idVal := slog.StringValue("null")
 	if f.ID != nil {
 		idVal = slog.Uint64Value(uint64(*f.ID))
-	} else {
-		idVal = slog.StringValue("<nil>")
 	}
+	userIDVal := slog.StringValue("null")
 	if f.UserID != nil {
 		userIDVal = slog.Uint64Value(uint64(*f.UserID))
-	} else {
-		userIDVal = slog.StringValue("<nil>")
 	}
 	return slog.GroupValue(
 		slog.Attr{Key: "ID", Value: idVal},
 		slog.Attr{Key: "UserID", Value: userIDVal},
-		slog.String("DeletedMode", f.DeletedMode.String()),
+		slog.Attr{Key: "DeletedMode", Value: slog.StringValue(f.DeletedMode.String())},
 	)
 }
