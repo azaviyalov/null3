@@ -84,7 +84,7 @@ func (s *Service) UpdateEntry(userID, id uint, req EditEntryRequest) (*Entry, er
 	entry.Note = req.Note
 	updatedEntry, err := s.repo.SaveEntry(entry)
 	if err != nil {
-		slog.Error("failed to update entry", "error", err, "userID", userID, "id", id)
+		slog.Error("failed to update entry", "error", err, "filter", filter)
 		return nil, err
 	}
 	slog.Info("successfully updated entry", "userID", userID, "id", id)
