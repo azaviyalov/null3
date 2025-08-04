@@ -34,7 +34,7 @@ func main() {
 	e := server.NewEchoServer(config.Server)
 
 	frontend.InitModule(e, config.Frontend)
-	authModule := auth.InitModule(e, config.Auth, config.StubUserConfig)
+	authModule := auth.InitModule(e, database, config.Auth, config.StubUserConfig)
 
 	mood.InitModule(e, database, authModule)
 

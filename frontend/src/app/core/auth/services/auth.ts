@@ -40,6 +40,10 @@ export class Auth {
     return this._isAuthenticated.asObservable();
   }
 
+  get currentUser(): UserResponse | null {
+    return this._user.getValue();
+  }
+
   login(data: LoginRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(this.loginUrl, data).pipe(
       tap((response) => {
@@ -61,5 +65,20 @@ export class Auth {
         this._isAuthenticated.next(false);
       }),
     );
+  }
+
+  refresh(): Observable<UserResponse | null> {
+    return this.http
+      .post<UserResponse>(`${environment.apiUrl}/auth/refresh`, {})
+      .pipe(
+        tap((response) => {
+          this._user.next(response);
+          this._isAuthenticated.next(true);
+        }),
+        catchError(() => {
+          this.clearSession();
+          return of(null);
+        }),
+      );
   }
 }

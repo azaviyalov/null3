@@ -2,35 +2,24 @@ package auth
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
-type User struct {
-	ID    uint   `json:"id"`
-	Token string `json:"token"`
-}
-
-func JWTMiddleware(config Config) echo.MiddlewareFunc {
+func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cookie, err := c.Cookie("jwt_token")
+			cookie, err := c.Cookie("jwt")
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
 			tokenStr := cookie.Value
-			claims, err := ParseJWT(config, tokenStr)
-			if err != nil {
-				return echo.ErrUnauthorized.WithInternal(err)
-			}
-			userID, err := strconv.ParseUint(claims.Subject, 10, 64)
+			jwt, err := service.ParseJWT(tokenStr)
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
 			c.Set("user", &User{
-				ID:    uint(userID),
-				Token: tokenStr,
+				ID: jwt.UserID,
 			})
 			return next(c)
 		}
