@@ -11,6 +11,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+const clockSkew = time.Minute * 1
+
 type Service struct {
 	repo           *Repository
 	config         Config
@@ -104,7 +106,7 @@ func (s *Service) ParseJWT(tokenStr string) (*JWT, error) {
 		return nil, fmt.Errorf("%w: user ID out of range for uint", ErrJWTInvalidClaims)
 	}
 	now := time.Now()
-	if claims.ExpiresAt.Time.Before(now) || claims.ExpiresAt.Time.Equal(now) {
+	if claims.ExpiresAt.Time.Before(now.Add(-clockSkew)) {
 		return nil, fmt.Errorf("%w: JWT has expired", ErrJWTExpired)
 	}
 	if claims.Issuer != "null3" {
