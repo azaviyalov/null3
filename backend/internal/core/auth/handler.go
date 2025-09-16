@@ -189,5 +189,5 @@ func (h *Handler) Refresh(c echo.Context) error {
 }
 
 func emptyJSON(c echo.Context, status int) error {
-	return c.JSON(status, map[string]string{})
+	return c.JSON(status, struct{}{})
 }
