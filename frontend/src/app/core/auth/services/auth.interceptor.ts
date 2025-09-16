@@ -36,19 +36,22 @@ export class AuthInterceptor implements HttpInterceptor {
     requestWithCredentials: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    // Only handle 401 errors for API requests (except refresh endpoint)
+    const isHttpError = err instanceof HttpErrorResponse;
+    const isUnauthorized = isHttpError && err.status === 401;
+    const isNotRefreshEndpoint = !originalRequest.url.endsWith("/auth/refresh");
+    const isMeEndpoint = originalRequest.url.endsWith("/auth/me");
+    const hasCurrentUser = !!this.auth.currentUser;
+
     const isAuthError =
-      err instanceof HttpErrorResponse &&
-      err.status === 401 &&
-      !originalRequest.url.endsWith("/auth/refresh") &&
-      (originalRequest.url.endsWith("/auth/me") || !!this.auth.currentUser);
+      isUnauthorized &&
+      isNotRefreshEndpoint &&
+      (isMeEndpoint || hasCurrentUser);
 
     if (!isAuthError) return throwError(() => err);
 
-    // If a refresh is already in progress, reuse it
     if (!this.refreshInProgressSubject) {
-      this.refreshInProgressSubject = new ReplaySubject<unknown>(1);
-      const subject = this.refreshInProgressSubject;
+      const subject = new ReplaySubject<unknown>(1);
+      this.refreshInProgressSubject = subject;
       this.auth.refresh().pipe(take(1)).subscribe({
         next: (user) => {
           subject.next(user);
@@ -64,7 +67,9 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
 
+    // Queue requests until refresh completes
     return this.refreshInProgressSubject.asObservable().pipe(
+      take(1),
       switchMap((user) => {
         if (user) {
           // Retry the original request after successful refresh
