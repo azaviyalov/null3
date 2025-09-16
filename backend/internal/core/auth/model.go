@@ -6,16 +6,23 @@ import (
 )
 
 type JWT struct {
-	Value  string `json:"-"`
-	UserID uint   `json:"-"`
+	Value  string
+	UserID uint
+}
+
+func (j JWT) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("value", "[REDACTED]"),
+		slog.Uint64("userID", uint64(j.UserID)),
+	)
 }
 
 type RefreshToken struct {
-	ID        uint      `gorm:"primaryKey" json:"-"`
-	UserID    uint      `gorm:"not null;index" json:"-"`
-	Value     string    `gorm:"not null;uniqueIndex" json:"-"`
-	CreatedAt time.Time `gorm:"not null" json:"-"`
-	ExpiresAt time.Time `gorm:"not null;index" json:"-"`
+	ID        uint      `gorm:"primaryKey"`
+	UserID    uint      `gorm:"not null;index"`
+	Value     string    `gorm:"not null;uniqueIndex"`
+	CreatedAt time.Time `gorm:"not null"`
+	ExpiresAt time.Time `gorm:"not null;index"`
 }
 
 func (r RefreshToken) LogValue() slog.Value {
@@ -28,8 +35,8 @@ func (r RefreshToken) LogValue() slog.Value {
 }
 
 type UserTokenData struct {
-	JWT          *JWT          `json:"-"`
-	RefreshToken *RefreshToken `json:"-"`
+	JWT          *JWT
+	RefreshToken *RefreshToken
 }
 
 func NewUserTokenData(jwt *JWT, refreshToken *RefreshToken) *UserTokenData {
