@@ -109,7 +109,7 @@ func (h *Handler) Logout(c echo.Context) error {
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   -1,
 	})
-	return c.JSON(http.StatusOK, map[string]string{"message": "logged out"})
+	return emptyJSON(c, http.StatusOK)
 }
 
 func (h *Handler) Me(c echo.Context) error {
@@ -185,5 +185,9 @@ func (h *Handler) Refresh(c echo.Context) error {
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   int(h.config.RefreshTokenExpiration.Seconds()),
 	})
-	return c.JSON(http.StatusOK, map[string]string{"message": "token refreshed"})
+	return emptyJSON(c, http.StatusOK)
+}
+
+func emptyJSON(c echo.Context, status int) error {
+	return c.JSON(status, map[string]string{})
 }
