@@ -99,6 +99,10 @@ func (s *Service) ParseJWT(tokenStr string) (*JWT, error) {
 	if userID == 0 {
 		return nil, fmt.Errorf("%w: user ID cannot be zero", ErrJWTInvalidClaims)
 	}
+	// Check for overflow before converting to uint
+	if userID > uint64(^uint(0)) {
+		return nil, fmt.Errorf("%w: user ID out of range for uint", ErrJWTInvalidClaims)
+	}
 	now := time.Now()
 	if claims.ExpiresAt.Time.Before(now) || claims.ExpiresAt.Time.Equal(now) {
 		return nil, fmt.Errorf("%w: JWT has expired", ErrJWTExpired)
