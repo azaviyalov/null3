@@ -6,10 +6,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	contextUserKey = "user"
+	cookieName     = "jwt"
+)
+
 func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cookie, err := c.Cookie("jwt")
+			cookie, err := c.Cookie(cookieName)
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
@@ -18,16 +23,14 @@ func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
-			c.Set("user", &User{
-				ID: jwt.UserID,
-			})
+			setUser(c, &User{ID: jwt.UserID})
 			return next(c)
 		}
 	}
 }
 
 func GetUser(c echo.Context) (*User, error) {
-	user := c.Get("user")
+	user := c.Get(contextUserKey)
 	if user == nil {
 		return nil, fmt.Errorf("user is nil: %w", ErrUserNotAuthenticated)
 	}
@@ -36,4 +39,8 @@ func GetUser(c echo.Context) (*User, error) {
 		return nil, fmt.Errorf("invalid user type: expected *User, got %T: %w", user, ErrUserInvalidType)
 	}
 	return u, nil
+}
+
+func setUser(c echo.Context, user *User) {
+	c.Set(contextUserKey, user)
 }
