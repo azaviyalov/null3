@@ -102,7 +102,7 @@ func (s *Service) ParseJWT(tokenStr string) (*JWT, error) {
 		return nil, fmt.Errorf("%w: user ID cannot be zero", ErrJWTInvalidClaims)
 	}
 	now := time.Now()
-	if claims.ExpiresAt.Time.Before(now.Add(-clockSkew)) {
+	if claims.ExpiresAt.Time.Before(now.Add(clockSkew)) {
 		return nil, fmt.Errorf("%w: JWT has expired", ErrJWTExpired)
 	}
 	if claims.Issuer != "null3" {
