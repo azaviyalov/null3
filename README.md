@@ -13,7 +13,7 @@ This is a pet project, focusing on simplicity and ease of development. Written f
 - Simple local development and build workflow
 
 ## Requirements
-- Go 1.24
+- Go 1.25
 - Node.js 20.x
 
 ## Usage
