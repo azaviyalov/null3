@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/mood"
 	"gorm.io/gorm"
 )
@@ -11,6 +12,7 @@ import (
 func AutoMigrate(db *gorm.DB) {
 	types := []any{
 		&mood.Entry{},
+		&auth.RefreshToken{},
 	}
 
 	slog.Debug("attempting database migration")

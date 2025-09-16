@@ -4,16 +4,18 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"time"
 )
 
 type Config struct {
-	Production    bool
-	JWTSecret     string
-	JWTExpiration time.Duration
-	SecureCookies bool
+	Production             bool
+	JWTSecret              string
+	JWTExpiration          time.Duration
+	SecureCookies          bool
+	RefreshTokenExpiration time.Duration
 }
 
 func GetConfig() (Config, error) {
@@ -22,6 +24,7 @@ func GetConfig() (Config, error) {
 	// Defaults
 	config.JWTExpiration = 24 * time.Hour
 	config.SecureCookies = false
+	config.RefreshTokenExpiration = 7 * 24 * time.Hour
 
 	if productionParam := os.Getenv("PRODUCTION"); productionParam != "" {
 		production, err := strconv.ParseBool(productionParam)
@@ -36,13 +39,14 @@ func GetConfig() (Config, error) {
 		if config.Production {
 			return Config{}, fmt.Errorf("JWT_SECRET must be set in production mode")
 		}
-		fmt.Println("Warning: JWT_SECRET is not set, using randomly generated secret")
+		slog.Warn("JWT_SECRET is not set, using randomly generated secret")
 		jwtSecret, err := generateRandomSecret()
 		if err != nil {
 			return Config{}, fmt.Errorf("failed to generate JWT_SECRET: %v", err)
 		}
 		config.JWTSecret = jwtSecret
 	}
+
 	if jwtExpirationParam := os.Getenv("JWT_EXPIRATION"); jwtExpirationParam != "" {
 		jwtExpiration, err := time.ParseDuration(jwtExpirationParam)
 		if err != nil {
@@ -52,6 +56,16 @@ func GetConfig() (Config, error) {
 			return Config{}, fmt.Errorf("JWT_EXPIRATION must be a positive duration")
 		}
 		config.JWTExpiration = jwtExpiration
+	}
+	if refreshExpirationParam := os.Getenv("REFRESH_TOKEN_EXPIRATION"); refreshExpirationParam != "" {
+		refreshExpiration, err := time.ParseDuration(refreshExpirationParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid REFRESH_TOKEN_EXPIRATION: %v", err)
+		}
+		if refreshExpiration <= 0 {
+			return Config{}, fmt.Errorf("REFRESH_TOKEN_EXPIRATION must be a positive duration")
+		}
+		config.RefreshTokenExpiration = refreshExpiration
 	}
 	if secureCookiesParam := os.Getenv("SECURE_COOKIES"); secureCookiesParam != "" {
 		secureCookies, err := strconv.ParseBool(secureCookiesParam)
@@ -82,7 +96,7 @@ type StubUserConfig struct {
 }
 
 func GetStubUserConfig() StubUserConfig {
-	fmt.Println("Warning: Using stub user configuration")
+	slog.Warn("Using stub user configuration")
 	return StubUserConfig{
 		UserID:   1,
 		Login:    "admin",
