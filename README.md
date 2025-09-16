@@ -43,7 +43,7 @@ This is a pet project, focusing on simplicity and ease of development. Written f
     ```
 2. Run the built binary:
    ```bash
-   ./null3-server
+   PRODUCTION=true ./null3-server
    ```
 3. Open your browser and navigate to `http://localhost:8080` to access the application.
 
@@ -55,6 +55,7 @@ Environment variables can be set in the `.env` file.
 - `PRODUCTION` is used to set the application to production mode. Default is `false`.
 - `JWT_SECRET` is used to sign JWT tokens. Default is generated randomly. Required if `PRODUCTION` is set to `true`.
 - `JWT_EXPIRATION` is used to set the JWT token expiration time in seconds. Default is `24h`. Must be a positive duration.
+- `REFRESH_TOKEN_EXPIRATION` is used to set the refresh token expiration time. Default is `168h` (7 days). Must be a positive duration.
 - `SECURE_COOKIES` is used to enable secure cookies. Default is `false`. Set to `true` in production environments to ensure cookies are only sent over HTTPS.
 - `DATABASE_URL` is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
 - `LOG_LEVEL` is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
@@ -72,7 +73,6 @@ Until user management is implemented, stub user is used:
 ## TODOs
 - [ ] Implement user management (registration, login, password reset)
 - [ ] Remove user data set from the environment variables
-- [ ] Add JWT token refresh functionality
 - [ ] Add more home page features (e.g., mood statistics, charts)
 - [ ] Improve error handling and logging
 
