@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"os"
+	"strconv"
 
 	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
@@ -14,6 +15,11 @@ import (
 )
 
 func main() {
+	if strconv.IntSize != 64 {
+		slog.Error("unsupported architecture: only 64-bit systems are supported")
+		os.Exit(1)
+	}
+
 	// Load environment variables from .env file
 	_ = godotenv.Load()
 
