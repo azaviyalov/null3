@@ -1,0 +1,50 @@
+<div class="admin-login-container">
+  <div class="admin-login-box">
+    <div class="admin-header">
+      <h1>Admin Panel</h1>
+      <p class="subtitle">Administrative access only</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="login()" class="admin-form">
+      @if (error()) {
+        <div class="error-message">
+          {{ error() }}
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" autocomplete="username" />
+        @if (form.get('username')?.hasError('required') && form.get('username')?.touched) {
+          <mat-error>Username is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" autocomplete="current-password" />
+        @if (form.get('password')?.hasError('required') && form.get('password')?.touched) {
+          <mat-error>Password is required</mat-error>
+        }
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid || isSubmitting()"
+        class="submit-button"
+      >
+        @if (isSubmitting()) {
+          Signing in...
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <div class="footer">
+      <a routerLink="/login" class="user-login-link">← User Login</a>
+    </div>
+  </div>
+</div>

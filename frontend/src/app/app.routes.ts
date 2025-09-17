@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { RequireAuthGuard } from "./core/auth/services/require-auth.guard";
 import { RequireGuestGuard } from "./core/auth/services/require-guest.guard";
+import { RequireAdminGuard, RequireAdminGuestGuard } from "./core/admin/services/admin-guards";
 
 export const routes: Routes = [
   {
@@ -10,6 +11,22 @@ export const routes: Routes = [
       import("./core/auth/pages/login/login").then((m) => m.Login),
   },
   { path: "logout", redirectTo: "/login" },
+  
+  // Admin routes
+  {
+    path: "admin/login",
+    canActivate: [RequireAdminGuestGuard],
+    loadComponent: () =>
+      import("./core/admin/pages/admin-login/admin-login").then((m) => m.AdminLogin),
+  },
+  {
+    path: "admin",
+    canActivate: [RequireAdminGuard],
+    loadComponent: () =>
+      import("./core/admin/pages/admin-dashboard/admin-dashboard").then((m) => m.AdminDashboard),
+  },
+  
+  // Regular user routes
   {
     path: "",
     canActivate: [RequireAuthGuard],

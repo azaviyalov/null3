@@ -1,17 +1,15 @@
 import { Component, inject, signal } from "@angular/core";
-import { Router, RouterModule } from "@angular/router";
+import { Router } from "@angular/router";
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
-import { Auth } from "../../services/auth";
-import { LoginRequest } from "../../models/login";
+import { RouterModule } from "@angular/router";
+import { AdminAuth } from "../../services/admin-auth";
 import { HttpErrorResponse } from "@angular/common/http";
 
-const ROOT_ROUTE = "";
-
 @Component({
-  selector: "app-login",
+  selector: "app-admin-login",
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -20,16 +18,16 @@ const ROOT_ROUTE = "";
     MatButtonModule,
     RouterModule,
   ],
-  templateUrl: "./login.html",
-  styleUrl: "./login.scss",
+  templateUrl: "./admin-login.html",
+  styleUrl: "./admin-login.scss",
 })
-export class Login {
-  private readonly auth = inject(Auth);
+export class AdminLogin {
+  private readonly adminAuth = inject(AdminAuth);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   readonly form = this.fb.group({
-    login: ["", Validators.required],
+    username: ["", Validators.required],
     password: ["", Validators.required],
   });
 
@@ -44,15 +42,15 @@ export class Login {
     this.isSubmitting.set(true);
     this.error.set(null);
 
-    const req: LoginRequest = {
-      login: this.form.value.login!,
+    const req = {
+      username: this.form.value.username!,
       password: this.form.value.password!,
     };
 
-    this.auth.login(req).subscribe({
+    this.adminAuth.login(req).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate([ROOT_ROUTE]);
+        this.router.navigate(["/admin"]);
       },
       error: (err) => this.handleError(err),
     });
@@ -64,7 +62,9 @@ export class Login {
     if (error.status === 0) {
       message = "Network error. Please check your connection.";
     } else if (error.status === 401) {
-      message = "Unauthorized: Incorrect login credentials.";
+      message = "Invalid admin credentials.";
+    } else if (error.status === 403) {
+      message = "Access forbidden.";
     } else if (error.status === 500) {
       message = "Server error. Please try again later.";
     }

@@ -1,0 +1,44 @@
+.user-dialog {
+  min-width: 400px;
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #fcc;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.edit-note {
+  color: #666;
+  font-style: italic;
+  margin-top: -8px;
+}
+
+.edit-note small {
+  font-size: 12px;
+}
+
+mat-dialog-actions {
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .user-dialog {
+    min-width: 300px;
+  }
+}
