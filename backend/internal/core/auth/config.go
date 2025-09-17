@@ -16,6 +16,8 @@ type Config struct {
 	JWTExpiration          time.Duration
 	SecureCookies          bool
 	RefreshTokenExpiration time.Duration
+	AdminUsername          string
+	AdminPassword          string
 }
 
 func GetConfig() (Config, error) {
@@ -73,6 +75,19 @@ func GetConfig() (Config, error) {
 			return Config{}, fmt.Errorf("invalid SECURE_COOKIES: %v", err)
 		}
 		config.SecureCookies = secureCookies
+	}
+
+	// Admin credentials
+	config.AdminUsername = os.Getenv("ADMIN_USERNAME")
+	if config.AdminUsername == "" {
+		config.AdminUsername = "admin"
+		slog.Warn("ADMIN_USERNAME not set, using default", "username", config.AdminUsername)
+	}
+
+	config.AdminPassword = os.Getenv("ADMIN_PASSWORD")
+	if config.AdminPassword == "" {
+		config.AdminPassword = "admin123"
+		slog.Warn("ADMIN_PASSWORD not set, using default password")
 	}
 
 	return config, nil

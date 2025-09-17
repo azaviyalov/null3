@@ -13,6 +13,7 @@ func AutoMigrate(db *gorm.DB) {
 	types := []any{
 		&mood.Entry{},
 		&auth.RefreshToken{},
+		&auth.User{},
 	}
 
 	slog.Debug("attempting database migration")
