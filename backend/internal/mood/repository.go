@@ -1,11 +1,12 @@
 package mood
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"gorm.io/gorm"
 )
 
@@ -19,88 +20,86 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (r *Repository) GetEntry(filter *EntryFilter) (*Entry, error) {
-	slog.Debug("GetEntry called", "filter", filter)
+func (r *Repository) GetEntry(ctx context.Context, filter *EntryFilter) (*Entry, error) {
+	logging.Debug(ctx, "GetEntry called")
 
 	var entry Entry
 
-	if err := filter.Apply(r.DB).First(&entry).Error; err != nil {
+	if err := filter.Apply(r.DB.WithContext(ctx)).First(&entry).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			slog.Warn("entry not found in GetEntry", "filter", filter)
+			// Not found is expected for some queries; log at Info so alerts aren't noisy
+			logging.Info(ctx, "entry not found in GetEntry", "user_id", filter.UserID, "id", filter.ID)
 			return nil, fmt.Errorf("%w: entry not found", core.ErrItemNotFound)
 		}
-		slog.Error("db error in GetEntry", "error", err, "filter", filter)
+		logging.Error(ctx, "db error in GetEntry", "error", err)
 		return nil, fmt.Errorf("db error: %w", err)
 	}
-	slog.Info("entry found in GetEntry", "userID", entry.UserID, "id", entry.ID)
+	logging.Info(ctx, "entry found in GetEntry", "user_id", entry.UserID, "id", entry.ID)
 	return &entry, nil
 }
 
-func (r *Repository) ListEntries(filter *EntryFilter, limit, offset int) ([]Entry, error) {
-	slog.Debug("ListEntries called", "filter", filter, "limit", limit, "offset", offset)
+func (r *Repository) ListEntries(ctx context.Context, filter *EntryFilter, limit, offset int) ([]Entry, error) {
+	logging.Debug(ctx, "ListEntries called", "limit", limit, "offset", offset)
 
 	var entries []Entry
 
-	err := filter.Apply(r.DB).
+	err := filter.Apply(r.DB.WithContext(ctx)).
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&entries).Error
 	if err != nil {
-		slog.Error("db error in ListEntries", "error", err, "filter", filter, "limit", limit, "offset", offset)
-		return nil, err
+		logging.Error(ctx, "db error in ListEntries", "error", err, "limit", limit, "offset", offset)
+		return nil, fmt.Errorf("db error: %w", err)
 	}
 
-	slog.Info("entries listed in ListEntries", "filter", filter, "count", len(entries), "limit", limit, "offset", offset)
+	logging.Info(ctx, "entries listed in ListEntries", "count", len(entries), "limit", limit, "offset", offset)
 	return entries, nil
 }
 
-func (r *Repository) CountEntries(filter *EntryFilter) (int64, error) {
-	slog.Debug("CountEntries called", "filter", filter)
+func (r *Repository) CountEntries(ctx context.Context, filter *EntryFilter) (int64, error) {
+	logging.Debug(ctx, "CountEntries called")
 
 	var count int64
-	err := filter.Apply(r.DB.Model(&Entry{})).Count(&count).Error
+	err := filter.Apply(r.DB.WithContext(ctx).Model(&Entry{})).Count(&count).Error
 	if err != nil {
-		slog.Error("db error in CountEntries", "error", err, "filter", filter)
+		logging.Error(ctx, "db error in CountEntries", "error", err)
 		return 0, fmt.Errorf("db error: %w", err)
 	}
-	slog.Info("entries counted in CountEntries", "filter", filter, "count", count)
+	logging.Info(ctx, "entries counted in CountEntries", "count", count)
 	return count, nil
 }
 
-func (r *Repository) SaveEntry(entry *Entry) (*Entry, error) {
-	if err := r.DB.Save(entry).Error; err != nil {
-		slog.Error("db error in SaveEntry", "error", err, "userID", entry.UserID)
+func (r *Repository) SaveEntry(ctx context.Context, entry *Entry) (*Entry, error) {
+	if err := r.DB.WithContext(ctx).Save(entry).Error; err != nil {
+		logging.Error(ctx, "db error in SaveEntry", "error", err, "user_id", entry.UserID)
 		return nil, fmt.Errorf("db error: %w", err)
 	}
-	slog.Info("entry saved in SaveEntry", "userID", entry.UserID, "id", entry.ID)
+	logging.Info(ctx, "entry saved in SaveEntry", "user_id", entry.UserID, "id", entry.ID)
 	return entry, nil
 }
 
-func (r *Repository) DeleteEntry(filter *EntryFilter) (*Entry, error) {
-	slog.Debug("DeleteEntry called", "filter", filter)
+func (r *Repository) DeleteEntry(ctx context.Context, filter *EntryFilter) (*Entry, error) {
+	logging.Debug(ctx, "DeleteEntry called")
 
 	var entry Entry
 
 	// Check if the entry exists before deleting
-	q := filter.Apply(r.DB).First(&entry)
+	q := filter.Apply(r.DB.WithContext(ctx)).First(&entry)
 	if err := q.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			slog.Warn("entry not found in DeleteEntry", "filter", filter)
+			logging.Info(ctx, "entry not found in DeleteEntry", "user_id", filter.UserID, "id", filter.ID)
 			return nil, fmt.Errorf("%w: entry not found", core.ErrItemNotFound)
 		}
-		slog.Error("db error in DeleteEntry (find)", "error", err, "filter", filter)
+		logging.Error(ctx, "db error in DeleteEntry (find)", "error", err)
 		return nil, fmt.Errorf("db error: %w", err)
 	}
 
-	if err := r.DB.Delete(&entry).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			slog.Warn("entry not found in DeleteEntry (delete)", "filter", filter)
-		}
+	if err := r.DB.WithContext(ctx).Delete(&entry).Error; err != nil {
 		// log error for delete
-		slog.Error("db error in DeleteEntry (delete)", "error", err, "filter", filter)
+		logging.Error(ctx, "db error in DeleteEntry (delete)", "error", err)
 		return nil, fmt.Errorf("db error: %w", err)
 	}
-	slog.Info("entry deleted in DeleteEntry", "userID", entry.UserID, "id", entry.ID)
+	logging.Info(ctx, "entry deleted in DeleteEntry", "user_id", entry.UserID, "id", entry.ID)
 	return &entry, nil
 }

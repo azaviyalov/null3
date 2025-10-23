@@ -1,25 +1,27 @@
 package db
 
 import (
-	"log/slog"
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/azaviyalov/null3/backend/internal/core/auth"
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/mood"
 	"gorm.io/gorm"
 )
 
-func AutoMigrate(db *gorm.DB) {
+func AutoMigrate(db *gorm.DB) error {
 	types := []any{
 		&mood.Entry{},
 		&auth.RefreshToken{},
 	}
 
-	slog.Debug("attempting database migration")
+	logging.Debug(context.Background(), "attempting database migration")
 	if err := db.AutoMigrate(types...); err != nil {
-		slog.Error("database migration failed", "error", err)
-		os.Exit(1)
+		logging.Error(context.Background(), "database migration failed", "error", err)
+		return fmt.Errorf("database migration failed: %w", err)
 	}
 
-	slog.Info("database migration completed successfully")
+	logging.Info(context.Background(), "database migration completed successfully")
+	return nil
 }

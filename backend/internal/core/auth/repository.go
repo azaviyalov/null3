@@ -1,11 +1,12 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"time"
 
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"gorm.io/gorm"
 )
 
@@ -26,39 +27,39 @@ func (r *Repository) GetRefreshToken(tokenString string) (*RefreshToken, error) 
 	return &token, nil
 }
 
-func (r *Repository) SaveRefreshToken(token *RefreshToken) (*RefreshToken, error) {
-	slog.Debug("SaveRefreshToken called", "token", token)
-	if err := r.db.Save(token).Error; err != nil {
-		slog.Error("db error in SaveRefreshToken", "error", err)
-		return nil, err
+func (r *Repository) SaveRefreshToken(ctx context.Context, token *RefreshToken) (*RefreshToken, error) {
+	logging.Debug(ctx, "SaveRefreshToken called", "user_id", token.UserID, "expires_at", token.ExpiresAt)
+	if err := r.db.WithContext(ctx).Save(token).Error; err != nil {
+		logging.Error(ctx, "db error in SaveRefreshToken", "error", err, "user_id", token.UserID)
+		return nil, fmt.Errorf("db error: %w", err)
 	}
 	return token, nil
 }
 
-func (r *Repository) DeleteRefreshToken(token *RefreshToken) error {
-	slog.Debug("DeleteRefreshToken called", "token", token)
+func (r *Repository) DeleteRefreshToken(ctx context.Context, token *RefreshToken) error {
+	logging.Debug(ctx, "DeleteRefreshToken called", "user_id", token.UserID)
 
-	if err := r.db.Delete(token).Error; err != nil {
+	if err := r.db.WithContext(ctx).Delete(token).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			slog.Warn("DeleteRefreshToken: token not found", "token", token)
-			return nil // Token not found, nothing to delete
+			logging.Info(ctx, "DeleteRefreshToken: token not found, nothing to delete", "user_id", token.UserID)
+			return nil
 		}
-		slog.Error("db error in DeleteRefreshToken", "error", err)
+		logging.Error(ctx, "db error in DeleteRefreshToken", "error", err, "user_id", token.UserID)
 		return fmt.Errorf("db error: %w", err)
 	}
 
-	slog.Info("token deleted in DeleteRefreshToken", "token", token)
+	logging.Info(ctx, "token deleted in DeleteRefreshToken", "user_id", token.UserID)
 	return nil
 }
 
-func (r *Repository) DeleteExpiredRefreshTokens() error {
-	slog.Debug("DeleteExpiredRefreshTokens called")
+func (r *Repository) DeleteExpiredRefreshTokens(ctx context.Context) error {
+	logging.Debug(ctx, "DeleteExpiredRefreshTokens called")
 
 	now := time.Now()
-	if err := r.db.Where("expires_at < ?", now).Delete(&RefreshToken{}).Error; err != nil {
-		slog.Error("db error in DeleteExpiredRefreshTokens", "error", err)
+	if err := r.db.WithContext(ctx).Where("expires_at < ?", now).Delete(&RefreshToken{}).Error; err != nil {
+		logging.Error(ctx, "db error in DeleteExpiredRefreshTokens", "error", err)
 		return fmt.Errorf("db error: %w", err)
 	}
-	slog.Info("expired refresh tokens deleted in DeleteExpiredRefreshTokens")
+	logging.Info(ctx, "expired refresh tokens deleted in DeleteExpiredRefreshTokens")
 	return nil
 }

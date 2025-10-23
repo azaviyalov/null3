@@ -1,9 +1,8 @@
 package mood
 
 import (
-	"log/slog"
-
 	"github.com/azaviyalov/null3/backend/internal/core"
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"gorm.io/gorm"
 )
 
@@ -59,18 +58,18 @@ func (f EntryFilter) Apply(db *gorm.DB) *gorm.DB {
 	return db
 }
 
-func (f EntryFilter) LogValue() slog.Value {
-	idVal := slog.StringValue("null")
+func (f EntryFilter) ToFieldValue() logging.FieldValue {
+	idVal := logging.NewStringValue("null")
 	if f.ID != nil {
-		idVal = slog.Uint64Value(uint64(*f.ID))
+		idVal = logging.NewUint64Value(uint64(*f.ID))
 	}
-	userIDVal := slog.StringValue("null")
+	userIDVal := logging.NewStringValue("null")
 	if f.UserID != nil {
-		userIDVal = slog.Uint64Value(uint64(*f.UserID))
+		userIDVal = logging.NewUint64Value(uint64(*f.UserID))
 	}
-	return slog.GroupValue(
-		slog.Attr{Key: "ID", Value: idVal},
-		slog.Attr{Key: "UserID", Value: userIDVal},
-		slog.Attr{Key: "DeletedMode", Value: slog.StringValue(f.DeletedMode.String())},
+	return logging.CombineFields(
+		logging.NewField("id", idVal),
+		logging.NewField("user_id", userIDVal),
+		logging.NewField("deleted_mode", logging.NewStringValue(f.DeletedMode.String())),
 	)
 }

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -27,7 +28,7 @@ func NewService(repo *Repository, config Config, stubUserConfig StubUserConfig) 
 	}
 }
 
-func (s *Service) Authenticate(req LoginRequest) (*UserResponse, *UserTokenData, error) {
+func (s *Service) Authenticate(ctx context.Context, req LoginRequest) (*UserResponse, *UserTokenData, error) {
 	// For simplicity, we use a stub function to check credentials
 	// Don't use this in production!
 
@@ -45,7 +46,7 @@ func (s *Service) Authenticate(req LoginRequest) (*UserResponse, *UserTokenData,
 		return nil, nil, fmt.Errorf("%w: %v", ErrJWTGenerationFailed, err)
 	}
 
-	refreshToken, err := s.CreateRefreshToken(s.stubUserConfig.UserID)
+	refreshToken, err := s.CreateRefreshToken(ctx, s.stubUserConfig.UserID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("%w: %v", ErrRefreshTokenCreationFailed, err)
 	}
@@ -115,7 +116,7 @@ func (s *Service) ParseJWT(tokenStr string) (*JWT, error) {
 	}, nil
 }
 
-func (s *Service) CreateRefreshToken(userID uint) (*RefreshToken, error) {
+func (s *Service) CreateRefreshToken(ctx context.Context, userID uint) (*RefreshToken, error) {
 	now := time.Now()
 
 	tokenString, err := generateRandomRefreshToken()
@@ -128,7 +129,7 @@ func (s *Service) CreateRefreshToken(userID uint) (*RefreshToken, error) {
 		CreatedAt: now,
 		ExpiresAt: now.Add(s.config.RefreshTokenExpiration),
 	}
-	createdToken, err := s.repo.SaveRefreshToken(token)
+	createdToken, err := s.repo.SaveRefreshToken(ctx, token)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrRefreshTokenCreationFailed, err)
 	}
@@ -139,13 +140,13 @@ func (s *Service) GetRefreshToken(tokenString string) (*RefreshToken, error) {
 	return s.repo.GetRefreshToken(tokenString)
 }
 
-func (s *Service) InvalidateRefreshToken(tokenString string) error {
+func (s *Service) InvalidateRefreshToken(ctx context.Context, tokenString string) error {
 	token, err := s.repo.GetRefreshToken(tokenString)
 	if err != nil {
 		return err
 	}
 
-	return s.repo.DeleteRefreshToken(token)
+	return s.repo.DeleteRefreshToken(ctx, token)
 }
 
 func generateRandomRefreshToken() (string, error) {

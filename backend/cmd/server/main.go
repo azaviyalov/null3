@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log/slog"
+	"context"
 	"os"
 	"strconv"
 
@@ -16,7 +16,7 @@ import (
 
 func main() {
 	if strconv.IntSize != 64 {
-		slog.Error("unsupported architecture: only 64-bit systems are supported")
+		logging.Error(context.Background(), "unsupported architecture: only 64-bit systems are supported")
 		os.Exit(1)
 	}
 
@@ -25,7 +25,7 @@ func main() {
 
 	config, err := GetConfig()
 	if err != nil {
-		slog.Error("failed to get configuration", "error", err)
+		logging.Error(context.Background(), "failed to get configuration", "error", err)
 		os.Exit(1)
 	}
 
@@ -33,7 +33,7 @@ func main() {
 
 	database, err := db.Setup(config.DB)
 	if err != nil {
-		slog.Error("failed to setup database", "error", err)
+		logging.Error(context.Background(), "failed to setup database", "error", err)
 		os.Exit(1)
 	}
 
@@ -45,7 +45,7 @@ func main() {
 	mood.InitModule(e, database, authModule)
 
 	if err := server.StartServer(e, config.Server); err != nil {
-		slog.Error("general server failure", "error", err)
+		logging.Error(context.Background(), "general server failure", "error", err)
 		os.Exit(1)
 	}
 }
