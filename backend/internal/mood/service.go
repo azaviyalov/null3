@@ -1,9 +1,10 @@
 package mood
 
 import (
-	"log/slog"
+	"context"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 )
 
 type Service struct {
@@ -16,109 +17,109 @@ func NewService(repo *Repository) *Service {
 	}
 }
 
-func (s *Service) ListEntries(userID uint, limit, offset int, deleted bool) (core.PaginatedResponse[Entry], error) {
-	slog.Debug("ListEntries service called", "userID", userID, "limit", limit, "offset", offset, "deleted", deleted)
+func (s *Service) ListEntries(ctx context.Context, userID uint, limit, offset int, deleted bool) (core.PaginatedResponse[Entry], error) {
+	logging.Debug(ctx, "ListEntries service called", "user_id", userID, "limit", limit, "offset", offset, "deleted", deleted)
 	filter := NewEntryFilter().WithUserID(userID)
 	if deleted {
 		filter = filter.WithDeletedMode(core.DeletedModeDeletedOnly)
 	}
-	slog.Debug("listing entries", "filter", filter)
-	entries, err := s.repo.ListEntries(filter, limit, offset)
+	logging.Debug(ctx, "listing entries", "filter", filter)
+	entries, err := s.repo.ListEntries(ctx, filter, limit, offset)
 	if err != nil {
-		slog.Error("failed to list entries", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to list entries", "error", err, "filter", filter)
 		return core.PaginatedResponse[Entry]{}, err
 	}
-	totalCount, err := s.repo.CountEntries(filter)
+	totalCount, err := s.repo.CountEntries(ctx, filter)
 	if err != nil {
-		slog.Error("failed to count entries", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to count entries", "error", err, "filter", filter)
 		return core.PaginatedResponse[Entry]{}, err
 	}
 	if entries == nil {
 		entries = []Entry{}
 	}
-	slog.Info("successfully listed entries", "userID", userID, "count", len(entries), "limit", limit, "offset", offset, "deleted", deleted)
+	logging.Info(ctx, "successfully listed entries", "user_id", userID, "count", len(entries), "limit", limit, "offset", offset, "deleted", deleted)
 	return core.PaginatedResponse[Entry]{
 		Items:      entries,
 		TotalCount: totalCount,
 	}, nil
 }
 
-func (s *Service) GetEntry(userID, id uint) (*Entry, error) {
-	slog.Debug("GetEntry service called", "userID", userID, "id", id)
+func (s *Service) GetEntry(ctx context.Context, userID, id uint) (*Entry, error) {
+	logging.Debug(ctx, "GetEntry service called", "user_id", userID, "id", id)
 	filter := NewEntryFilter().WithUserID(userID).WithID(id).WithDeletedMode(core.DeletedModeAll)
-	slog.Debug("getting entry", "filter", filter)
-	entry, err := s.repo.GetEntry(filter)
+	logging.Debug(ctx, "getting entry", "filter", filter)
+	entry, err := s.repo.GetEntry(ctx, filter)
 	if err != nil {
-		slog.Error("failed to get entry", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to get entry", "error", err, "filter", filter)
 		return nil, err
 	}
-	slog.Info("successfully retrieved entry", "userID", userID, "id", id)
+	logging.Info(ctx, "successfully retrieved entry", "user_id", userID, "id", id)
 	return entry, nil
 }
 
-func (s *Service) CreateEntry(userID uint, req EditEntryRequest) (*Entry, error) {
-	slog.Debug("CreateEntry service called", "userID", userID)
-	entry, err := s.repo.SaveEntry(&Entry{
+func (s *Service) CreateEntry(ctx context.Context, userID uint, req EditEntryRequest) (*Entry, error) {
+	logging.Debug(ctx, "CreateEntry service called", "user_id", userID)
+	entry, err := s.repo.SaveEntry(ctx, &Entry{
 		UserID:  userID,
 		Feeling: req.Feeling,
 		Note:    req.Note,
 	})
 	if err != nil {
-		slog.Error("failed to create entry", "error", err, "userID", userID)
+		logging.Error(ctx, "failed to create entry", "error", err, "user_id", userID)
 		return nil, err
 	}
-	slog.Info("successfully created entry", "userID", userID, "id", entry.ID)
+	logging.Info(ctx, "successfully created entry", "user_id", userID, "id", entry.ID)
 	return entry, nil
 }
 
-func (s *Service) UpdateEntry(userID, id uint, req EditEntryRequest) (*Entry, error) {
-	slog.Debug("UpdateEntry service called", "userID", userID, "id", id)
+func (s *Service) UpdateEntry(ctx context.Context, userID, id uint, req EditEntryRequest) (*Entry, error) {
+	logging.Debug(ctx, "UpdateEntry service called", "user_id", userID, "id", id)
 	filter := NewEntryFilter().WithUserID(userID).WithID(id)
-	slog.Debug("updating entry", "filter", filter)
-	entry, err := s.repo.GetEntry(filter)
+	logging.Debug(ctx, "updating entry", "filter", filter)
+	entry, err := s.repo.GetEntry(ctx, filter)
 	if err != nil {
-		slog.Error("failed to get entry for update", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to get entry for update", "error", err, "filter", filter)
 		return nil, err
 	}
 	entry.Feeling = req.Feeling
 	entry.Note = req.Note
-	updatedEntry, err := s.repo.SaveEntry(entry)
+	updatedEntry, err := s.repo.SaveEntry(ctx, entry)
 	if err != nil {
-		slog.Error("failed to update entry", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to update entry", "error", err, "filter", filter)
 		return nil, err
 	}
-	slog.Info("successfully updated entry", "userID", userID, "id", id)
+	logging.Info(ctx, "successfully updated entry", "user_id", userID, "id", id)
 	return updatedEntry, nil
 }
 
-func (s *Service) DeleteEntry(userID, id uint) (*Entry, error) {
-	slog.Debug("DeleteEntry service called", "userID", userID, "id", id)
+func (s *Service) DeleteEntry(ctx context.Context, userID, id uint) (*Entry, error) {
+	logging.Debug(ctx, "DeleteEntry service called", "user_id", userID, "id", id)
 	filter := NewEntryFilter().WithUserID(userID).WithID(id)
-	slog.Debug("deleting entry", "filter", filter)
-	entry, err := s.repo.DeleteEntry(filter)
+	logging.Debug(ctx, "deleting entry", "filter", filter)
+	entry, err := s.repo.DeleteEntry(ctx, filter)
 	if err != nil {
-		slog.Error("failed to delete entry", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to delete entry", "error", err, "filter", filter)
 		return nil, err
 	}
-	slog.Info("successfully deleted entry", "userID", userID, "id", id)
+	logging.Info(ctx, "successfully deleted entry", "user_id", userID, "id", id)
 	return entry, nil
 }
 
-func (s *Service) RestoreEntry(userID, id uint) (*Entry, error) {
-	slog.Debug("RestoreEntry service called", "userID", userID, "id", id)
+func (s *Service) RestoreEntry(ctx context.Context, userID, id uint) (*Entry, error) {
+	logging.Debug(ctx, "RestoreEntry service called", "user_id", userID, "id", id)
 	filter := NewEntryFilter().WithUserID(userID).WithID(id).WithDeletedMode(core.DeletedModeDeletedOnly)
-	slog.Debug("restoring entry", "filter", filter)
-	entry, err := s.repo.GetEntry(filter)
+	logging.Debug(ctx, "restoring entry", "filter", filter)
+	entry, err := s.repo.GetEntry(ctx, filter)
 	if err != nil {
-		slog.Error("failed to get entry for restore", "error", err, "filter", filter)
+		logging.Error(ctx, "failed to get entry for restore", "error", err, "filter", filter)
 		return nil, err
 	}
 	entry.DeletedAt.Valid = false
-	restoredEntry, err := s.repo.SaveEntry(entry)
+	restoredEntry, err := s.repo.SaveEntry(ctx, entry)
 	if err != nil {
-		slog.Error("failed to restore entry", "error", err, "userID", userID, "id", id)
+		logging.Error(ctx, "failed to restore entry", "error", err, "user_id", userID, "id", id)
 		return nil, err
 	}
-	slog.Info("successfully restored entry", "userID", userID, "id", id)
+	logging.Info(ctx, "successfully restored entry", "user_id", userID, "id", id)
 	return restoredEntry, nil
 }

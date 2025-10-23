@@ -1,17 +1,19 @@
 package auth
 
 import (
-	"log/slog"
+	"context"
 
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 func InitModule(e *echo.Echo, db *gorm.DB, config Config, stubUserConfig StubUserConfig) *Module {
 	repo := NewRepository(db)
-	err := repo.DeleteExpiredRefreshTokens()
+	ctx := context.Background()
+	err := repo.DeleteExpiredRefreshTokens(ctx)
 	if err != nil {
-		slog.Error("failed to delete expired refresh tokens", "error", err)
+		logging.Error(ctx, "failed to delete expired refresh tokens, continuing", "error", err)
 	}
 	service := NewService(repo, config, stubUserConfig)
 	jwt := JWTMiddleware(config, service)

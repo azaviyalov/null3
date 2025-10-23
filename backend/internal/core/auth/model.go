@@ -1,8 +1,9 @@
 package auth
 
 import (
-	"log/slog"
 	"time"
+
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 )
 
 type JWT struct {
@@ -10,10 +11,10 @@ type JWT struct {
 	UserID uint
 }
 
-func (j JWT) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("value", "[REDACTED]"),
-		slog.Uint64("userID", uint64(j.UserID)),
+func (j JWT) ToFieldValue() logging.FieldValue {
+	return logging.CombineFields(
+		logging.NewField("value", logging.NewStringValue("[REDACTED]")),
+		logging.NewField("user_id", logging.NewUint64Value(uint64(j.UserID))),
 	)
 }
 
@@ -25,12 +26,12 @@ type RefreshToken struct {
 	ExpiresAt time.Time `gorm:"not null;index"`
 }
 
-func (r RefreshToken) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("value", "[REDACTED]"),
-		slog.Uint64("userID", uint64(r.UserID)),
-		slog.Time("createdAt", r.CreatedAt),
-		slog.Time("expiresAt", r.ExpiresAt),
+func (r RefreshToken) ToFieldValue() logging.FieldValue {
+	return logging.CombineFields(
+		logging.NewField("value", logging.NewStringValue("[REDACTED]")),
+		logging.NewField("user_id", logging.NewUint64Value(uint64(r.UserID))),
+		logging.NewField("created_at", logging.NewTimeValue(r.CreatedAt)),
+		logging.NewField("expires_at", logging.NewTimeValue(r.ExpiresAt)),
 	)
 }
 
@@ -55,10 +56,10 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func (r LoginRequest) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("login", r.Login),
-		slog.String("password", "[REDACTED]"),
+func (r LoginRequest) ToFieldValue() logging.FieldValue {
+	return logging.CombineFields(
+		logging.NewField("login", logging.NewStringValue(r.Login)),
+		logging.NewField("password", logging.NewStringValue("[REDACTED]")),
 	)
 }
 

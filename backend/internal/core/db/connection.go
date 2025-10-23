@@ -1,20 +1,21 @@
 package db
 
 import (
-	"log/slog"
-	"os"
+	"context"
+	"fmt"
 
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func Connect(config Config) *gorm.DB {
-	slog.Debug("attempting database connection", "database_url", config.DatabaseURL)
+func Connect(config Config) (*gorm.DB, error) {
+	logging.Debug(context.Background(), "attempting database connection")
 	db, err := gorm.Open(sqlite.Open(config.DatabaseURL), &gorm.Config{})
 	if err != nil {
-		slog.Error("failed to connect database", "error", err)
-		os.Exit(1)
+		logging.Error(context.Background(), "failed to open database connection", "error", err)
+		return nil, fmt.Errorf("failed to connect database: %w", err)
 	}
-	slog.Info("database connection established")
-	return db
+	logging.Info(context.Background(), "database connection established")
+	return db, nil
 }

@@ -2,11 +2,11 @@ package auth
 
 import (
 	"errors"
-	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
@@ -35,24 +35,24 @@ func NewHandler(service *Service, config Config, stubUserConfig StubUserConfig) 
 }
 
 func (h *Handler) Login(c echo.Context) error {
-	slog.Debug("Login handler called", "method", c.Request().Method, "path", c.Path())
+	logging.DebugEcho(c, "Login handler called", "method", c.Request().Method, "path", c.Path())
 	var req LoginRequest
 	if err := c.Bind(&req); err != nil {
-		slog.Warn("failed to bind LoginRequest", "error", err)
+		logging.InfoEcho(c, "failed to bind LoginRequest", "error", err)
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 	if err := h.validator.Struct(req); err != nil {
-		slog.Warn("validation failed for LoginRequest", "error", err)
+		logging.InfoEcho(c, "validation failed for LoginRequest", "error", err)
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
-	res, tokenData, err := h.service.Authenticate(req)
+	res, tokenData, err := h.service.Authenticate(c.Request().Context(), req)
 	if err != nil {
 		if errors.Is(err, ErrInvalidCredentials) {
-			slog.Warn("invalid credentials", "login", req.Login)
+			logging.InfoEcho(c, "invalid credentials", "login", req.Login)
 			return echo.ErrUnauthorized.WithInternal(err)
 		}
-		slog.Error("authentication failed", "error", err, "login", req.Login)
+		logging.ErrorEcho(c, "authentication failed", "error", err, "login", req.Login)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 
@@ -77,7 +77,7 @@ func (h *Handler) Login(c echo.Context) error {
 }
 
 func (h *Handler) Logout(c echo.Context) error {
-	slog.Debug("Logout handler called", "method", c.Request().Method, "path", c.Path())
+	logging.DebugEcho(c, "Logout handler called", "method", c.Request().Method, "path", c.Path())
 
 	cookie := new(http.Cookie)
 	cookie.Name = "jwt"
@@ -91,12 +91,13 @@ func (h *Handler) Logout(c echo.Context) error {
 
 	refreshCookie, err := c.Cookie("refresh_token")
 	if err != nil {
-		slog.Warn("failed to get refresh token cookie", "error", err)
+		logging.InfoEcho(c, "failed to get refresh token cookie", "error", err)
 	}
 
 	if refreshCookie != nil {
-		if err := h.service.InvalidateRefreshToken(refreshCookie.Value); err != nil {
-			slog.Error("failed to invalidate refresh token", "error", err)
+		// do not log raw token values
+		if err := h.service.InvalidateRefreshToken(c.Request().Context(), refreshCookie.Value); err != nil {
+			logging.ErrorEcho(c, "failed to invalidate refresh token", "error", err)
 			return echo.ErrInternalServerError.WithInternal(err)
 		}
 	}
@@ -113,10 +114,10 @@ func (h *Handler) Logout(c echo.Context) error {
 }
 
 func (h *Handler) Me(c echo.Context) error {
-	slog.Debug("Me handler called", "method", c.Request().Method, "path", c.Path())
+	logging.DebugEcho(c, "Me handler called", "method", c.Request().Method, "path", c.Path())
 	user, err := GetUser(c)
 	if err != nil {
-		slog.Warn("failed to get user from context", "error", err)
+		logging.InfoEcho(c, "failed to get user from context", "error", err)
 		return echo.ErrUnauthorized.WithInternal(err)
 	}
 	meResponse := UserResponse{
@@ -126,10 +127,11 @@ func (h *Handler) Me(c echo.Context) error {
 }
 
 func (h *Handler) Refresh(c echo.Context) error {
-	slog.Debug("Refresh handler called", "method", c.Request().Method, "path", c.Path())
+	logging.DebugEcho(c, "Refresh handler called", "method", c.Request().Method, "path", c.Path())
+
 	refreshCookie, err := c.Cookie("refresh_token")
 	if err != nil {
-		slog.Warn("failed to get refresh token cookie", "error", err)
+		logging.InfoEcho(c, "failed to get refresh token cookie", "error", err)
 		return echo.ErrUnauthorized.WithInternal(ErrRefreshTokenInvalid)
 	}
 	refreshTokenStr := refreshCookie.Value
@@ -137,34 +139,34 @@ func (h *Handler) Refresh(c echo.Context) error {
 	token, err := h.service.GetRefreshToken(refreshTokenStr)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
-			slog.Warn("refresh token not found", "token", refreshTokenStr)
+			logging.InfoEcho(c, "refresh token not found", "user_action", "invalid_refresh_token")
 			return echo.ErrUnauthorized.WithInternal(ErrRefreshTokenInvalid)
 		}
-		slog.Error("failed to validate refresh token", "error", err)
+		logging.ErrorEcho(c, "failed to validate refresh token", "error", err)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 
 	// Check if the refresh token has expired
 	if token.ExpiresAt.Before(time.Now()) {
-		slog.Warn("refresh token expired", "token", refreshTokenStr)
+		logging.InfoEcho(c, "refresh token expired", "user_id", token.UserID)
 		return echo.ErrUnauthorized.WithInternal(ErrRefreshTokenInvalid)
 	}
 
 	// Invalidate the old refresh token before creating a new one
-	if err := h.service.InvalidateRefreshToken(refreshTokenStr); err != nil {
-		slog.Error("failed to invalidate old refresh token", "error", err)
+	if err := h.service.InvalidateRefreshToken(c.Request().Context(), refreshTokenStr); err != nil {
+		logging.ErrorEcho(c, "failed to invalidate old refresh token", "error", err)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 
 	jwt, err := h.service.GenerateJWT(token.UserID)
 	if err != nil {
-		slog.Error("failed to generate JWT token", "error", err)
+		logging.ErrorEcho(c, "failed to generate JWT token", "error", err)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 
-	newRefreshToken, err := h.service.CreateRefreshToken(token.UserID)
+	newRefreshToken, err := h.service.CreateRefreshToken(c.Request().Context(), token.UserID)
 	if err != nil {
-		slog.Error("failed to generate new refresh token", "error", err)
+		logging.ErrorEcho(c, "failed to generate new refresh token", "error", err)
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 

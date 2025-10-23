@@ -65,7 +65,7 @@ Environment variables can be set in the `.env` file.
 
 ## Stub user
 Until user management is implemented, stub user is used:
-- userID: `1`.
+- user_id: `1`.
 - login: `admin`.
 - password: `password`.
 - email: `admin@example.com`.

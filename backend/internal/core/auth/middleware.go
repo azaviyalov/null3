@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	contextUserKey = "user"
-	cookieName     = "jwt"
+	cookieName = "jwt"
 )
 
 func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
@@ -30,7 +29,7 @@ func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
 }
 
 func GetUser(c echo.Context) (*User, error) {
-	user := c.Get(contextUserKey)
+	user := c.Get(echoUserKey)
 	if user == nil {
 		return nil, fmt.Errorf("user is nil: %w", ErrUserNotAuthenticated)
 	}
@@ -42,5 +41,5 @@ func GetUser(c echo.Context) (*User, error) {
 }
 
 func setUser(c echo.Context, user *User) {
-	c.Set(contextUserKey, user)
+	c.Set(echoUserKey, user)
 }

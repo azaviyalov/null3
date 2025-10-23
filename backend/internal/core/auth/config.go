@@ -1,13 +1,15 @@
 package auth
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"log/slog"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
 )
 
 type Config struct {
@@ -39,7 +41,7 @@ func GetConfig() (Config, error) {
 		if config.Production {
 			return Config{}, fmt.Errorf("JWT_SECRET must be set in production mode")
 		}
-		slog.Warn("JWT_SECRET is not set, using randomly generated secret")
+		logging.Warn(context.Background(), "JWT_SECRET is not set, using randomly generated secret")
 		jwtSecret, err := generateRandomSecret()
 		if err != nil {
 			return Config{}, fmt.Errorf("failed to generate JWT_SECRET: %v", err)
@@ -96,7 +98,7 @@ type StubUserConfig struct {
 }
 
 func GetStubUserConfig() StubUserConfig {
-	slog.Warn("Using stub user configuration")
+	logging.Warn(context.Background(), "Using stub user configuration")
 	return StubUserConfig{
 		UserID:   1,
 		Login:    "admin",

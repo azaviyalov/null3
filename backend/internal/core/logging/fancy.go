@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -33,28 +32,21 @@ func (h *FancyHandler) Handle(_ context.Context, r slog.Record) error {
 	timeStr := fmt.Sprintf("\033[35m%s\033[0m", time.Now().Format("15:04:05.000"))
 	lvl := coloredLevel(r.Level)
 	msg := fmt.Sprintf("\033[1m%s\033[0m", r.Message)
-	caller := h.caller()
-	attrs := h.formatAttrs(r)
-	status := fmt.Sprintf("\033[1m%s %s\033[0m", lvl, caller)
-	fmt.Fprintf(os.Stdout, "%s %s %s %s%s\n", timeStr, status, msg, "", attrs)
+	attrs := h.formatRecordAttrs(r)
+	status := fmt.Sprintf("\033[1m%s\033[0m", lvl)
+	fmt.Fprintf(os.Stdout, "%s %s %s%s\n", timeStr, status, msg, attrs)
 	return nil
 }
 
-func (h *FancyHandler) caller() string {
-	caller := ""
-	if h.addSource {
-		if _, file, line, ok := runtime.Caller(4); ok {
-			shortFile := trimProjectRoot(file)
-			caller = fmt.Sprintf("%s:%d", shortFile, line)
-		}
-	}
-	return caller
-}
-
-func (h *FancyHandler) formatAttrs(r slog.Record) string {
+func (h *FancyHandler) formatRecordAttrs(r slog.Record) string {
 	var attrLines []string
 	for _, a := range h.attrs {
 		attrLines = append(attrLines, h.formatAttr(a))
+	}
+	if h.addSource {
+		if fileLine := findExternalSource(); fileLine != "" {
+			attrLines = append(attrLines, h.formatAttr(slog.Attr{Key: "source", Value: slog.StringValue(fileLine)}))
+		}
 	}
 	r.Attrs(func(a slog.Attr) bool {
 		attrLines = append(attrLines, h.formatAttr(a))
@@ -73,6 +65,8 @@ func (h *FancyHandler) formatAttr(a slog.Attr) string {
 	val := a.Value
 	if lv, ok := val.Any().(slog.LogValuer); ok {
 		val = lv.LogValue()
+	} else if fv, ok := val.Any().(FieldValuer); ok {
+		val = fv.ToFieldValue().toSlogValue()
 	}
 	key := fmt.Sprintf("\033[1;34m%s\033[0m", a.Key)
 	valStr := fmt.Sprintf("%v", val)
@@ -125,12 +119,4 @@ func coloredLevel(level slog.Level) string {
 	default:
 		return fmt.Sprintf("%5s", level.String())
 	}
-}
-
-func trimProjectRoot(file string) string {
-	marker := "null3/backend/"
-	if idx := strings.Index(file, marker); idx != -1 {
-		return file[idx:]
-	}
-	return file
 }
