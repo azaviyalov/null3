@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-**null3** (pronounced "nulls", *NUHLZ*) is a mood tracking web application built with Go backend and Angular frontend. This is a pet project focusing on simplicity and ease of development. It uses a RESTful API architecture with JWT authentication, SQLite database, and Angular Material Design UI.
+**null3** (pronounced "nulls", *NUHLZ*) is a mood tracking web application built with Go backend and Angular frontend. See `README.md` for project description and features.
 
 - **Size**: Small (~2,345 lines Go, ~1,037 lines TypeScript)
 - **Languages**: Go 1.25, TypeScript (Angular 20.x), SCSS
@@ -13,6 +13,8 @@
 - **Key Libraries**: Echo, GORM, golang-jwt, Angular Material, RxJS
 
 ## Project Structure
+
+High-level directory layout (use `tree` or `find` commands to explore current structure):
 
 ```
 /
@@ -53,6 +55,8 @@
 - **Go**: 1.25 (note: project uses Go 1.25 but 1.24+ may work)
 - **Node.js**: 20.x
 - **NPM**: 10.x+ (comes with Node.js)
+
+See `README.md` for the official requirements.
 
 ### CRITICAL: Known Build Issues & Workarounds
 
@@ -156,59 +160,30 @@ make format
 
 ### Running the Application
 
-#### Development Mode (Separate Frontend/Backend)
-```bash
-# Terminal 1 - Backend:
-cd backend
-go run cmd/server/main.go
-# Listens on localhost:8080
+See `README.md` for detailed instructions on running in development and production modes.
 
-# Terminal 2 - Frontend:
-cd frontend
-npx ng serve
-# Listens on localhost:4200, proxies /api to localhost:8080
-# Open browser to http://localhost:4200
-```
-
-#### Production Mode (Integrated Binary)
-```bash
-# Build release (if internet available):
-make release
-
-# Run:
-PRODUCTION=true ./null3-server
-# Open browser to http://localhost:8080
-```
+**Key Differences from README**:
+- Use `npx ng serve` instead of `ng serve` for frontend (Makefile issue workaround)
+- Frontend development server proxies `/api` to `localhost:8080` via `proxy.conf.json`
+- Production build requires internet access (Google Fonts inlining)
 
 ## Configuration
 
-Environment variables can be set in a `.env` file in the repository root or backend directory:
+See `README.md` for complete list of environment variables and their descriptions.
 
-- `ADDRESS`: Backend server address (default: `localhost:8080`)
-- `ENABLE_CORS`: Enable CORS (default: `false`)
-- `FRONTEND_URL`: Frontend URL for CORS (default: `http://localhost:4200`)
-- `PRODUCTION`: Production mode flag (default: `false`)
-- `JWT_SECRET`: JWT signing secret (required in production, auto-generated otherwise)
-- `JWT_EXPIRATION`: JWT expiration time (default: `24h`)
-- `REFRESH_TOKEN_EXPIRATION`: Refresh token expiration (default: `168h`)
-- `SECURE_COOKIES`: Enable secure cookies for HTTPS (default: `false`)
-- `DATABASE_URL`: SQLite database path (default: `file:null3.db?_fk=1`)
-- `LOG_LEVEL`: Logging level - `debug`, `info`, `warn`, `error` (default: `info`)
-- `LOG_FORMAT`: Logging format - `fancy`, `text`, `json` (default: `text`)
-- `ENABLE_FRONTEND_DIST`: Serve frontend from backend (default: `false`)
-- `API_URL`: Replace %%API_URL%% in frontend build (default: `http://localhost:8080/api`)
-
-### Stub User Credentials
-Until user management is implemented:
-- **Username**: `admin`
-- **Password**: `password`
-- **Email**: `admin@example.com`
+**Key Configuration Notes**:
+- Environment variables can be set in a `.env` file in repository root or backend directory
+- `JWT_SECRET` required in production, auto-generated in development
+- Stub user credentials (until user management implemented):
+  - Username: `admin`
+  - Password: `password`
+  - Email: `admin@example.com`
 
 ## Code Style & Conventions
 
 ### Editor Configuration
-The repository includes `.editorconfig` with these rules:
-- **General**: UTF-8, LF line endings, spaces for indentation (2 spaces), trim trailing whitespace, final newline
+See `.editorconfig` for complete formatting rules. Key points:
+- **General**: UTF-8, LF line endings, 2-space indentation, trim trailing whitespace, final newline
 - **Go files**: Tabs (width 4), max line length 100
 - **Makefile**: Tabs (width 2)
 
