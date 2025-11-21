@@ -13,11 +13,21 @@ var loggerKey = &ctxKey{}
 
 const echoErrorKey = "internal/logging_error"
 
-func withLogger(ctx context.Context, l Logger) context.Context {
-	return context.WithValue(ctx, loggerKey, l)
+func fromContext(ctx any) Logger {
+	if ctx == nil {
+		return &callerInjector{l: slog.Default()}
+	}
+	switch v := ctx.(type) {
+	case context.Context:
+		return fromStdContext(v)
+	case echo.Context:
+		return fromEchoContext(v)
+	default:
+		return &callerInjector{l: slog.Default()}
+	}
 }
 
-func fromContext(ctx context.Context) Logger {
+func fromStdContext(ctx context.Context) Logger {
 	if ctx == nil {
 		return &callerInjector{l: slog.Default()}
 	}
@@ -29,25 +39,20 @@ func fromContext(ctx context.Context) Logger {
 	return &callerInjector{l: slog.Default()}
 }
 
-func fromEcho(c echo.Context) Logger {
-	if c == nil || c.Request() == nil {
-		return fromContext(context.TODO())
-	}
+func fromEchoContext(c echo.Context) Logger {
 	ctx := c.Request().Context()
-	if ctx == nil {
-		ctx = context.TODO()
-	}
-	return fromContext(ctx)
+	return fromStdContext(ctx)
 }
 
-func withEchoLogger(c echo.Context, l Logger) {
+func withLogger(ctx context.Context, l Logger) context.Context {
+	return context.WithValue(ctx, loggerKey, l)
+}
+
+func addLogger(c echo.Context, l Logger) {
 	if c == nil || c.Request() == nil {
 		return
 	}
 	ctx := c.Request().Context()
-	if ctx == nil {
-		ctx = context.TODO()
-	}
 	ctx = withLogger(ctx, l)
 	c.SetRequest(c.Request().WithContext(ctx))
 }
