@@ -25,9 +25,9 @@ export class AuthInterceptor implements HttpInterceptor {
     // Only handle API requests
     if (!req.url.includes("/api/")) return next.handle(request);
 
-    return next.handle(request).pipe(
-      catchError((err) => this.handleAuthError(err, req, request, next)),
-    );
+    return next
+      .handle(request)
+      .pipe(catchError((err) => this.handleAuthError(err, req, request, next)));
   }
 
   private handleAuthError(
@@ -52,18 +52,21 @@ export class AuthInterceptor implements HttpInterceptor {
     if (!this.refreshInProgressSubject) {
       const subject = new ReplaySubject<unknown>(1);
       this.refreshInProgressSubject = subject;
-      this.auth.refresh().pipe(take(1)).subscribe({
-        next: (user) => {
-          subject.next(user);
-          subject.complete();
-          this.refreshInProgressSubject = null;
-        },
-        error: (error) => {
-          subject.next(null);
-          subject.complete();
-          this.refreshInProgressSubject = null;
-        }
-      });
+      this.auth
+        .refresh()
+        .pipe(take(1))
+        .subscribe({
+          next: (user) => {
+            subject.next(user);
+            subject.complete();
+            this.refreshInProgressSubject = null;
+          },
+          error: (error) => {
+            subject.next(null);
+            subject.complete();
+            this.refreshInProgressSubject = null;
+          },
+        });
     }
 
     // Queue requests until refresh completes
