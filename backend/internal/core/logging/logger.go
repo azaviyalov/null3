@@ -1,5 +1,7 @@
 package logging
 
+import "log/slog"
+
 type Logger interface {
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
@@ -33,4 +35,8 @@ func Warn(ctx any, msg string, args ...any) {
 // It panics if the context type is unsupported or if the context is nil.
 func Error(ctx any, msg string, args ...any) {
 	fromContext(ctx).Error(msg, args...)
+}
+
+func defaultLogger() Logger {
+	return &callerInjector{l: slog.Default()}
 }
