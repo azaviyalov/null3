@@ -1,10 +1,6 @@
 package logging
 
-import (
-	"context"
-
-	"github.com/labstack/echo/v4"
-)
+import "log/slog"
 
 type Logger interface {
 	Debug(msg string, args ...any)
@@ -13,34 +9,34 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
-func Debug(ctx context.Context, msg string, args ...any) {
+// Debug logs a debug-level message using [Logger] extracted from the given context.
+// It supports both [context.Context] and [echo.Context].
+// It panics if the context type is unsupported or if the context is nil.
+func Debug(ctx any, msg string, args ...any) {
 	fromContext(ctx).Debug(msg, args...)
 }
 
-func Info(ctx context.Context, msg string, args ...any) {
+// Info logs an info-level message using [Logger] extracted from the given context.
+// It supports both [context.Context] and [echo.Context].
+// It panics if the context type is unsupported or if the context is nil.
+func Info(ctx any, msg string, args ...any) {
 	fromContext(ctx).Info(msg, args...)
 }
 
-func Warn(ctx context.Context, msg string, args ...any) {
+// Warn logs a warn-level message using [Logger] extracted from the given context.
+// It supports both [context.Context] and [echo.Context].
+// It panics if the context type is unsupported or if the context is nil.
+func Warn(ctx any, msg string, args ...any) {
 	fromContext(ctx).Warn(msg, args...)
 }
 
-func Error(ctx context.Context, msg string, args ...any) {
+// Error logs an error-level message using [Logger] extracted from the given context.
+// It supports both [context.Context] and [echo.Context].
+// It panics if the context type is unsupported or if the context is nil.
+func Error(ctx any, msg string, args ...any) {
 	fromContext(ctx).Error(msg, args...)
 }
 
-func DebugEcho(c echo.Context, msg string, args ...any) {
-	fromEcho(c).Debug(msg, args...)
-}
-
-func InfoEcho(c echo.Context, msg string, args ...any) {
-	fromEcho(c).Info(msg, args...)
-}
-
-func WarnEcho(c echo.Context, msg string, args ...any) {
-	fromEcho(c).Warn(msg, args...)
-}
-
-func ErrorEcho(c echo.Context, msg string, args ...any) {
-	fromEcho(c).Error(msg, args...)
+func defaultLogger() Logger {
+	return &callerInjector{l: slog.Default()}
 }
