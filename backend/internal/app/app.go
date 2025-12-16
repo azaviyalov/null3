@@ -44,8 +44,8 @@ func New() *App {
 	}
 
 	err = db.AutoMigrate(database,
-		mood.Entry{},
-		auth.RefreshToken{},
+		&mood.Entry{},
+		&auth.RefreshToken{},
 	)
 	if err != nil {
 		logging.Error(context.Background(), "database migration failed", "error", err)
