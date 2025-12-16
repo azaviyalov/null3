@@ -149,6 +149,10 @@ func (s *Service) InvalidateRefreshToken(ctx context.Context, tokenString string
 	return s.repo.DeleteRefreshToken(ctx, token)
 }
 
+func (s *Service) DeleteExpiredRefreshTokens(ctx context.Context) error {
+	return s.repo.DeleteExpiredRefreshTokens(ctx)
+}
+
 func generateRandomRefreshToken() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
