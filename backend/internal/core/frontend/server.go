@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitModule(e *echo.Echo, config Config) {
+func RegisterRoutes(e *echo.Echo, config Config) {
 	if !config.EnableFrontendDist {
 		e.Logger.Info("Frontend dist is disabled, skipping static file serving")
 		return
