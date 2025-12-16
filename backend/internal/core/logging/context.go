@@ -15,7 +15,7 @@ const echoErrorKey = "internal/logging_error"
 // fromContext extracts [Logger] from various context types.
 // It supports both [context.Context] and [echo.Context].
 // It returns a default logger if the context is nil or no logger is found in the context.
-// It panics if the context type is unsupported.
+// It panics if the context is a non-nil value of an unsupported type.
 func fromContext(ctx any) Logger {
 	if ctx == nil {
 		return defaultLogger()
