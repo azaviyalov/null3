@@ -39,7 +39,7 @@
     "@angular/cli": "^21.0.3",
     "@angular/compiler-cli": "^21.0.6",
     "@types/jasmine": "~5.1.12",
-    "angular-eslint": "^20.4.0",
+    "angular-eslint": "^21.1.0",
     "autoprefixer": "^10.4.21",
     "baseline-browser-mapping": "^2.9.10",
     "eslint": "^9.38.0",
