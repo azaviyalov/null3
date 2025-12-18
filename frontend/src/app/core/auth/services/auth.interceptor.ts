@@ -58,7 +58,7 @@ export class AuthInterceptor implements HttpInterceptor {
           subject.complete();
           this.refreshInProgressSubject = null;
         },
-        error: (error) => {
+        error: () => {
           subject.next(null);
           subject.complete();
           this.refreshInProgressSubject = null;
