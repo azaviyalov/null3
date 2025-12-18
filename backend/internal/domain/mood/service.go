@@ -17,7 +17,7 @@ func NewService(repo *Repository) *Service {
 	}
 }
 
-func (s *Service) ListEntries(ctx context.Context, userID uint, limit, offset int, deleted bool) (core.PaginatedResponse[Entry], error) {
+func (s *Service) ListEntries(ctx context.Context, userID uint, limit, offset int, deleted bool) (core.Page[Entry], error) {
 	logging.Debug(ctx, "ListEntries service called", "user_id", userID, "limit", limit, "offset", offset, "deleted", deleted)
 	filter := NewEntryFilter().WithUserID(userID)
 	if deleted {
@@ -27,18 +27,18 @@ func (s *Service) ListEntries(ctx context.Context, userID uint, limit, offset in
 	entries, err := s.repo.ListEntries(ctx, filter, limit, offset)
 	if err != nil {
 		logging.Error(ctx, "failed to list entries", "error", err, "filter", filter)
-		return core.PaginatedResponse[Entry]{}, err
+		return core.Page[Entry]{}, err
 	}
 	totalCount, err := s.repo.CountEntries(ctx, filter)
 	if err != nil {
 		logging.Error(ctx, "failed to count entries", "error", err, "filter", filter)
-		return core.PaginatedResponse[Entry]{}, err
+		return core.Page[Entry]{}, err
 	}
 	if entries == nil {
 		entries = []Entry{}
 	}
 	logging.Info(ctx, "successfully listed entries", "user_id", userID, "count", len(entries), "limit", limit, "offset", offset, "deleted", deleted)
-	return core.PaginatedResponse[Entry]{
+	return core.Page[Entry]{
 		Items:      entries,
 		TotalCount: totalCount,
 	}, nil
