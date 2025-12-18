@@ -15,3 +15,7 @@ type Entry struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }
+
+func (e *Entry) TableName() string {
+	return "mood_entries"
+}
