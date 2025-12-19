@@ -1,14 +1,14 @@
-import { Component, inject, signal, OnInit } from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
 import { MatCardModule } from "@angular/material/card";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Entry } from "../../models/entry";
 import { EntryApi } from "../../services/entry-api";
-
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { EntryCard } from "../../components/entry-card/entry-card";
-
+import { map } from "rxjs";
+import { toWritableStateSignal } from "../../../../core/utils/signal-helpers";
+import { stateError, stateSuccess } from "../../../../core/utils/state";
 @Component({
   selector: "app-entry-view",
   standalone: true,
@@ -22,73 +22,57 @@ import { EntryCard } from "../../components/entry-card/entry-card";
   templateUrl: "./entry-view.html",
   styleUrl: "./entry-view.scss",
 })
-export class EntryView implements OnInit {
+export class EntryView {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly entryApi = inject(EntryApi);
 
-  readonly entry = signal<Entry | null>(null);
-  readonly isLoading = signal(true);
+  private readonly entryState = toWritableStateSignal({
+    trigger: this.route.params.pipe(map((params) => Number(params["id"]))),
+    project: (id) => this.entryApi.getById(id),
+  });
 
-  ngOnInit(): void {
-    this.loadEntry(Number(this.route.snapshot.paramMap.get("id")));
-  }
-
-  readonly errorMessage = signal<string | null>(null);
-
-  private loadEntry(id: number): void {
-    this.isLoading.set(true);
-    this.entryApi.getById(id).subscribe({
-      next: (entry) => {
-        this.entry.set(entry);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.errorMessage.set(err?.message ?? "Failed to load entry");
-        this.isLoading.set(false);
-      },
-    });
-  }
+  readonly entry = computed(() => this.entryState().value);
+  readonly isLoading = computed(() => this.entryState().isLoading);
+  readonly errorMessage = computed(() => this.entryState().error);
 
   editEntry(): void {
     const entry = this.entry();
     if (!entry || entry.deletedAt) {
-      this.errorMessage.set("Cannot edit an already deleted entry");
+      this.entryState.set(stateError("Cannot edit a deleted entry"));
       return;
     }
+
     this.router.navigate(["/mood/entries", entry.id, "update"]);
   }
 
   deleteEntry(): void {
     const entry = this.entry();
     if (!entry || entry.deletedAt) {
-      this.errorMessage.set("Cannot delete an already deleted entry");
+      this.entryState.set(stateError("Cannot delete a deleted entry"));
       return;
     }
+
     this.entryApi.delete(entry.id).subscribe({
-      next: (deletedEntry) => {
-        this.entry.set(deletedEntry);
-        this.errorMessage.set(null);
-      },
-      error: (err) => {
-        this.errorMessage.set(err?.message ?? "Failed to delete entry");
-      },
+      next: (deletedEntry) =>
+        this.entryState.set(stateSuccess(deletedEntry)),
+      error: (err) => this.entryState.set(stateError(err)),
     });
   }
 
   restoreEntry(): void {
     const entry = this.entry();
     if (!entry?.deletedAt) {
-      this.errorMessage.set("Cannot restore an active entry");
+      this.entryState.set(stateError("Cannot restore an active entry"));
       return;
     }
+
     this.entryApi.restore(entry.id).subscribe({
       next: (restoredEntry) => {
-        this.entry.set(restoredEntry);
-        this.errorMessage.set(null);
+        this.entryState.set(stateSuccess(restoredEntry));
       },
       error: (err) => {
-        this.errorMessage.set(err?.message ?? "Failed to restore entry");
+        this.entryState.set(stateError(err));
       },
     });
   }
