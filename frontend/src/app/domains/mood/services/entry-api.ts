@@ -3,12 +3,11 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, map } from "rxjs";
 import { environment } from "../../../../environments/environment";
 import {
-  PaginatedEntryList,
-  EntryView,
+  EntryResponse,
   Entry,
-  PaginatedEntryListView,
   EditEntryRequest,
 } from "../models/entry";
+import { Page, PageResponse } from "../../../core/utils/page";
 import { Auth } from "../../../core/auth/services/auth";
 
 @Injectable({
@@ -23,43 +22,43 @@ export class EntryApi {
     limit = 10,
     offset = 0,
     deleted = false,
-  ): Observable<PaginatedEntryList> {
+  ): Observable<Page<Entry>> {
     const params = new HttpParams()
       .set("limit", limit)
       .set("offset", offset)
       .set("deleted", deleted);
     return this.http
-      .get<PaginatedEntryListView>(this.baseUrl, { params })
-      .pipe(map(PaginatedEntryList.fromView));
+      .get<PageResponse<EntryResponse>>(this.baseUrl, { params })
+      .pipe(map(data => Page.fromResponse(data, Entry.fromResponse)));
   }
 
   getById(id: number): Observable<Entry> {
     return this.http
-      .get<EntryView>(`${this.baseUrl}/${id}`)
-      .pipe(map(Entry.fromView));
+      .get<EntryResponse>(`${this.baseUrl}/${id}`)
+      .pipe(map(Entry.fromResponse));
   }
 
   create(req: EditEntryRequest): Observable<Entry> {
     return this.http
-      .post<EntryView>(this.baseUrl, req)
-      .pipe(map(Entry.fromView));
+      .post<EntryResponse>(this.baseUrl, req)
+      .pipe(map(Entry.fromResponse));
   }
 
   update(id: number, req: EditEntryRequest): Observable<Entry> {
     return this.http
-      .put<EntryView>(`${this.baseUrl}/${id}`, req)
-      .pipe(map(Entry.fromView));
+      .put<EntryResponse>(`${this.baseUrl}/${id}`, req)
+      .pipe(map(Entry.fromResponse));
   }
 
   delete(id: number): Observable<Entry> {
     return this.http
-      .delete<EntryView>(`${this.baseUrl}/${id}`)
-      .pipe(map(Entry.fromView));
+      .delete<EntryResponse>(`${this.baseUrl}/${id}`)
+      .pipe(map(Entry.fromResponse));
   }
 
   restore(id: number): Observable<Entry> {
     return this.http
-      .post<EntryView>(`${this.baseUrl}/${id}/restore`, {})
-      .pipe(map(Entry.fromView));
+      .post<EntryResponse>(`${this.baseUrl}/${id}/restore`, {})
+      .pipe(map(Entry.fromResponse));
   }
 }
