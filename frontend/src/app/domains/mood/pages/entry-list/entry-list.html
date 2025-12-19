@@ -10,7 +10,7 @@
     <mat-button-toggle value="deleted">Deleted</mat-button-toggle>
   </mat-button-toggle-group>
 
-  @if (entriesPage()?.totalCount; as totalCount) {
+  @if (page()?.totalCount; as totalCount) {
     <mat-paginator
       [length]="totalCount"
       [pageSize]="pageSize()"
@@ -23,8 +23,8 @@
 
 <app-entry-card-grid
   [skeleton]="isLoading()"
-  [skeletonCount]="defaultCardCount"
-  [entries]="entriesPage()?.items ?? null"
+  [skeletonCount]="EntryList.defaultCardCount"
+  [entries]="page()?.items ?? null"
   [showOpen]="true"
   (open)="openEntry($event)"
 />

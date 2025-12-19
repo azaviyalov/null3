@@ -8,7 +8,7 @@ export class Entry {
     readonly note?: string,
   ) {}
 
-  static fromView(data: EntryView): Entry {
+  static fromResponse(data: EntryResponse): Entry {
     return new Entry(
       data.id,
       data.feeling,
@@ -20,30 +20,12 @@ export class Entry {
   }
 }
 
-export class PaginatedEntryList {
-  constructor(
-    readonly items: Entry[],
-    readonly totalCount: number,
-  ) {}
-
-  static fromView(data: PaginatedEntryListView): PaginatedEntryList {
-    return new PaginatedEntryList(
-      data.items.map(Entry.fromView),
-      data.total_count,
-    );
-  }
-
-  static empty(): PaginatedEntryList {
-    return new PaginatedEntryList([], 0);
-  }
-}
-
 export interface EditEntryRequest {
   readonly feeling: string;
   readonly note?: string;
 }
 
-export interface EntryView {
+export interface EntryResponse {
   readonly id: number;
   readonly feeling: string;
   readonly user_id: number;
@@ -51,9 +33,4 @@ export interface EntryView {
   readonly created_at: string;
   readonly updated_at: string;
   readonly deleted_at?: string;
-}
-
-export interface PaginatedEntryListView {
-  readonly items: EntryView[];
-  readonly total_count: number;
 }
