@@ -29,7 +29,7 @@ export function stateError<T>(err: unknown): State<T> {
 export function stateSuccess<T>(value: T): State<T> {
   return {
     isLoading: false,
-    value: value,
+    value,
     error: null,
   };
 }

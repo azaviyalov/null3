@@ -23,7 +23,7 @@
 
 <app-entry-card-grid
   [skeleton]="isLoading()"
-  [skeletonCount]="EntryList.defaultCardCount"
+  [skeletonCount]="defaultCardCount"
   [entries]="page()?.items ?? null"
   [showOpen]="true"
   (open)="openEntry($event)"
