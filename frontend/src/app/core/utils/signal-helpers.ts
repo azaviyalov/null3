@@ -1,6 +1,7 @@
 import { DestroyRef, WritableSignal, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import {
+  EMPTY,
   Observable,
   catchError,
   map,
@@ -10,7 +11,7 @@ import {
   switchMap,
 } from "rxjs";
 import {
-  State as State,
+  State,
   stateError,
   stateLoading,
   stateSuccess,
@@ -35,11 +36,20 @@ export function toWritableSignal<TTrigger, TResult = TTrigger>({
 
   trigger
     .pipe(
-      switchMap((input) => project(input).pipe(startWith(initialValue))),
       catchError((err) => {
         console.error(err);
-        return of(onError(err));
+        result.set(onError(err));
+        return EMPTY;
       }),
+      switchMap((input) =>
+        project(input).pipe(
+          startWith(initialValue),
+          catchError((err) => {
+            console.error(err);
+            return of(onError(err));
+          }),
+        ),
+      ),
       skip(1),
       takeUntilDestroyed(destroyRef),
     )

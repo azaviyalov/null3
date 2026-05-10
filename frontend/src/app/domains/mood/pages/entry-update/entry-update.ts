@@ -28,6 +28,7 @@ export class EntryUpdate {
 
   readonly entry = computed(() => this.entryState().value);
   readonly isLoading = computed(() => this.entryState().isLoading);
+  readonly errorMessage = computed(() => this.entryState().error);
 
   submit(payload: EditEntryRequest): void {
     const entry = this.entry();
