@@ -17,7 +17,8 @@ This is a pet project, focusing on simplicity and ease of development. Written f
 
 ## Requirements
 - Go 1.26.3
-- Node.js 20.x
+- Node.js 24.15.x
+- npm 11.14.x
 
 ## Usage
 - See the Makefile for available commands.
@@ -35,7 +36,7 @@ This is a pet project, focusing on simplicity and ease of development. Written f
    ```bash
    cd frontend
    npm ci
-   ng serve
+   npm start
    ```
 3. Open your browser and navigate to `http://localhost:4200` to access the application.
 

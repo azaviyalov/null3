@@ -6,10 +6,10 @@ node_modules/.package-lock.json:
 prepare: node_modules/.package-lock.json
 
 build: prepare
-	ng build --configuration production
+	npm run build
 
 lint: prepare
-	ng lint
+	npm run lint
 
 format: prepare
 	npm run prettier
