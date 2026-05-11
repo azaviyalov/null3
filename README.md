@@ -24,6 +24,12 @@ This is a pet project, focusing on simplicity and ease of development. Written f
 - See the Makefile for available commands.
 - Backend and frontend are managed in their respective directories.
 
+## Project Structure
+- Backend `internal/core` contains infrastructure and shared runtime concerns such as database, logging, HTTP server setup, and frontend asset serving.
+- Backend `internal/domain` contains feature logic such as `account`, `session`, `admin`, and `mood`.
+- Frontend `src/app/core` contains shared app utilities and static app-level pages such as `about`.
+- Frontend `src/app/domains` contains feature domains such as `account`, `session`, `admin`, `mood`, and `dashboard`.
+
 ## Running the Application
 
 ### Development

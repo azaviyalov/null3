@@ -1,0 +1,94 @@
+package session
+
+import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
+	"os"
+	"strconv"
+	"time"
+
+	"github.com/azaviyalov/null3/backend/internal/core/logging"
+)
+
+type Config struct {
+	Production             bool
+	JWTSecret              string
+	JWTExpiration          time.Duration
+	SecureCookies          bool
+	RefreshTokenExpiration time.Duration
+}
+
+func GetConfig() (Config, error) {
+	config := Config{
+		JWTExpiration:          24 * time.Hour,
+		RefreshTokenExpiration: 7 * 24 * time.Hour,
+	}
+
+	if productionParam := os.Getenv("PRODUCTION"); productionParam != "" {
+		production, err := strconv.ParseBool(productionParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid value for PRODUCTION: %v", err)
+		}
+		config.Production = production
+	}
+
+	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
+		config.JWTSecret = jwtSecret
+	} else {
+		if config.Production {
+			return Config{}, fmt.Errorf("JWT_SECRET must be set in production mode")
+		}
+
+		logging.Warn(context.Background(), "JWT_SECRET is not set, using randomly generated secret")
+		jwtSecret, err := generateRandomSecret()
+		if err != nil {
+			return Config{}, fmt.Errorf("failed to generate JWT_SECRET: %v", err)
+		}
+		config.JWTSecret = jwtSecret
+	}
+
+	if jwtExpirationParam := os.Getenv("JWT_EXPIRATION"); jwtExpirationParam != "" {
+		jwtExpiration, err := time.ParseDuration(jwtExpirationParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid JWT_EXPIRATION: %v", err)
+		}
+		if jwtExpiration <= 0 {
+			return Config{}, fmt.Errorf("JWT_EXPIRATION must be a positive duration")
+		}
+		config.JWTExpiration = jwtExpiration
+	}
+
+	if refreshExpirationParam := os.Getenv("REFRESH_TOKEN_EXPIRATION"); refreshExpirationParam != "" {
+		refreshExpiration, err := time.ParseDuration(refreshExpirationParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid REFRESH_TOKEN_EXPIRATION: %v", err)
+		}
+		if refreshExpiration <= 0 {
+			return Config{}, fmt.Errorf("REFRESH_TOKEN_EXPIRATION must be a positive duration")
+		}
+		config.RefreshTokenExpiration = refreshExpiration
+	}
+
+	if secureCookiesParam := os.Getenv("SECURE_COOKIES"); secureCookiesParam != "" {
+		secureCookies, err := strconv.ParseBool(secureCookiesParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid SECURE_COOKIES: %v", err)
+		}
+		config.SecureCookies = secureCookies
+	}
+
+	return config, nil
+}
+
+func generateRandomSecret() (string, error) {
+	const secretLen = 32
+	b := make([]byte, secretLen)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate random secret: %v", err)
+	}
+
+	return base64.RawURLEncoding.EncodeToString(b), nil
+}

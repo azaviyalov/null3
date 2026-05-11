@@ -8,14 +8,12 @@ import {
   EditEntryRequest,
 } from "../models/entry";
 import { Page, PageResponse } from "../../../core/utils/page";
-import { Auth } from "../../../core/auth/services/auth";
 
 @Injectable({
   providedIn: "root",
 })
 export class EntryApi {
   private readonly http = inject(HttpClient);
-  private readonly auth = inject(Auth);
   private readonly baseUrl = `${environment.apiUrl}/mood/entries`;
 
   getPaged(

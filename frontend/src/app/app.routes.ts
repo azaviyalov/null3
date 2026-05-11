@@ -1,37 +1,37 @@
 import { Routes } from "@angular/router";
-import { RequireAuthGuard } from "./core/auth/services/require-auth.guard";
-import { RequireGuestGuard } from "./core/auth/services/require-guest.guard";
-import { RequireAdminGuard } from "./core/admin/services/require-admin.guard";
-import { RequireAdminGuestGuard } from "./core/admin/services/require-admin-guest.guard";
+import { RequireAdminSessionGuard } from "./domains/admin/services/require-admin-session.guard";
+import { RequireAdminGuestGuard } from "./domains/admin/services/require-admin-guest.guard";
+import { RequireUserSessionGuard } from "./domains/session/services/require-user-session.guard";
+import { RequireUserGuestGuard } from "./domains/session/services/require-user-guest.guard";
 
 export const routes: Routes = [
   {
     path: "login",
-    canActivate: [RequireGuestGuard],
+    canActivate: [RequireUserGuestGuard],
     loadComponent: () =>
-      import("./core/auth/pages/login/login").then((m) => m.Login),
+      import("./domains/session/pages/login/login").then((m) => m.Login),
   },
   {
     path: "forgot-password",
-    canActivate: [RequireGuestGuard],
+    canActivate: [RequireUserGuestGuard],
     loadComponent: () =>
-      import("./core/auth/pages/forgot-password/forgot-password").then(
+      import("./domains/account/pages/forgot-password/forgot-password").then(
         (m) => m.ForgotPassword,
       ),
   },
   {
     path: "reset-password",
-    canActivate: [RequireGuestGuard],
+    canActivate: [RequireUserGuestGuard],
     loadComponent: () =>
-      import("./core/auth/pages/reset-password/reset-password").then(
+      import("./domains/account/pages/reset-password/reset-password").then(
         (m) => m.ResetPassword,
       ),
   },
   {
     path: "invite/:token",
-    canActivate: [RequireGuestGuard],
+    canActivate: [RequireUserGuestGuard],
     loadComponent: () =>
-      import("./core/auth/pages/invite-register/invite-register").then(
+      import("./domains/account/pages/invite-register/invite-register").then(
         (m) => m.InviteRegister,
       ),
   },
@@ -39,27 +39,28 @@ export const routes: Routes = [
     path: "admin/login",
     canActivate: [RequireAdminGuestGuard],
     loadComponent: () =>
-      import("./core/admin/pages/admin-login/admin-login").then(
+      import("./domains/admin/pages/admin-login/admin-login").then(
         (m) => m.AdminLogin,
       ),
   },
   {
     path: "admin/invites",
-    canActivate: [RequireAdminGuard],
+    canActivate: [RequireAdminSessionGuard],
     loadComponent: () =>
-      import("./core/admin/pages/admin-invites/admin-invites").then(
+      import("./domains/admin/pages/admin-invites/admin-invites").then(
         (m) => m.AdminInvites,
       ),
   },
   { path: "logout", redirectTo: "/login" },
   {
     path: "",
-    canActivate: [RequireAuthGuard],
-    loadComponent: () => import("./core/pages/home/home").then((m) => m.Home),
+    canActivate: [RequireUserSessionGuard],
+    loadComponent: () =>
+      import("./domains/dashboard/pages/home/home").then((m) => m.Home),
   },
   {
     path: "mood/entries",
-    canActivate: [RequireAuthGuard],
+    canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
       import("./domains/mood/pages/entry-list/entry-list").then(
         (m) => m.EntryList,
@@ -67,7 +68,7 @@ export const routes: Routes = [
   },
   {
     path: "mood/entries/create",
-    canActivate: [RequireAuthGuard],
+    canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
       import("./domains/mood/pages/entry-create/entry-create").then(
         (m) => m.EntryCreate,
@@ -75,7 +76,7 @@ export const routes: Routes = [
   },
   {
     path: "mood/entries/:id",
-    canActivate: [RequireAuthGuard],
+    canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
       import("./domains/mood/pages/entry-view/entry-view").then(
         (m) => m.EntryView,
@@ -83,7 +84,7 @@ export const routes: Routes = [
   },
   {
     path: "mood/entries/:id/update",
-    canActivate: [RequireAuthGuard],
+    canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
       import("./domains/mood/pages/entry-update/entry-update").then(
         (m) => m.EntryUpdate,

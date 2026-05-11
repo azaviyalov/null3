@@ -5,20 +5,22 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/azaviyalov/null3/backend/internal/core/auth"
 	"github.com/azaviyalov/null3/backend/internal/core/db"
 	"github.com/azaviyalov/null3/backend/internal/core/frontend"
 	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/core/server"
+	"github.com/azaviyalov/null3/backend/internal/domain/account"
+	"github.com/azaviyalov/null3/backend/internal/domain/admin"
 	"github.com/azaviyalov/null3/backend/internal/domain/mood"
+	"github.com/azaviyalov/null3/backend/internal/domain/session"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
 
 type App struct {
-	authService *auth.Service
-	echo        *echo.Echo
-	config      Config
+	sessionService *session.Service
+	echo           *echo.Echo
+	config         Config
 }
 
 func New() *App {
@@ -45,10 +47,10 @@ func New() *App {
 
 	err = db.AutoMigrate(database,
 		&mood.Entry{},
-		&auth.User{},
-		&auth.RefreshToken{},
-		&auth.PasswordResetToken{},
-		&auth.Invite{},
+		&account.User{},
+		&session.RefreshToken{},
+		&account.PasswordResetToken{},
+		&account.Invite{},
 	)
 	if err != nil {
 		logging.Error(context.Background(), "database migration failed", "error", err)
@@ -59,18 +61,35 @@ func New() *App {
 
 	frontend.RegisterRoutes(e, config.Frontend)
 
-	authRepository := auth.NewRepository(database)
-	authService := auth.NewService(authRepository, config.Auth)
-	if err := authService.SeedAdminUser(context.Background()); err != nil {
+	sessionRepository := session.NewRepository(database)
+	sessionService := session.NewService(sessionRepository, config.Session)
+
+	accountRepository := account.NewRepository(database)
+	accountService := account.NewService(accountRepository, sessionService, config.Account)
+	if err := accountService.SeedAdminUser(context.Background()); err != nil {
 		logging.Error(context.Background(), "failed to seed admin user", "error", err)
 		os.Exit(1)
 	}
-	authHandler := auth.NewHandler(authService, config.Auth)
+	accountHandler := account.NewHandler(accountService, sessionService, config.Account, config.Session)
+	adminHandler := admin.NewHandler(accountService, sessionService, config.Admin, config.Session)
 
-	userJWTMiddleware := auth.UserJWTMiddleware(authService)
-	adminJWTMiddleware := auth.AdminJWTMiddleware(authService)
+	resolveActor := func(ctx context.Context, userID uint) (*session.Actor, error) {
+		user, err := accountService.GetUserByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
 
-	auth.RegisterRoutes(e, authHandler, userJWTMiddleware, adminJWTMiddleware)
+		return &session.Actor{
+			UserID:  user.ID,
+			IsAdmin: accountService.IsAdmin(user),
+		}, nil
+	}
+
+	userJWTMiddleware := session.UserJWTMiddleware(sessionService, resolveActor)
+	adminJWTMiddleware := session.AdminJWTMiddleware(sessionService, resolveActor)
+
+	account.RegisterRoutes(e, accountHandler, userJWTMiddleware)
+	admin.RegisterRoutes(e, adminHandler, adminJWTMiddleware)
 
 	moodRepo := mood.NewRepository(database)
 	moodService := mood.NewService(moodRepo)
@@ -79,14 +98,14 @@ func New() *App {
 	mood.RegisterRoutes(e, moodHandler, userJWTMiddleware)
 
 	return &App{
-		authService: authService,
-		echo:        e,
-		config:      config,
+		sessionService: sessionService,
+		echo:           e,
+		config:         config,
 	}
 }
 
 func (a *App) Start() {
-	if err := a.authService.DeleteExpiredRefreshTokens(context.Background()); err != nil {
+	if err := a.sessionService.DeleteExpiredRefreshTokens(context.Background()); err != nil {
 		logging.Error(context.Background(), "failed to delete expired refresh tokens", "error", err)
 		os.Exit(1)
 	}
