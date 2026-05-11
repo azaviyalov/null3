@@ -11,3 +11,26 @@
 .detail-deleted {
   opacity: 0.72;
 }
+
+.backlink-card {
+  display: grid;
+  width: 100%;
+  gap: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 78%, transparent);
+  border-radius: 1.4rem;
+  background: color-mix(in oklab, var(--color-base-100) 86%, white);
+  padding: 1rem 1.1rem;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.backlink-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--color-primary) 26%, white);
+  background: color-mix(in oklab, var(--color-primary) 6%, white);
+}

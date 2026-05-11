@@ -1,17 +1,30 @@
 <section class="page-shell-wide space-y-10">
   <header class="page-intro">
     <h1 class="page-title">Welcome to null3</h1>
-    <p class="page-copy">Track your mood and reflect on your feelings.</p>
+    <p class="page-copy">
+      Capture quick Mood Entries, then expand them into fuller Diary Entries.
+    </p>
   </header>
 
   <section class="space-y-4">
     <h2 class="section-title">Latest Mood Entries</h2>
 
     <app-entry-history
-      [entries]="entriesPage()?.items ?? null"
+      [entries]="moodEntriesPage()?.items ?? null"
       [showOpen]="true"
-      emptyMessage="No entries found"
-      (open)="openEntry($event)"
+      emptyMessage="No Mood Entries found"
+      (open)="openMoodEntry($event)"
+    />
+  </section>
+
+  <section class="space-y-4">
+    <h2 class="section-title">Latest Diary Entries</h2>
+
+    <app-diary-entry-feed
+      [entries]="diaryEntriesPage()?.items ?? null"
+      [showOpen]="true"
+      emptyMessage="No Diary Entries found"
+      (open)="openDiaryEntry($event)"
     />
   </section>
 </section>

@@ -8,12 +8,18 @@ import (
 )
 
 type Service struct {
-	repo *Repository
+	repo            *Repository
+	diaryEntryLinks DiaryEntryLinkFinder
 }
 
-func NewService(repo *Repository) *Service {
+type DiaryEntryLinkFinder interface {
+	ListDiaryEntryLinks(ctx context.Context, userID, moodEntryID uint) ([]DiaryEntryLink, error)
+}
+
+func NewService(repo *Repository, diaryEntryLinks DiaryEntryLinkFinder) *Service {
 	return &Service{
-		repo: repo,
+		repo:            repo,
+		diaryEntryLinks: diaryEntryLinks,
 	}
 }
 
@@ -124,4 +130,12 @@ func (s *Service) RestoreEntry(ctx context.Context, userID, id uint) (*Entry, er
 	}
 	logging.Info(ctx, "successfully restored entry", "user_id", userID, "id", id)
 	return restoredEntry, nil
+}
+
+func (s *Service) ListDiaryEntryLinks(ctx context.Context, userID, moodEntryID uint) ([]DiaryEntryLink, error) {
+	if s.diaryEntryLinks == nil {
+		return []DiaryEntryLink{}, nil
+	}
+
+	return s.diaryEntryLinks.ListDiaryEntryLinks(ctx, userID, moodEntryID)
 }

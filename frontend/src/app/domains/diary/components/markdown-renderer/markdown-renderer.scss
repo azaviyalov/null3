@@ -1,0 +1,96 @@
+.markdown-renderer {
+  color: color-mix(in oklab, var(--color-base-content) 88%, transparent);
+  line-height: 1.8;
+}
+
+.markdown-renderer > :first-child {
+  margin-top: 0;
+}
+
+.markdown-renderer > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-renderer h1,
+.markdown-renderer h2,
+.markdown-renderer h3,
+.markdown-renderer h4 {
+  margin: 1.4em 0 0.55em;
+  font-family: var(--font-serif);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--color-base-content);
+}
+
+.markdown-renderer h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.markdown-renderer h2 {
+  font-size: clamp(1.55rem, 3vw, 2.2rem);
+}
+
+.markdown-renderer h3 {
+  font-size: 1.2rem;
+}
+
+.markdown-renderer p,
+.markdown-renderer ul,
+.markdown-renderer ol,
+.markdown-renderer blockquote,
+.markdown-renderer pre {
+  margin: 0 0 1rem;
+}
+
+.markdown-renderer ul,
+.markdown-renderer ol {
+  padding-left: 1.35rem;
+}
+
+.markdown-renderer li + li {
+  margin-top: 0.4rem;
+}
+
+.markdown-renderer blockquote {
+  border-left: 3px solid
+    color-mix(in oklab, var(--color-primary) 28%, var(--color-base-300));
+  margin-left: 0;
+  padding: 0.2rem 0 0.2rem 1rem;
+  color: color-mix(in oklab, var(--color-base-content) 65%, transparent);
+}
+
+.markdown-renderer code {
+  border-radius: 0.65rem;
+  background: color-mix(in oklab, var(--color-base-200) 62%, white);
+  padding: 0.16rem 0.42rem;
+  font-size: 0.92em;
+}
+
+.markdown-renderer pre {
+  overflow-x: auto;
+  border-radius: 1.25rem;
+  background: color-mix(in oklab, var(--color-base-200) 80%, white);
+  padding: 1rem 1.1rem;
+}
+
+.markdown-renderer pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-renderer hr {
+  border: 0;
+  border-top: 1px solid
+    color-mix(in oklab, var(--color-base-300) 84%, transparent);
+  margin: 1.6rem 0;
+}
+
+.markdown-renderer a {
+  color: color-mix(in oklab, var(--color-primary) 76%, black);
+  text-decoration-thickness: 0.08em;
+}
+
+.markdown-empty {
+  margin: 0;
+  color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+}

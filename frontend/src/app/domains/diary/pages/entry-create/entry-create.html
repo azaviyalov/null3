@@ -1,0 +1,21 @@
+<section class="page-shell-wide space-y-6">
+  <header class="page-intro">
+    <h1 class="page-title">New Diary Entry</h1>
+    <p class="page-copy">
+      Write the fuller version of the moment, then thread Mood Entries into the
+      narrative where they belong.
+    </p>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="status-message error">{{ errorMessage() }}</div>
+  }
+
+  <section class="surface-panel">
+    <app-diary-entry-form
+      [disabled]="isSubmitting()"
+      submitLabel="Save entry"
+      (entrySubmit)="submit($event)"
+    />
+  </section>
+</section>

@@ -1,4 +1,4 @@
-<section class="page-shell space-y-6">
+<section class="page-shell-wide space-y-6">
   <button type="button" class="quiet-action w-fit" (click)="goBack()">
     Back
   </button>
@@ -6,7 +6,7 @@
   @if (errorMessage()) {
     <div class="status-message error">{{ errorMessage() }}</div>
   } @else {
-    <app-entry-detail
+    <app-diary-entry-detail
       [entry]="entry()"
       [skeleton]="isLoading()"
       [showEdit]="!entry()?.deletedAt"
@@ -15,8 +15,7 @@
       (edit)="editEntry()"
       (delete)="deleteEntry()"
       (restore)="restoreEntry()"
-      (openDiaryEntry)="openDiaryEntry($event)"
-      (createDiaryEntry)="createDiaryEntry()"
+      (openMood)="openMoodEntry($event)"
     />
   }
 </section>

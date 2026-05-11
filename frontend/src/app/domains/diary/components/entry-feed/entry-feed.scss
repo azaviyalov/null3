@@ -1,0 +1,7 @@
+.entry-row {
+  transition: background-color 160ms ease;
+}
+
+.entry-row:hover {
+  background: color-mix(in oklab, var(--color-primary) 4%, white);
+}

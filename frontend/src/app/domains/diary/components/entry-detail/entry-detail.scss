@@ -1,0 +1,10 @@
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
+}
+
+.detail-deleted {
+  opacity: 0.92;
+}

@@ -1,10 +1,14 @@
 <section class="page-shell-wide space-y-8">
   <header class="page-intro">
-    <h1 class="page-title">Your mood entries</h1>
+    <h1 class="page-title">Your Diary Entries</h1>
+    <p class="page-copy">
+      A fuller writing space for memory, context, and reflection beyond quick
+      Mood Entries.
+    </p>
 
     <div class="page-actions">
       <button type="button" class="primary-action" (click)="createEntry()">
-        Add Entry
+        New Diary Entry
       </button>
     </div>
   </header>
@@ -13,7 +17,7 @@
     <div
       class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
     >
-      <div class="filter-switch" aria-label="Entry status filter">
+      <div class="filter-switch" aria-label="Diary Entry status filter">
         <button
           type="button"
           class="filter-switch-button"
@@ -77,12 +81,12 @@
       }
     </div>
 
-    <app-entry-history
+    <app-diary-entry-feed
       [skeleton]="isLoading()"
       [skeletonCount]="defaultEntryCount"
       [entries]="page()?.items ?? null"
       [showOpen]="true"
-      emptyMessage="No Mood Entries found"
+      emptyMessage="No Diary Entries found"
       (open)="openEntry($event)"
     />
   </section>

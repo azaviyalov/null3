@@ -1,0 +1,41 @@
+.diary-form-stack {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.diary-helper-panel,
+.diary-preview-panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1.2rem;
+}
+
+.diary-link-chip {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 82%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, white 82%, var(--color-base-100));
+  color: color-mix(in oklab, var(--color-base-content) 82%, transparent);
+  padding: 0.55rem 0.85rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.diary-link-chip:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--color-primary) 28%, white);
+  background: color-mix(in oklab, var(--color-primary) 8%, white);
+}
+
+.diary-link-chip:disabled {
+  opacity: 0.7;
+}
+
+.diary-markdown-field {
+  min-height: 24rem;
+}

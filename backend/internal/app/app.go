@@ -11,6 +11,7 @@ import (
 	"github.com/azaviyalov/null3/backend/internal/core/server"
 	"github.com/azaviyalov/null3/backend/internal/domain/account"
 	"github.com/azaviyalov/null3/backend/internal/domain/admin"
+	"github.com/azaviyalov/null3/backend/internal/domain/diary"
 	"github.com/azaviyalov/null3/backend/internal/domain/mood"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
 	"github.com/joho/godotenv"
@@ -47,6 +48,8 @@ func New() *App {
 
 	err = db.AutoMigrate(database,
 		&mood.Entry{},
+		&diary.Entry{},
+		&diary.MoodEntryLink{},
 		&account.User{},
 		&session.RefreshToken{},
 		&account.PasswordResetToken{},
@@ -92,10 +95,14 @@ func New() *App {
 	admin.RegisterRoutes(e, adminHandler, adminJWTMiddleware)
 
 	moodRepo := mood.NewRepository(database)
-	moodService := mood.NewService(moodRepo)
+	diaryRepo := diary.NewRepository(database)
+	diaryService := diary.NewService(diaryRepo)
+	moodService := mood.NewService(moodRepo, diaryService)
 	moodHandler := mood.NewHandler(moodService)
+	diaryHandler := diary.NewHandler(diaryService)
 
 	mood.RegisterRoutes(e, moodHandler, userJWTMiddleware)
+	diary.RegisterRoutes(e, diaryHandler, userJWTMiddleware)
 
 	return &App{
 		sessionService: sessionService,

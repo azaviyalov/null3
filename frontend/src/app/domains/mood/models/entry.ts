@@ -1,3 +1,29 @@
+export class DiaryEntryLink {
+  constructor(
+    readonly id: number,
+    readonly title: string | undefined,
+    readonly preview: string | undefined,
+    readonly occurredAt: Date,
+    readonly createdAt: Date,
+    readonly updatedAt: Date,
+  ) {}
+
+  get headline(): string {
+    return this.title || this.preview || "Untitled Diary Entry";
+  }
+
+  static fromResponse(data: DiaryEntryLinkResponse): DiaryEntryLink {
+    return new DiaryEntryLink(
+      data.id,
+      data.title || undefined,
+      data.preview || undefined,
+      new Date(data.occurred_at),
+      new Date(data.created_at),
+      new Date(data.updated_at),
+    );
+  }
+}
+
 export class Entry {
   constructor(
     readonly id: number,
@@ -7,6 +33,7 @@ export class Entry {
     readonly updatedAt: Date,
     readonly deletedAt?: Date,
     readonly note?: string,
+    readonly diaryEntryLinks: DiaryEntryLink[] = [],
   ) {}
 
   static fromResponse(data: EntryResponse): Entry {
@@ -18,6 +45,7 @@ export class Entry {
       new Date(data.updated_at),
       data.deleted_at ? new Date(data.deleted_at) : undefined,
       data.note || undefined,
+      (data.diary_entry_links ?? []).map(DiaryEntryLink.fromResponse),
     );
   }
 }
@@ -37,4 +65,14 @@ export interface EntryResponse {
   readonly created_at: string;
   readonly updated_at: string;
   readonly deleted_at?: string;
+  readonly diary_entry_links?: DiaryEntryLinkResponse[];
+}
+
+export interface DiaryEntryLinkResponse {
+  readonly id: number;
+  readonly title?: string;
+  readonly preview?: string;
+  readonly occurred_at: string;
+  readonly created_at: string;
+  readonly updated_at: string;
 }

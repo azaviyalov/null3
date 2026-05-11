@@ -1,30 +1,29 @@
-import { Component, computed, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { Entry } from "../../models/entry";
-import { feelingLabel } from "../../utils/entry-presenter";
+import { Component, computed, input, output } from "@angular/core";
+import { DiaryEntry } from "../../models/entry";
 
 interface EntryGroup {
   readonly key: string;
   readonly label: string;
-  readonly entries: Entry[];
+  readonly entries: DiaryEntry[];
 }
 
 @Component({
-  selector: "app-entry-history",
+  selector: "app-diary-entry-feed",
   standalone: true,
   imports: [CommonModule],
-  templateUrl: "./entry-history.html",
-  styleUrl: "./entry-history.scss",
+  templateUrl: "./entry-feed.html",
+  styleUrl: "./entry-feed.scss",
 })
-export class EntryHistory {
+export class EntryFeed {
   readonly skeleton = input(false);
   readonly skeletonCount = input(10);
-  readonly entries = input<Entry[] | null>(null);
+  readonly entries = input<DiaryEntry[] | null>(null);
   readonly showOpen = input(false);
   readonly showEdit = input(false);
   readonly showDelete = input(false);
   readonly showRestore = input(false);
-  readonly emptyMessage = input("No Mood Entries found");
+  readonly emptyMessage = input("No Diary Entries found");
 
   readonly groupedEntries = computed<EntryGroup[]>(() =>
     groupEntriesByDate(this.entries() ?? []),
@@ -32,12 +31,6 @@ export class EntryHistory {
   readonly skeletonRows = computed(() =>
     Array.from({ length: this.skeletonCount() }, (_, index) => index),
   );
-
-  readonly open = output<Entry>();
-  readonly edit = output<Entry>();
-  readonly delete = output<Entry>();
-  readonly restore = output<Entry>();
-
   readonly showActions = computed(
     () =>
       this.showOpen() ||
@@ -45,19 +38,22 @@ export class EntryHistory {
       this.showDelete() ||
       this.showRestore(),
   );
-  readonly feelingLabel = feelingLabel;
+
+  readonly open = output<DiaryEntry>();
+  readonly edit = output<DiaryEntry>();
+  readonly delete = output<DiaryEntry>();
+  readonly restore = output<DiaryEntry>();
 
   trackByGroup = (_: number, group: EntryGroup): string => group.key;
-  trackByEntry = (_: number, entry: Entry): number => entry.id;
+  trackByEntry = (_: number, entry: DiaryEntry): number => entry.id;
 }
 
-function groupEntriesByDate(entries: Entry[]): EntryGroup[] {
+function groupEntriesByDate(entries: DiaryEntry[]): EntryGroup[] {
   const groups = new Map<string, EntryGroup>();
 
   for (const entry of entries) {
-    const key = dateKey(entry.createdAt);
+    const key = dateKey(entry.occurredAt);
     const existingGroup = groups.get(key);
-
     if (existingGroup) {
       existingGroup.entries.push(entry);
       continue;
@@ -65,7 +61,7 @@ function groupEntriesByDate(entries: Entry[]): EntryGroup[] {
 
     groups.set(key, {
       key,
-      label: formatGroupLabel(entry.createdAt),
+      label: formatGroupLabel(entry.occurredAt),
       entries: [entry],
     });
   }

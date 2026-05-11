@@ -91,6 +91,38 @@ export const routes: Routes = [
       ),
   },
   {
+    path: "diary/entries",
+    canActivate: [RequireUserSessionGuard],
+    loadComponent: () =>
+      import("./domains/diary/pages/entry-list/entry-list").then(
+        (m) => m.EntryList,
+      ),
+  },
+  {
+    path: "diary/entries/create",
+    canActivate: [RequireUserSessionGuard],
+    loadComponent: () =>
+      import("./domains/diary/pages/entry-create/entry-create").then(
+        (m) => m.EntryCreate,
+      ),
+  },
+  {
+    path: "diary/entries/:id",
+    canActivate: [RequireUserSessionGuard],
+    loadComponent: () =>
+      import("./domains/diary/pages/entry-view/entry-view").then(
+        (m) => m.EntryView,
+      ),
+  },
+  {
+    path: "diary/entries/:id/update",
+    canActivate: [RequireUserSessionGuard],
+    loadComponent: () =>
+      import("./domains/diary/pages/entry-update/entry-update").then(
+        (m) => m.EntryUpdate,
+      ),
+  },
+  {
     path: "about",
     loadComponent: () =>
       import("./core/pages/about/about").then((m) => m.About),

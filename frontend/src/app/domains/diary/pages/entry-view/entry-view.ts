@@ -1,13 +1,14 @@
 import { Component, computed, inject } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { EntryApi } from "../../services/entry-api";
-import { EntryDetail } from "../../components/entry-detail/entry-detail";
 import { map } from "rxjs";
+import { Entry as MoodEntry } from "../../../mood/models/entry";
 import { toWritableStateSignal } from "../../../../core/utils/signal-helpers";
 import { stateError, stateSuccess } from "../../../../core/utils/state";
-import { DiaryEntryLink } from "../../models/entry";
+import { DiaryEntryApi } from "../../services/entry-api";
+import { EntryDetail } from "../../components/entry-detail/entry-detail";
+
 @Component({
-  selector: "app-entry-view",
+  selector: "app-diary-entry-view",
   standalone: true,
   imports: [EntryDetail],
   templateUrl: "./entry-view.html",
@@ -16,7 +17,7 @@ import { DiaryEntryLink } from "../../models/entry";
 export class EntryView {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly entryApi = inject(EntryApi);
+  private readonly entryApi = inject(DiaryEntryApi);
 
   private readonly entryState = toWritableStateSignal({
     trigger: this.route.params.pipe(map((params) => Number(params["id"]))),
@@ -34,7 +35,7 @@ export class EntryView {
       return;
     }
 
-    this.router.navigate(["/mood/entries", entry.id, "update"]);
+    this.router.navigate(["/diary/entries", entry.id, "update"]);
   }
 
   deleteEntry(): void {
@@ -58,21 +59,13 @@ export class EntryView {
     }
 
     this.entryApi.restore(entry.id).subscribe({
-      next: (restoredEntry) => {
-        this.entryState.set(stateSuccess(restoredEntry));
-      },
-      error: (err) => {
-        this.entryState.set(stateError(err));
-      },
+      next: (restoredEntry) => this.entryState.set(stateSuccess(restoredEntry)),
+      error: (err) => this.entryState.set(stateError(err)),
     });
   }
 
-  openDiaryEntry(entry: DiaryEntryLink): void {
-    this.router.navigate(["/diary/entries", entry.id]);
-  }
-
-  createDiaryEntry(): void {
-    this.router.navigate(["/diary/entries/create"]);
+  openMoodEntry(entry: MoodEntry): void {
+    this.router.navigate(["/mood/entries", entry.id]);
   }
 
   goBack(): void {
