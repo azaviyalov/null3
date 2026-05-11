@@ -7,10 +7,21 @@ import (
 )
 
 const (
-	cookieName = "jwt"
+	userCookieName         = "jwt"
+	userRefreshCookieName  = "refresh_token"
+	adminCookieName        = "admin_jwt"
+	adminRefreshCookieName = "admin_refresh_token"
 )
 
-func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
+func UserJWTMiddleware(service *Service) echo.MiddlewareFunc {
+	return jwtMiddleware(service, userCookieName, false)
+}
+
+func AdminJWTMiddleware(service *Service) echo.MiddlewareFunc {
+	return jwtMiddleware(service, adminCookieName, true)
+}
+
+func jwtMiddleware(service *Service, cookieName string, requireAdmin bool) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cookie, err := c.Cookie(cookieName)
@@ -22,7 +33,17 @@ func JWTMiddleware(config Config, service *Service) echo.MiddlewareFunc {
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
-			setUser(c, &User{ID: jwt.UserID})
+			user, err := service.GetUserByID(c.Request().Context(), jwt.UserID)
+			if err != nil {
+				return echo.ErrUnauthorized.WithInternal(err)
+			}
+			if requireAdmin && !service.IsAdmin(user) {
+				return echo.ErrForbidden.WithInternal(ErrAdminAccessRequired)
+			}
+			if !requireAdmin && service.IsAdmin(user) {
+				return echo.ErrUnauthorized.WithInternal(ErrInvalidCredentials)
+			}
+			setUser(c, user)
 			return next(c)
 		}
 	}

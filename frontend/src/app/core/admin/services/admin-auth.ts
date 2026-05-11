@@ -1,37 +1,27 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { tap, catchError } from "rxjs/operators";
+import { catchError, tap } from "rxjs/operators";
 import { environment } from "../../../../environments/environment";
-import { LoginRequest } from "../models/login";
-import { UserResponse } from "../models/user";
-import {
-  InviteRegistrationRequest,
-  InviteValidationResponse,
-} from "../models/invite";
-import {
-  ForgotPasswordRequest,
-  ForgotPasswordResponse,
-  MessageResponse,
-  ResetPasswordRequest,
-} from "../models/password";
+import { LoginRequest } from "../../auth/models/login";
+import { UserResponse } from "../../auth/models/user";
+import { AdminInviteResponse } from "../models/invite";
 
 @Injectable({ providedIn: "root" })
-export class Auth {
+export class AdminAuth {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/auth`;
-  private readonly loginUrl = `${this.baseUrl}/login`;
-  private readonly meUrl = `${this.baseUrl}/me`;
+  private readonly baseUrl = `${environment.apiUrl}/admin/auth`;
+  private readonly invitesUrl = `${environment.apiUrl}/admin/invites`;
 
   private readonly _user = new BehaviorSubject<UserResponse | null>(null);
   private readonly _isAuthenticated = new BehaviorSubject<boolean | null>(null);
 
   init(): void {
     this.http
-      .get<UserResponse>(this.meUrl)
+      .get<UserResponse>(`${this.baseUrl}/me`)
       .pipe(
         catchError((error) => {
-          console.error("Error during authentication initialization:", error);
+          console.error("Error during admin authentication initialization:", error);
           return of(null);
         }),
       )
@@ -56,7 +46,7 @@ export class Auth {
   }
 
   login(data: LoginRequest): Observable<UserResponse> {
-    return this.http.post<UserResponse>(this.loginUrl, data).pipe(
+    return this.http.post<UserResponse>(`${this.baseUrl}/login`, data).pipe(
       tap((response) => {
         this._user.next(response);
         this._isAuthenticated.next(true);
@@ -64,35 +54,8 @@ export class Auth {
     );
   }
 
-  registerWithInvite(
-    token: string,
-    data: InviteRegistrationRequest,
-  ): Observable<UserResponse> {
-    return this.http
-      .post<UserResponse>(`${this.baseUrl}/invites/${token}/register`, data)
-      .pipe(
-        tap((response) => {
-          this._user.next(response);
-          this._isAuthenticated.next(true);
-        }),
-      );
-  }
-
-  getInvite(token: string): Observable<InviteValidationResponse> {
-    return this.http.get<InviteValidationResponse>(`${this.baseUrl}/invites/${token}`);
-  }
-
-  requestPasswordReset(
-    data: ForgotPasswordRequest,
-  ): Observable<ForgotPasswordResponse> {
-    return this.http.post<ForgotPasswordResponse>(
-      `${this.baseUrl}/forgot-password`,
-      data,
-    );
-  }
-
-  resetPassword(data: ResetPasswordRequest): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.baseUrl}/reset-password`, data);
+  createInvite(): Observable<AdminInviteResponse> {
+    return this.http.post<AdminInviteResponse>(this.invitesUrl, {});
   }
 
   clearSession(): void {

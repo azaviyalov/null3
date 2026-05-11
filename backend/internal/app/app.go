@@ -45,7 +45,10 @@ func New() *App {
 
 	err = db.AutoMigrate(database,
 		&mood.Entry{},
+		&auth.User{},
 		&auth.RefreshToken{},
+		&auth.PasswordResetToken{},
+		&auth.Invite{},
 	)
 	if err != nil {
 		logging.Error(context.Background(), "database migration failed", "error", err)
@@ -57,18 +60,23 @@ func New() *App {
 	frontend.RegisterRoutes(e, config.Frontend)
 
 	authRepository := auth.NewRepository(database)
-	authService := auth.NewService(authRepository, config.Auth, config.StubUserConfig)
-	authHandler := auth.NewHandler(authService, config.Auth, config.StubUserConfig)
+	authService := auth.NewService(authRepository, config.Auth)
+	if err := authService.SeedAdminUser(context.Background()); err != nil {
+		logging.Error(context.Background(), "failed to seed admin user", "error", err)
+		os.Exit(1)
+	}
+	authHandler := auth.NewHandler(authService, config.Auth)
 
-	jwtMiddleware := auth.JWTMiddleware(config.Auth, authService)
+	userJWTMiddleware := auth.UserJWTMiddleware(authService)
+	adminJWTMiddleware := auth.AdminJWTMiddleware(authService)
 
-	auth.RegisterRoutes(e, authHandler, jwtMiddleware)
+	auth.RegisterRoutes(e, authHandler, userJWTMiddleware, adminJWTMiddleware)
 
 	moodRepo := mood.NewRepository(database)
 	moodService := mood.NewService(moodRepo)
 	moodHandler := mood.NewHandler(moodService)
 
-	mood.RegisterRoutes(e, moodHandler, jwtMiddleware)
+	mood.RegisterRoutes(e, moodHandler, userJWTMiddleware)
 
 	return &App{
 		authService: authService,

@@ -1,48 +1,77 @@
 <mat-toolbar>
   <div class="toolbar-container">
-    @if (!user()) {
+    <div class="toolbar-section">
+      @if (!user()) {
+        <button
+          matButton
+          matRipple
+          routerLink="/login"
+          routerLinkActive="active-link"
+        >
+          Login
+        </button>
+      }
+      @if (user()) {
+        <button
+          matButton
+          matRipple
+          routerLink="/"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Home
+        </button>
+        <button
+          matButton
+          matRipple
+          routerLink="/mood/entries"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Mood Entries
+        </button>
+      }
       <button
         matButton
         matRipple
-        routerLink="/login"
+        routerLink="/about"
         routerLinkActive="active-link"
       >
-        Login
+        About
       </button>
-    }
-    @if (user()) {
-      <button
-        matButton
-        matRipple
-        routerLink="/"
-        routerLinkActive="active-link"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        Home
-      </button>
-      <button
-        matButton
-        matRipple
-        routerLink="/mood/entries"
-        routerLinkActive="active-link"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        Mood Entries
-      </button>
-    }
-    <button
-      matButton
-      matRipple
-      routerLink="/about"
-      routerLinkActive="active-link"
-    >
-      About
-    </button>
-    @if (user()) {
-      <button matButton matRipple (click)="logout()" routerLink="/logout">
-        Logout
-      </button>
-    }
+      @if (user()) {
+        <button matButton matRipple (click)="logout()" routerLink="/logout">
+          Logout
+        </button>
+      }
+    </div>
+
+    <span class="spacer"></span>
+
+    <div class="toolbar-section">
+      @if (!adminUser()) {
+        <button
+          matButton
+          matRipple
+          routerLink="/admin/login"
+          routerLinkActive="active-link"
+        >
+          Admin Login
+        </button>
+      } @else {
+        <button
+          matButton
+          matRipple
+          routerLink="/admin/invites"
+          routerLinkActive="active-link"
+        >
+          Admin Area
+        </button>
+        <button matButton matRipple (click)="logoutAdmin()">
+          Admin Logout
+        </button>
+      }
+    </div>
   </div>
 </mat-toolbar>
 <main class="container">

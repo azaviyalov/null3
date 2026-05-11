@@ -13,6 +13,7 @@ import {
   withInterceptorsFromDi,
 } from "@angular/common/http";
 import { AuthInterceptor } from "./core/auth/services/auth.interceptor";
+import { AdminAuthInterceptor } from "./core/admin/services/admin-auth.interceptor";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: AdminAuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
 };

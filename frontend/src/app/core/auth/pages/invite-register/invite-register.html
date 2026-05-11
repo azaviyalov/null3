@@ -1,0 +1,137 @@
+<main>
+  <h1>Accept Invite</h1>
+
+  @if (isLoadingInvite()) {
+    <p>Checking your invite link...</p>
+  } @else if (error() && !inviteExpiresAt()) {
+    <div class="error-message">
+      <mat-error>{{ error() }}</mat-error>
+    </div>
+    <div class="page-links">
+      <a routerLink="/login">Back to login</a>
+    </div>
+  } @else {
+    <p>
+      Create your account. This invite link expires on
+      {{ inviteExpiresAt() | date: "medium" }}.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+      <mat-form-field class="full-width">
+        <mat-label>Login</mat-label>
+        <input
+          matInput
+          formControlName="login"
+          autocomplete="username"
+          required
+        />
+        @if (
+          form.controls["login"].hasError("required") &&
+          form.controls["login"].touched
+        ) {
+          <div>
+            <mat-error>This field is required</mat-error>
+          </div>
+        } @else if (
+          form.controls["login"].hasError("pattern") &&
+          form.controls["login"].touched
+        ) {
+          <div>
+            <mat-error>
+              Login must be 3-32 characters and use only letters, numbers,
+              underscores, or hyphens
+            </mat-error>
+          </div>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          formControlName="email"
+          type="email"
+          autocomplete="email"
+          required
+        />
+        @if (
+          form.controls["email"].hasError("required") &&
+          form.controls["email"].touched
+        ) {
+          <div>
+            <mat-error>This field is required</mat-error>
+          </div>
+        }
+        @if (
+          form.controls["email"].hasError("email") &&
+          form.controls["email"].touched
+        ) {
+          <div>
+            <mat-error>Enter a valid email address</mat-error>
+          </div>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          formControlName="password"
+          type="password"
+          autocomplete="new-password"
+          required
+        />
+        @if (
+          form.controls["password"].hasError("required") &&
+          form.controls["password"].touched
+        ) {
+          <div>
+            <mat-error>This field is required</mat-error>
+          </div>
+        }
+        @if (
+          form.controls["password"].hasError("minlength") &&
+          form.controls["password"].touched
+        ) {
+          <div>
+            <mat-error>Password must be at least 8 characters</mat-error>
+          </div>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Confirm password</mat-label>
+        <input
+          matInput
+          formControlName="confirmPassword"
+          type="password"
+          autocomplete="new-password"
+          required
+        />
+        @if (
+          form.controls["confirmPassword"].hasError("required") &&
+          form.controls["confirmPassword"].touched
+        ) {
+          <div>
+            <mat-error>This field is required</mat-error>
+          </div>
+        }
+      </mat-form-field>
+
+      <button
+        matButton
+        type="submit"
+        class="primary-button"
+        [disabled]="form.invalid || isSubmitting()"
+      >
+        Create account
+      </button>
+    </form>
+
+    @if (error()) {
+      <div class="error-message">
+        <mat-error>{{ error() }}</mat-error>
+      </div>
+    }
+  }
+</main>

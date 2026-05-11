@@ -1,31 +1,30 @@
 import { Component, inject, signal } from "@angular/core";
-import { Router } from "@angular/router";
-import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { HttpErrorResponse } from "@angular/common/http";
+import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-import { MatButtonModule } from "@angular/material/button";
-import { RouterModule } from "@angular/router";
-import { Auth } from "../../services/auth";
-import { LoginRequest } from "../../models/login";
-import { HttpErrorResponse } from "@angular/common/http";
+import { Router, RouterModule } from "@angular/router";
+import { AdminAuth } from "../../services/admin-auth";
+import { LoginRequest } from "../../../auth/models/login";
 
-const ROOT_ROUTE = "";
+const ADMIN_HOME_ROUTE = "/admin/invites";
 
 @Component({
-  selector: "app-login",
+  selector: "app-admin-login",
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
     RouterModule,
   ],
-  templateUrl: "./login.html",
-  styleUrl: "./login.scss",
+  templateUrl: "./admin-login.html",
+  styleUrl: "./admin-login.scss",
 })
-export class Login {
-  private readonly auth = inject(Auth);
+export class AdminLogin {
+  private readonly adminAuth = inject(AdminAuth);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
@@ -37,38 +36,39 @@ export class Login {
   readonly error = signal<string | null>(null);
   readonly isSubmitting = signal(false);
 
-  login(): void {
+  submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.isSubmitting.set(true);
+
     this.error.set(null);
+    this.isSubmitting.set(true);
 
     const req: LoginRequest = {
       login: this.form.value.login!,
       password: this.form.value.password!,
     };
 
-    this.auth.login(req).subscribe({
+    this.adminAuth.login(req).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate([ROOT_ROUTE]);
+        void this.router.navigate([ADMIN_HOME_ROUTE]);
       },
-      error: (err) => this.handleError(err),
+      error: (error) => this.handleError(error),
     });
   }
 
   private handleError(error: HttpErrorResponse): void {
     this.isSubmitting.set(false);
-    let message = "Failed to login";
     if (error.status === 0) {
-      message = "Network error. Please check your connection.";
-    } else if (error.status === 401) {
-      message = "Incorrect login credentials.";
-    } else if (error.status === 500) {
-      message = "Server error. Please try again later.";
+      this.error.set("Network error. Please check your connection.");
+      return;
     }
-    this.error.set(message);
+    if (error.status === 401) {
+      this.error.set("Incorrect admin credentials.");
+      return;
+    }
+    this.error.set("Failed to sign in to the admin area.");
   }
 }

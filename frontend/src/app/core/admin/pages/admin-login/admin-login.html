@@ -1,10 +1,8 @@
 <main>
-  <h1>Welcome to null3</h1>
-  <p class="login-copy">
-    Accounts are invite-only. Use the registration link from an admin to create
-    a user account.
-  </p>
-  <form [formGroup]="form" (ngSubmit)="login()" class="login-form">
+  <h1>Admin Login</h1>
+  <p>Use the seeded admin account to create one-time invite links.</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
     <mat-form-field class="full-width">
       <mat-label>Login</mat-label>
       <input
@@ -50,16 +48,15 @@
     >
       Login
     </button>
-
-    @if (error()) {
-      <div class="error-message">
-        <mat-error>{{ error() }}</mat-error>
-      </div>
-    }
   </form>
 
-  <div class="login-links">
-    <a routerLink="/forgot-password">Forgot password?</a>
-    <a routerLink="/admin/login">Admin login</a>
+  @if (error()) {
+    <div class="error-message">
+      <mat-error>{{ error() }}</mat-error>
+    </div>
+  }
+
+  <div class="page-links">
+    <a routerLink="/login">Back to user login</a>
   </div>
 </main>

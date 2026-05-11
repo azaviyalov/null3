@@ -13,11 +13,13 @@ import (
 )
 
 type Config struct {
-	Production             bool
-	JWTSecret              string
-	JWTExpiration          time.Duration
-	SecureCookies          bool
-	RefreshTokenExpiration time.Duration
+	Production                   bool
+	JWTSecret                    string
+	JWTExpiration                time.Duration
+	SecureCookies                bool
+	RefreshTokenExpiration       time.Duration
+	PasswordResetTokenExpiration time.Duration
+	FrontendURL                  string
 }
 
 func GetConfig() (Config, error) {
@@ -27,6 +29,7 @@ func GetConfig() (Config, error) {
 	config.JWTExpiration = 24 * time.Hour
 	config.SecureCookies = false
 	config.RefreshTokenExpiration = 7 * 24 * time.Hour
+	config.PasswordResetTokenExpiration = time.Hour
 
 	if productionParam := os.Getenv("PRODUCTION"); productionParam != "" {
 		production, err := strconv.ParseBool(productionParam)
@@ -69,6 +72,16 @@ func GetConfig() (Config, error) {
 		}
 		config.RefreshTokenExpiration = refreshExpiration
 	}
+	if resetExpirationParam := os.Getenv("PASSWORD_RESET_TOKEN_EXPIRATION"); resetExpirationParam != "" {
+		resetExpiration, err := time.ParseDuration(resetExpirationParam)
+		if err != nil {
+			return Config{}, fmt.Errorf("invalid PASSWORD_RESET_TOKEN_EXPIRATION: %v", err)
+		}
+		if resetExpiration <= 0 {
+			return Config{}, fmt.Errorf("PASSWORD_RESET_TOKEN_EXPIRATION must be a positive duration")
+		}
+		config.PasswordResetTokenExpiration = resetExpiration
+	}
 	if secureCookiesParam := os.Getenv("SECURE_COOKIES"); secureCookiesParam != "" {
 		secureCookies, err := strconv.ParseBool(secureCookiesParam)
 		if err != nil {
@@ -88,21 +101,4 @@ func generateRandomSecret() (string, error) {
 		return "", fmt.Errorf("failed to generate random secret: %v", err)
 	}
 	return base64.RawURLEncoding.EncodeToString(b), nil
-}
-
-type StubUserConfig struct {
-	UserID   uint
-	Login    string
-	Password string
-	Email    string
-}
-
-func GetStubUserConfig() StubUserConfig {
-	logging.Warn(context.Background(), "Using stub user configuration")
-	return StubUserConfig{
-		UserID:   1,
-		Login:    "admin",
-		Password: "password",
-		Email:    "admin@example.com",
-	}
 }

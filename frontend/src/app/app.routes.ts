@@ -1,6 +1,8 @@
 import { Routes } from "@angular/router";
 import { RequireAuthGuard } from "./core/auth/services/require-auth.guard";
 import { RequireGuestGuard } from "./core/auth/services/require-guest.guard";
+import { RequireAdminGuard } from "./core/admin/services/require-admin.guard";
+import { RequireAdminGuestGuard } from "./core/admin/services/require-admin-guest.guard";
 
 export const routes: Routes = [
   {
@@ -8,6 +10,46 @@ export const routes: Routes = [
     canActivate: [RequireGuestGuard],
     loadComponent: () =>
       import("./core/auth/pages/login/login").then((m) => m.Login),
+  },
+  {
+    path: "forgot-password",
+    canActivate: [RequireGuestGuard],
+    loadComponent: () =>
+      import("./core/auth/pages/forgot-password/forgot-password").then(
+        (m) => m.ForgotPassword,
+      ),
+  },
+  {
+    path: "reset-password",
+    canActivate: [RequireGuestGuard],
+    loadComponent: () =>
+      import("./core/auth/pages/reset-password/reset-password").then(
+        (m) => m.ResetPassword,
+      ),
+  },
+  {
+    path: "invite/:token",
+    canActivate: [RequireGuestGuard],
+    loadComponent: () =>
+      import("./core/auth/pages/invite-register/invite-register").then(
+        (m) => m.InviteRegister,
+      ),
+  },
+  {
+    path: "admin/login",
+    canActivate: [RequireAdminGuestGuard],
+    loadComponent: () =>
+      import("./core/admin/pages/admin-login/admin-login").then(
+        (m) => m.AdminLogin,
+      ),
+  },
+  {
+    path: "admin/invites",
+    canActivate: [RequireAdminGuard],
+    loadComponent: () =>
+      import("./core/admin/pages/admin-invites/admin-invites").then(
+        (m) => m.AdminInvites,
+      ),
   },
   { path: "logout", redirectTo: "/login" },
   {
@@ -54,6 +96,6 @@ export const routes: Routes = [
   },
   {
     path: "**",
-    redirectTo: "",
+    redirectTo: "/",
   },
 ];

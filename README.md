@@ -8,6 +8,9 @@ This is a pet project, focusing on simplicity and ease of development. Written f
 
 ## Features
 - Track and manage mood entries
+- Invite-only user registration
+- Separate admin area for generating one-time registration links
+- Cookie-based login with password reset flow
 - Angular frontend
 - RESTful Go backend
 - Simple local development and build workflow
@@ -56,6 +59,7 @@ Environment variables can be set in the `.env` file.
 - `JWT_SECRET` is used to sign JWT tokens. Default is generated randomly. Required if `PRODUCTION` is set to `true`.
 - `JWT_EXPIRATION` is used to set the JWT token expiration time in seconds. Default is `24h`. Must be a positive duration.
 - `REFRESH_TOKEN_EXPIRATION` is used to set the refresh token expiration time. Default is `168h` (7 days). Must be a positive duration.
+- `PASSWORD_RESET_TOKEN_EXPIRATION` is used to set the password reset token expiration time. Default is `1h`. Must be a positive duration.
 - `SECURE_COOKIES` is used to enable secure cookies. Default is `false`. Set to `true` in production environments to ensure cookies are only sent over HTTPS.
 - `DATABASE_URL` is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
 - `LOG_LEVEL` is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
@@ -63,16 +67,16 @@ Environment variables can be set in the `.env` file.
 - `ENABLE_FRONTEND_DIST` is used to enable serving the frontend from the backend. Default is `false`.
 - `API_URL` is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `false`.
 
-## Stub user
-Until user management is implemented, stub user is used:
+## Seeded admin account
+The application seeds a single admin account on startup if user `1` does not exist:
 - user_id: `1`.
 - login: `admin`.
 - password: `password`.
 - email: `admin@example.com`.
 
+Use this account only on the separate admin login page at `/admin/login`. Regular user accounts are created through invite links generated from the admin area.
+
 ## TODOs
-- [ ] Implement user management (registration, login, password reset)
-- [ ] Remove user data set from the environment variables
 - [ ] Add more home page features (e.g., mood statistics, charts)
 - [ ] Improve error handling and logging
 

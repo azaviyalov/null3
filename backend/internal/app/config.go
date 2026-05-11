@@ -9,12 +9,11 @@ import (
 )
 
 type Config struct {
-	Auth           auth.Config
-	StubUserConfig auth.StubUserConfig
-	DB             db.Config
-	Frontend       frontend.Config
-	Logging        logging.Config
-	Server         server.Config
+	Auth     auth.Config
+	DB       db.Config
+	Frontend frontend.Config
+	Logging  logging.Config
+	Server   server.Config
 }
 
 func GetConfig() (Config, error) {
@@ -22,8 +21,6 @@ func GetConfig() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-
-	stubUserConfig := auth.GetStubUserConfig()
 
 	dbConfig := db.GetConfig()
 
@@ -39,12 +36,13 @@ func GetConfig() (Config, error) {
 		return Config{}, err
 	}
 
+	authConfig.FrontendURL = serverConfig.FrontendURL
+
 	return Config{
-		Auth:           authConfig,
-		StubUserConfig: stubUserConfig,
-		DB:             dbConfig,
-		Frontend:       frontendConfig,
-		Logging:        loggingConfig,
-		Server:         serverConfig,
+		Auth:     authConfig,
+		DB:       dbConfig,
+		Frontend: frontendConfig,
+		Logging:  loggingConfig,
+		Server:   serverConfig,
 	}, nil
 }

@@ -8,11 +8,11 @@ import {
 } from "@angular/common/http";
 import { Observable, ReplaySubject, throwError } from "rxjs";
 import { catchError, switchMap, take } from "rxjs/operators";
-import { Auth } from "./auth";
+import { AdminAuth } from "./admin-auth";
 
 @Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  private readonly auth = inject(Auth);
+export class AdminAuthInterceptor implements HttpInterceptor {
+  private readonly adminAuth = inject(AdminAuth);
 
   private refreshInProgress: ReplaySubject<unknown> | null = null;
 
@@ -20,7 +20,7 @@ export class AuthInterceptor implements HttpInterceptor {
     req: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    if (!this.isUserApiRequest(req.url)) return next.handle(req);
+    if (!this.isAdminApiRequest(req.url)) return next.handle(req);
 
     const request = req.clone({ withCredentials: true });
 
@@ -37,9 +37,9 @@ export class AuthInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     const isHttpError = err instanceof HttpErrorResponse;
     const isUnauthorized = isHttpError && err.status === 401;
-    const isRefreshEndpoint = originalRequest.url.endsWith("/auth/refresh");
-    const isMeEndpoint = originalRequest.url.endsWith("/auth/me");
-    const hasCurrentUser = !!this.auth.currentUser;
+    const isRefreshEndpoint = originalRequest.url.endsWith("/admin/auth/refresh");
+    const isMeEndpoint = originalRequest.url.endsWith("/admin/auth/me");
+    const hasCurrentUser = !!this.adminAuth.currentUser;
 
     const isAuthError =
       isUnauthorized && !isRefreshEndpoint && (isMeEndpoint || hasCurrentUser);
@@ -55,18 +55,18 @@ export class AuthInterceptor implements HttpInterceptor {
           return next.handle(requestWithCredentials);
         }
 
-        this.auth.clearSession();
+        this.adminAuth.clearSession();
         return throwError(() => err);
       }),
       catchError(() => {
-        this.auth.clearSession();
+        this.adminAuth.clearSession();
         return throwError(() => err);
       }),
     );
   }
 
-  private isUserApiRequest(url: string): boolean {
-    return url.includes("/api/") && !url.includes("/api/admin/");
+  private isAdminApiRequest(url: string): boolean {
+    return url.includes("/api/admin/");
   }
 
   private getOrStartRefresh(): ReplaySubject<unknown> {
@@ -75,7 +75,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const subject = new ReplaySubject<unknown>(1);
     this.refreshInProgress = subject;
 
-    this.auth.refresh().pipe(take(1)).subscribe({
+    this.adminAuth.refresh().pipe(take(1)).subscribe({
       next: (user) => this.finishRefresh(subject, user),
       error: () => this.finishRefresh(subject, null),
     });

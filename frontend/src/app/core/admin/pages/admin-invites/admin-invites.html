@@ -1,0 +1,35 @@
+<main>
+  <h1>Invite Links</h1>
+  <p>Generate a one-time registration link for a new user account.</p>
+
+  <button
+    matButton
+    class="primary-button"
+    (click)="generateInvite()"
+    [disabled]="isSubmitting()"
+  >
+    Generate invite link
+  </button>
+
+  @if (invite()) {
+    <div class="invite-result">
+      <mat-form-field class="full-width">
+        <mat-label>Invite URL</mat-label>
+        <input matInput readonly [value]="invite()?.invite_url ?? ''" />
+      </mat-form-field>
+      <p>Expires: {{ invite()?.expires_at | date: "medium" }}</p>
+      <div class="result-actions">
+        <button matButton (click)="copyInviteLink()">Copy link</button>
+        @if (copyMessage()) {
+          <span>{{ copyMessage() }}</span>
+        }
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">
+      <mat-error>{{ error() }}</mat-error>
+    </div>
+  }
+</main>
