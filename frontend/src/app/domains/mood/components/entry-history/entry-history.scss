@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.entry-row {
+  transition: background-color 160ms ease;
+}
+
+.entry-row:hover {
+  background: color-mix(in oklab, var(--color-primary) 4%, transparent);
+}
+
+.entry-row-copy {
+  margin: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.entry-row-actions {
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+@media (min-width: 640px) {
+  .entry-row-actions {
+    opacity: 0.38;
+    transform: translateX(0.35rem);
+  }
+
+  .entry-row:hover .entry-row-actions,
+  .entry-row:focus-within .entry-row-actions {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

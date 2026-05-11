@@ -1,28 +1,26 @@
 import { Component, inject } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatIconModule } from "@angular/material/icon";
-import { RouterModule } from "@angular/router";
+import { Router, RouterModule } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { EntryCardGrid } from "../../../mood/components/entry-card-grid/entry-card-grid";
+import { EntryHistory } from "../../../mood/components/entry-history/entry-history";
 import { EntryApi } from "../../../mood/services/entry-api";
+import { Entry } from "../../../mood/models/entry";
 
 @Component({
   selector: "app-home",
-  imports: [
-    RouterModule,
-    MatButtonModule,
-    MatCardModule,
-    MatIconModule,
-    EntryCardGrid,
-  ],
+  imports: [RouterModule, EntryHistory],
   templateUrl: "./home.html",
   styleUrl: "./home.scss",
 })
 export class Home {
   private readonly entryApi = inject(EntryApi);
-  private readonly limit = 4;
+  private readonly router = inject(Router);
+  private readonly limit = 6;
+
   readonly entriesPage = toSignal(this.entryApi.getPaged(this.limit), {
     initialValue: null,
   });
+
+  openEntry(entry: Entry): void {
+    this.router.navigate(["/mood/entries", entry.id]);
+  }
 }

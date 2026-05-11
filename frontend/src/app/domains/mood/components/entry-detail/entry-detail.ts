@@ -1,17 +1,16 @@
 import { Component, computed, input, output } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
 import { CommonModule } from "@angular/common";
 import { Entry } from "../../models/entry";
+import { feelingLabel } from "../../utils/entry-presenter";
 
 @Component({
-  selector: "app-entry-card",
+  selector: "app-entry-detail",
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule],
-  templateUrl: "./entry-card.html",
-  styleUrl: "./entry-card.scss",
+  imports: [CommonModule],
+  templateUrl: "./entry-detail.html",
+  styleUrl: "./entry-detail.scss",
 })
-export class EntryCard {
+export class EntryDetail {
   readonly skeleton = input(false);
   readonly entry = input<Entry | null>(null);
   readonly showOpen = input(false);
@@ -42,6 +41,7 @@ export class EntryCard {
       this.entry()?.updatedAt.getTime() !== this.entry()?.createdAt.getTime(),
   );
   readonly deleted = computed(() => !!this.entry()?.deletedAt);
+  readonly feelingLabel = feelingLabel;
 
   readonly open = output<void>();
   readonly edit = output<void>();

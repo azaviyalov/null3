@@ -1,79 +1,87 @@
-<mat-toolbar>
-  <div class="toolbar-container">
-    <div class="toolbar-section">
-      @if (!user()) {
-        <button
-          matButton
-          matRipple
-          routerLink="/login"
-          routerLinkActive="active-link"
-        >
-          Login
-        </button>
-      }
-      @if (user()) {
-        <button
-          matButton
-          matRipple
-          routerLink="/"
-          routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          Home
-        </button>
-        <button
-          matButton
-          matRipple
-          routerLink="/mood/entries"
-          routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          Mood Entries
-        </button>
-      }
-      <button
-        matButton
-        matRipple
-        routerLink="/about"
-        routerLinkActive="active-link"
-      >
-        About
-      </button>
-      @if (user()) {
-        <button matButton matRipple (click)="logout()" routerLink="/logout">
-          Logout
-        </button>
-      }
-    </div>
+<div class="app-frame">
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="brand-block">
+        <a routerLink="/" class="brand-link">null3</a>
+      </div>
 
-    <span class="spacer"></span>
+      <div class="nav-stack">
+        <nav class="nav-group" aria-label="Primary navigation">
+          @if (!user()) {
+            <a
+              routerLink="/login"
+              routerLinkActive="nav-link-active"
+              class="nav-link"
+            >
+              Login
+            </a>
+          }
 
-    <div class="toolbar-section">
-      @if (!adminUser()) {
-        <button
-          matButton
-          matRipple
-          routerLink="/admin/login"
-          routerLinkActive="active-link"
-        >
-          Admin Login
-        </button>
-      } @else {
-        <button
-          matButton
-          matRipple
-          routerLink="/admin/invites"
-          routerLinkActive="active-link"
-        >
-          Admin Area
-        </button>
-        <button matButton matRipple (click)="logoutAdmin()">
-          Admin Logout
-        </button>
-      }
+          @if (user()) {
+            <a
+              routerLink="/"
+              routerLinkActive="nav-link-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="nav-link"
+            >
+              Home
+            </a>
+            <a
+              routerLink="/mood/entries"
+              routerLinkActive="nav-link-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="nav-link"
+            >
+              Mood Entries
+            </a>
+          }
+
+          <a
+            routerLink="/about"
+            routerLinkActive="nav-link-active"
+            class="nav-link"
+          >
+            About
+          </a>
+
+          @if (user()) {
+            <button type="button" class="nav-link" (click)="logout()">
+              Logout
+            </button>
+          }
+        </nav>
+
+        <nav class="nav-group nav-group-muted" aria-label="Admin navigation">
+          @if (!adminUser()) {
+            <a
+              routerLink="/admin/login"
+              routerLinkActive="nav-link-active"
+              class="nav-link nav-link-muted"
+            >
+              Admin Login
+            </a>
+          } @else {
+            <a
+              routerLink="/admin/invites"
+              routerLinkActive="nav-link-active"
+              class="nav-link nav-link-muted"
+            >
+              Admin Area
+            </a>
+            <button
+              type="button"
+              class="nav-link nav-link-muted"
+              (click)="logoutAdmin()"
+            >
+              Admin Logout
+            </button>
+          }
+        </nav>
+      </div>
     </div>
-  </div>
-</mat-toolbar>
-<main class="container">
-  <router-outlet />
-</main>
+  </header>
+
+  <main class="app-main">
+    <router-outlet />
+  </main>
+</div>

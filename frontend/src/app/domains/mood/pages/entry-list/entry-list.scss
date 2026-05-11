@@ -1,14 +1,47 @@
-.entry-list-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 1rem 0;
-  height: 56px;
+:host {
+  display: block;
 }
 
-.fab-fixed {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1000;
+.filter-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 80%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-base-200) 48%, white);
+}
+
+.filter-switch-button {
+  min-height: 2.4rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in oklab, var(--color-base-content) 66%, transparent);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.filter-switch-button:hover {
+  color: var(--color-base-content);
+}
+
+.filter-switch-button:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 46%, white);
+  outline-offset: 2px;
+}
+
+.filter-switch-button-active {
+  background: color-mix(in oklab, var(--color-base-100) 86%, white);
+  color: var(--color-base-content);
+}
+
+.page-size-select {
+  min-width: 5.5rem;
+  padding-block: 0.55rem;
 }

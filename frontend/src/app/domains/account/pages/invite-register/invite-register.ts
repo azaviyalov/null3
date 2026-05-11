@@ -5,9 +5,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { catchError, map, of, switchMap, tap } from "rxjs";
-import { MatButtonModule } from "@angular/material/button";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
 import { AccountApi } from "../../services/account-api";
 import { InviteRegistrationRequest } from "../../models/invite";
 import { UserSession } from "../../../session/services/user-session";
@@ -18,14 +15,7 @@ const LOGIN_PATTERN = /^[A-Za-z0-9_-]{3,32}$/;
 @Component({
   selector: "app-invite-register",
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    RouterModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./invite-register.html",
   styleUrl: "./invite-register.scss",
 })
@@ -123,28 +113,34 @@ export class InviteRegister {
       return;
     }
     if (error.status === 400) {
-      this.error.set(this.httpErrorMessage(error, "Failed to complete registration."));
+      this.error.set(
+        this.httpErrorMessage(error, "Failed to complete registration."),
+      );
       return;
     }
     if (error.status === 409) {
-      this.error.set(this.httpErrorMessage(error, "That login or email is already in use."));
+      this.error.set(
+        this.httpErrorMessage(error, "That login or email is already in use."),
+      );
       return;
     }
 
-    this.error.set(this.httpErrorMessage(error, "Failed to complete registration."));
+    this.error.set(
+      this.httpErrorMessage(error, "Failed to complete registration."),
+    );
   }
 
   private inviteLookupErrorMessage(error: HttpErrorResponse): string {
     if (error.status === 0) {
       return "Network error. Please check your connection.";
     }
-    return this.httpErrorMessage(error, "This invite link is invalid or expired.");
+    return this.httpErrorMessage(
+      error,
+      "This invite link is invalid or expired.",
+    );
   }
 
-  private httpErrorMessage(
-    error: HttpErrorResponse,
-    fallback: string,
-  ): string {
+  private httpErrorMessage(error: HttpErrorResponse, fallback: string): string {
     const message = error.error?.message;
     if (typeof message === "string" && message.trim().length > 0) {
       return message;

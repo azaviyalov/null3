@@ -1,137 +1,132 @@
-<main>
-  <h1>Accept Invite</h1>
+<section class="page-shell space-y-6">
+  <header class="page-intro">
+    <h1 class="page-title">Accept Invite</h1>
+  </header>
 
   @if (isLoadingInvite()) {
-    <p>Checking your invite link...</p>
+    <section class="surface-panel">
+      <p class="m-0 text-base leading-7 text-base-content/60">
+        Checking your invite link...
+      </p>
+    </section>
   } @else if (error() && !inviteExpiresAt()) {
-    <div class="error-message">
-      <mat-error>{{ error() }}</mat-error>
-    </div>
-    <div class="page-links">
+    <div class="status-message error">{{ error() }}</div>
+    <div class="inline-link-row">
       <a routerLink="/login">Back to login</a>
     </div>
   } @else {
-    <p>
-      Create your account. This invite link expires on
-      {{ inviteExpiresAt() | date: "medium" }}.
-    </p>
+    <section class="surface-panel">
+      <p class="m-0 text-base leading-7 text-base-content/65">
+        Create your account. This invite link expires on
+        {{ inviteExpiresAt() | date: "medium" }}.
+      </p>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
-      <mat-form-field class="full-width">
-        <mat-label>Login</mat-label>
-        <input
-          matInput
-          formControlName="login"
-          autocomplete="username"
-          required
-        />
-        @if (
-          form.controls["login"].hasError("required") &&
-          form.controls["login"].touched
-        ) {
-          <div>
-            <mat-error>This field is required</mat-error>
-          </div>
-        } @else if (
-          form.controls["login"].hasError("pattern") &&
-          form.controls["login"].touched
-        ) {
-          <div>
-            <mat-error>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack mt-6">
+        <div class="form-field">
+          <label class="field-label" for="invite-login">Login</label>
+          <input
+            id="invite-login"
+            class="field-input"
+            formControlName="login"
+            autocomplete="username"
+            required
+          />
+          @if (
+            form.controls["login"].hasError("required") &&
+            form.controls["login"].touched
+          ) {
+            <p class="field-error">This field is required.</p>
+          } @else if (
+            form.controls["login"].hasError("pattern") &&
+            form.controls["login"].touched
+          ) {
+            <p class="field-error">
               Login must be 3-32 characters and use only letters, numbers,
-              underscores, or hyphens
-            </mat-error>
-          </div>
-        }
-      </mat-form-field>
+              underscores, or hyphens.
+            </p>
+          }
+        </div>
 
-      <mat-form-field class="full-width">
-        <mat-label>Email</mat-label>
-        <input
-          matInput
-          formControlName="email"
-          type="email"
-          autocomplete="email"
-          required
-        />
-        @if (
-          form.controls["email"].hasError("required") &&
-          form.controls["email"].touched
-        ) {
-          <div>
-            <mat-error>This field is required</mat-error>
-          </div>
-        }
-        @if (
-          form.controls["email"].hasError("email") &&
-          form.controls["email"].touched
-        ) {
-          <div>
-            <mat-error>Enter a valid email address</mat-error>
-          </div>
-        }
-      </mat-form-field>
+        <div class="form-field">
+          <label class="field-label" for="invite-email">Email</label>
+          <input
+            id="invite-email"
+            class="field-input"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            required
+          />
+          @if (
+            form.controls["email"].hasError("required") &&
+            form.controls["email"].touched
+          ) {
+            <p class="field-error">This field is required.</p>
+          }
+          @if (
+            form.controls["email"].hasError("email") &&
+            form.controls["email"].touched
+          ) {
+            <p class="field-error">Enter a valid email address.</p>
+          }
+        </div>
 
-      <mat-form-field class="full-width">
-        <mat-label>Password</mat-label>
-        <input
-          matInput
-          formControlName="password"
-          type="password"
-          autocomplete="new-password"
-          required
-        />
-        @if (
-          form.controls["password"].hasError("required") &&
-          form.controls["password"].touched
-        ) {
-          <div>
-            <mat-error>This field is required</mat-error>
-          </div>
-        }
-        @if (
-          form.controls["password"].hasError("minlength") &&
-          form.controls["password"].touched
-        ) {
-          <div>
-            <mat-error>Password must be at least 8 characters</mat-error>
-          </div>
-        }
-      </mat-form-field>
+        <div class="form-field">
+          <label class="field-label" for="invite-password">Password</label>
+          <input
+            id="invite-password"
+            class="field-input"
+            formControlName="password"
+            type="password"
+            autocomplete="new-password"
+            required
+          />
+          @if (
+            form.controls["password"].hasError("required") &&
+            form.controls["password"].touched
+          ) {
+            <p class="field-error">This field is required.</p>
+          }
+          @if (
+            form.controls["password"].hasError("minlength") &&
+            form.controls["password"].touched
+          ) {
+            <p class="field-error">Password must be at least 8 characters.</p>
+          }
+        </div>
 
-      <mat-form-field class="full-width">
-        <mat-label>Confirm password</mat-label>
-        <input
-          matInput
-          formControlName="confirmPassword"
-          type="password"
-          autocomplete="new-password"
-          required
-        />
-        @if (
-          form.controls["confirmPassword"].hasError("required") &&
-          form.controls["confirmPassword"].touched
-        ) {
-          <div>
-            <mat-error>This field is required</mat-error>
-          </div>
-        }
-      </mat-form-field>
+        <div class="form-field">
+          <label class="field-label" for="invite-confirm-password">
+            Confirm password
+          </label>
+          <input
+            id="invite-confirm-password"
+            class="field-input"
+            formControlName="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            required
+          />
+          @if (
+            form.controls["confirmPassword"].hasError("required") &&
+            form.controls["confirmPassword"].touched
+          ) {
+            <p class="field-error">This field is required.</p>
+          }
+        </div>
 
-      <button
-        matButton
-        type="submit"
-        class="primary-button"
-        [disabled]="form.invalid || isSubmitting()"
-      >
-        Create account
-      </button>
-    </form>
+        <button
+          type="submit"
+          class="primary-action"
+          [disabled]="form.invalid || isSubmitting()"
+        >
+          Create account
+        </button>
+      </form>
 
-    @if (error()) {
-      <div class="error-message">
-        <mat-error>{{ error() }}</mat-error>
-      </div>
-    }
+      @if (error()) {
+        <div class="status-message error">{{ error() }}</div>
+      }
+    </section>
   }
-</main>
+</section>

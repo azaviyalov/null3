@@ -51,9 +51,9 @@ export class UserSession {
   }
 
   login(data: LoginRequest): Observable<UserResponse> {
-    return this.http.post<UserResponse>(this.loginUrl, data).pipe(
-      tap((response) => this.setAuthenticatedUser(response)),
-    );
+    return this.http
+      .post<UserResponse>(this.loginUrl, data)
+      .pipe(tap((response) => this.setAuthenticatedUser(response)));
   }
 
   clearSession(): void {
@@ -62,9 +62,9 @@ export class UserSession {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/logout`, {}).pipe(
-      tap(() => this.clearSession()),
-    );
+    return this.http
+      .post<void>(`${this.baseUrl}/logout`, {})
+      .pipe(tap(() => this.clearSession()));
   }
 
   refresh(): Observable<UserResponse | null> {

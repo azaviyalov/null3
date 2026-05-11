@@ -21,7 +21,15 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
-    { provide: HTTP_INTERCEPTORS, useClass: AdminSessionInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: UserSessionInterceptor, multi: true },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AdminSessionInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: UserSessionInterceptor,
+      multi: true,
+    },
   ],
 };

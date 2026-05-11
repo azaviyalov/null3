@@ -21,7 +21,10 @@ export class AdminSession {
       .get<UserResponse>(`${this.baseUrl}/me`)
       .pipe(
         catchError((error) => {
-          console.error("Error during admin authentication initialization:", error);
+          console.error(
+            "Error during admin authentication initialization:",
+            error,
+          );
           return of(null);
         }),
       )
@@ -51,9 +54,9 @@ export class AdminSession {
   }
 
   login(data: LoginRequest): Observable<UserResponse> {
-    return this.http.post<UserResponse>(`${this.baseUrl}/login`, data).pipe(
-      tap((response) => this.setAuthenticatedUser(response)),
-    );
+    return this.http
+      .post<UserResponse>(`${this.baseUrl}/login`, data)
+      .pipe(tap((response) => this.setAuthenticatedUser(response)));
   }
 
   createInvite(): Observable<AdminInviteResponse> {
@@ -66,9 +69,9 @@ export class AdminSession {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/logout`, {}).pipe(
-      tap(() => this.clearSession()),
-    );
+    return this.http
+      .post<void>(`${this.baseUrl}/logout`, {})
+      .pipe(tap(() => this.clearSession()));
   }
 
   refresh(): Observable<UserResponse | null> {

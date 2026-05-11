@@ -1,16 +1,20 @@
-<button mat-button (click)="goBack()" class="top-button">Back</button>
+<section class="page-shell space-y-6">
+  <button type="button" class="quiet-action w-fit" (click)="goBack()">
+    Back
+  </button>
 
-@if (errorMessage()) {
-  <p>{{ errorMessage() }}</p>
-} @else {
-  <app-entry-card
-    [entry]="entry()"
-    [skeleton]="isLoading()"
-    [showEdit]="!entry()?.deletedAt"
-    [showDelete]="!entry()?.deletedAt"
-    [showRestore]="!!entry()?.deletedAt"
-    (edit)="editEntry()"
-    (delete)="deleteEntry()"
-    (restore)="restoreEntry()"
-  />
-}
+  @if (errorMessage()) {
+    <div class="status-message error">{{ errorMessage() }}</div>
+  } @else {
+    <app-entry-detail
+      [entry]="entry()"
+      [skeleton]="isLoading()"
+      [showEdit]="!entry()?.deletedAt"
+      [showDelete]="!entry()?.deletedAt"
+      [showRestore]="!!entry()?.deletedAt"
+      (edit)="editEntry()"
+      (delete)="deleteEntry()"
+      (restore)="restoreEntry()"
+    />
+  }
+</section>

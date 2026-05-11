@@ -1,27 +1,40 @@
-<form [formGroup]="form" (ngSubmit)="handleSubmit()" class="entry-form">
-  <mat-form-field class="full-width">
-    <mat-label>Feeling</mat-label>
-    <input matInput formControlName="feeling" autocomplete="off" required />
-    @if (form.controls["feeling"].hasError("required")) {
-      <mat-error>This field is required</mat-error>
+<form [formGroup]="form" (ngSubmit)="handleSubmit()" class="form-stack">
+  <div class="form-field">
+    <label class="field-label" for="feeling">Feeling</label>
+    <input
+      id="feeling"
+      class="field-input"
+      formControlName="feeling"
+      autocomplete="off"
+      [disabled]="disabled()"
+      required
+    />
+    @if (
+      form.controls["feeling"].hasError("required") &&
+      form.controls["feeling"].touched
+    ) {
+      <p class="field-error">This field is required.</p>
     }
-  </mat-form-field>
+  </div>
 
-  <mat-form-field class="full-width">
-    <mat-label>Note (optional)</mat-label>
-    <textarea matInput formControlName="note" rows="4"></textarea>
-  </mat-form-field>
+  <div class="form-field">
+    <label class="field-label" for="note">Note (optional)</label>
+    <textarea
+      id="note"
+      class="field-textarea"
+      formControlName="note"
+      rows="6"
+      [disabled]="disabled()"
+    ></textarea>
+  </div>
 
-  <button
-    matButton
-    type="submit"
-    class="primary-button"
-    [disabled]="form.invalid || disabled()"
-  >
-    Submit
-  </button>
-
-  @if (errorMessage()) {
-    <mat-error class="error-message">{{ errorMessage() }}</mat-error>
-  }
+  <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+    <button
+      type="submit"
+      class="primary-action"
+      [disabled]="form.invalid || disabled()"
+    >
+      {{ submitLabel() }}
+    </button>
+  </div>
 </form>

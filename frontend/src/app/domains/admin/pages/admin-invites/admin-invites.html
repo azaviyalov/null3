@@ -1,35 +1,55 @@
-<main>
-  <h1>Invite Links</h1>
-  <p>Generate a one-time registration link for a new user account.</p>
+<section class="page-shell space-y-6">
+  <header class="page-intro">
+    <h1 class="page-title">Invite Links</h1>
+    <p class="page-copy">
+      Generate a one-time registration link for a new user account.
+    </p>
+  </header>
 
-  <button
-    matButton
-    class="primary-button"
-    (click)="generateInvite()"
-    [disabled]="isSubmitting()"
-  >
-    Generate invite link
-  </button>
+  <section class="surface-panel space-y-5">
+    <button
+      type="button"
+      class="primary-action"
+      (click)="generateInvite()"
+      [disabled]="isSubmitting()"
+    >
+      Generate invite link
+    </button>
 
-  @if (invite()) {
-    <div class="invite-result">
-      <mat-form-field class="full-width">
-        <mat-label>Invite URL</mat-label>
-        <input matInput readonly [value]="invite()?.invite_url ?? ''" />
-      </mat-form-field>
-      <p>Expires: {{ invite()?.expires_at | date: "medium" }}</p>
-      <div class="result-actions">
-        <button matButton (click)="copyInviteLink()">Copy link</button>
-        @if (copyMessage()) {
-          <span>{{ copyMessage() }}</span>
-        }
+    @if (invite()) {
+      <div
+        class="space-y-4 rounded-[1.5rem] border border-base-300/80 bg-base-100/70 p-4"
+      >
+        <div class="form-field">
+          <label class="field-label" for="invite-url">Invite URL</label>
+          <input
+            id="invite-url"
+            class="field-input"
+            readonly
+            [value]="invite()?.invite_url ?? ''"
+          />
+        </div>
+
+        <p class="m-0 text-sm leading-6 text-base-content/60">
+          Expires {{ invite()?.expires_at | date: "medium" }}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" class="quiet-action" (click)="copyInviteLink()">
+            Copy link
+          </button>
+
+          @if (copyMessage()) {
+            <span class="text-sm text-base-content/55">{{
+              copyMessage()
+            }}</span>
+          }
+        </div>
       </div>
-    </div>
-  }
+    }
 
-  @if (error()) {
-    <div class="error-message">
-      <mat-error>{{ error() }}</mat-error>
-    </div>
-  }
-</main>
+    @if (error()) {
+      <div class="status-message error">{{ error() }}</div>
+    }
+  </section>
+</section>

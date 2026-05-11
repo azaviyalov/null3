@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-deleted {
+  opacity: 0.72;
+}

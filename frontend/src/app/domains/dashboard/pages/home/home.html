@@ -1,13 +1,17 @@
-<main class="home-container">
-  <h1>Welcome to null3</h1>
-  <p>Track your mood and reflect on your feelings.</p>
-  <div class="dashboard">
-    <section>
-      <h2 class="">Latest Mood Entries</h2>
-      <app-entry-card-grid
-        [entries]="entriesPage()?.items ?? null"
-        [columns]="2"
-      />
-    </section>
-  </div>
-</main>
+<section class="page-shell-wide space-y-10">
+  <header class="page-intro">
+    <h1 class="page-title">Welcome to null3</h1>
+    <p class="page-copy">Track your mood and reflect on your feelings.</p>
+  </header>
+
+  <section class="space-y-4">
+    <h2 class="section-title">Latest Mood Entries</h2>
+
+    <app-entry-history
+      [entries]="entriesPage()?.items ?? null"
+      [showOpen]="true"
+      emptyMessage="No entries found"
+      (open)="openEntry($event)"
+    />
+  </section>
+</section>

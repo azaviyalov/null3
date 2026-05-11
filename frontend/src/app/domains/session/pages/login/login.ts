@@ -1,9 +1,6 @@
 import { Component, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatButtonModule } from "@angular/material/button";
 import { RouterModule } from "@angular/router";
 import { UserSession } from "../../services/user-session";
 import { LoginRequest } from "../../models/login";
@@ -14,13 +11,7 @@ const ROOT_ROUTE = "";
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    RouterModule,
-  ],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: "./login.html",
   styleUrl: "./login.scss",
 })

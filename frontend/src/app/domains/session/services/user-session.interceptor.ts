@@ -24,9 +24,9 @@ export class UserSessionInterceptor implements HttpInterceptor {
 
     const request = req.clone({ withCredentials: true });
 
-    return next.handle(request).pipe(
-      catchError((err) => this.handleAuthError(err, req, request, next)),
-    );
+    return next
+      .handle(request)
+      .pipe(catchError((err) => this.handleAuthError(err, req, request, next)));
   }
 
   private handleAuthError(
@@ -75,18 +75,18 @@ export class UserSessionInterceptor implements HttpInterceptor {
     const subject = new ReplaySubject<unknown>(1);
     this.refreshInProgress = subject;
 
-    this.userSession.refresh().pipe(take(1)).subscribe({
-      next: (user) => this.finishRefresh(subject, user),
-      error: () => this.finishRefresh(subject, null),
-    });
+    this.userSession
+      .refresh()
+      .pipe(take(1))
+      .subscribe({
+        next: (user) => this.finishRefresh(subject, user),
+        error: () => this.finishRefresh(subject, null),
+      });
 
     return subject;
   }
 
-  private finishRefresh(
-    subject: ReplaySubject<unknown>,
-    user: unknown,
-  ): void {
+  private finishRefresh(subject: ReplaySubject<unknown>, user: unknown): void {
     subject.next(user);
     subject.complete();
     this.refreshInProgress = null;

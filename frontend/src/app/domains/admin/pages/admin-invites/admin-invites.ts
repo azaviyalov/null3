@@ -1,16 +1,13 @@
 import { Component, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
-import { MatButtonModule } from "@angular/material/button";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
 import { AdminSession } from "../../services/admin-session";
 import { AdminInviteResponse } from "../../models/invite";
 
 @Component({
   selector: "app-admin-invites",
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule],
   templateUrl: "./admin-invites.html",
   styleUrl: "./admin-invites.scss",
 })

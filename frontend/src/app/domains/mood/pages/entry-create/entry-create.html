@@ -1,3 +1,17 @@
-<h2>Create Mood Entry</h2>
+<section class="page-shell space-y-6">
+  <header class="page-intro">
+    <h1 class="page-title">Create Mood Entry</h1>
+  </header>
 
-<app-entry-form [disabled]="isSubmitting()" (entrySubmit)="submit($event)" />
+  @if (errorMessage()) {
+    <div class="status-message error">{{ errorMessage() }}</div>
+  }
+
+  <section class="surface-panel">
+    <app-entry-form
+      [disabled]="isSubmitting()"
+      submitLabel="Submit"
+      (entrySubmit)="submit($event)"
+    />
+  </section>
+</section>

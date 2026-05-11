@@ -1,9 +1,6 @@
 import { Component, inject, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
-import { MatButtonModule } from "@angular/material/button";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { AccountApi } from "../../services/account-api";
 import { ResetPasswordRequest } from "../../models/password";
@@ -13,13 +10,7 @@ const LOGIN_ROUTE = "/login";
 @Component({
   selector: "app-reset-password",
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    RouterModule,
-  ],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: "./reset-password.html",
   styleUrl: "./reset-password.scss",
 })

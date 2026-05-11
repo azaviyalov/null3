@@ -10,12 +10,7 @@ import {
   startWith,
   switchMap,
 } from "rxjs";
-import {
-  State,
-  stateError,
-  stateLoading,
-  stateSuccess,
-} from "./state";
+import { State, stateError, stateLoading, stateSuccess } from "./state";
 
 export function toWritableSignal<TTrigger, TResult = TTrigger>({
   trigger,

@@ -2,11 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, map } from "rxjs";
 import { environment } from "../../../../environments/environment";
-import {
-  EntryResponse,
-  Entry,
-  EditEntryRequest,
-} from "../models/entry";
+import { EntryResponse, Entry, EditEntryRequest } from "../models/entry";
 import { Page, PageResponse } from "../../../core/utils/page";
 
 @Injectable({
@@ -16,18 +12,14 @@ export class EntryApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/mood/entries`;
 
-  getPaged(
-    limit = 10,
-    offset = 0,
-    deleted = false,
-  ): Observable<Page<Entry>> {
+  getPaged(limit = 10, offset = 0, deleted = false): Observable<Page<Entry>> {
     const params = new HttpParams()
       .set("limit", limit)
       .set("offset", offset)
       .set("deleted", deleted);
     return this.http
       .get<PageResponse<EntryResponse>>(this.baseUrl, { params })
-      .pipe(map(data => Page.fromResponse(data, Entry.fromResponse)));
+      .pipe(map((data) => Page.fromResponse(data, Entry.fromResponse)));
   }
 
   getById(id: number): Observable<Entry> {

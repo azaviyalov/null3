@@ -1,62 +1,63 @@
-<main>
-  <h1>Admin Login</h1>
-  <p>Use the seeded admin account to create one-time invite links.</p>
+<section class="page-shell space-y-6">
+  <header class="page-intro">
+    <h1 class="page-title">Admin Login</h1>
+    <p class="page-copy">
+      Use the seeded admin account to create one-time invite links.
+    </p>
+  </header>
 
-  <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
-    <mat-form-field class="full-width">
-      <mat-label>Login</mat-label>
-      <input
-        matInput
-        formControlName="login"
-        autocomplete="username"
-        required
-      />
-      @if (
-        form.controls["login"].hasError("required") &&
-        form.controls["login"].touched
-      ) {
-        <div>
-          <mat-error>This field is required</mat-error>
-        </div>
-      }
-    </mat-form-field>
+  <section class="surface-panel">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack">
+      <div class="form-field">
+        <label class="field-label" for="admin-login">Login</label>
+        <input
+          id="admin-login"
+          class="field-input"
+          formControlName="login"
+          autocomplete="username"
+          required
+        />
+        @if (
+          form.controls["login"].hasError("required") &&
+          form.controls["login"].touched
+        ) {
+          <p class="field-error">This field is required.</p>
+        }
+      </div>
 
-    <mat-form-field class="full-width">
-      <mat-label>Password</mat-label>
-      <input
-        matInput
-        formControlName="password"
-        type="password"
-        autocomplete="current-password"
-        required
-      />
-      @if (
-        form.controls["password"].hasError("required") &&
-        form.controls["password"].touched
-      ) {
-        <div>
-          <mat-error>This field is required</mat-error>
-        </div>
-      }
-    </mat-form-field>
+      <div class="form-field">
+        <label class="field-label" for="admin-password">Password</label>
+        <input
+          id="admin-password"
+          class="field-input"
+          formControlName="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+        @if (
+          form.controls["password"].hasError("required") &&
+          form.controls["password"].touched
+        ) {
+          <p class="field-error">This field is required.</p>
+        }
+      </div>
 
-    <button
-      matButton
-      type="submit"
-      class="primary-button"
-      [disabled]="form.invalid || isSubmitting()"
-    >
-      Login
-    </button>
-  </form>
+      <button
+        type="submit"
+        class="primary-action"
+        [disabled]="form.invalid || isSubmitting()"
+      >
+        Login
+      </button>
+    </form>
 
-  @if (error()) {
-    <div class="error-message">
-      <mat-error>{{ error() }}</mat-error>
-    </div>
-  }
+    @if (error()) {
+      <div class="status-message error">{{ error() }}</div>
+    }
+  </section>
 
-  <div class="page-links">
+  <div class="inline-link-row">
     <a routerLink="/login">Back to user login</a>
   </div>
-</main>
+</section>

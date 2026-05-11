@@ -1,26 +1,3 @@
-.primary-button {
-  margin-top: 1rem;
-  background-color: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-}
-
-.invite-result {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
-  border-radius: 12px;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.result-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.error-message {
-  margin-top: 1rem;
+:host {
+  display: block;
 }

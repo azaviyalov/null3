@@ -1,34 +1,119 @@
-mat-toolbar {
+:host {
+  display: block;
+}
+
+.app-frame {
+  min-height: 100vh;
+}
+
+.app-header {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 30;
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-base-300) 80%, transparent);
+  background: color-mix(in oklab, var(--color-base-100) 74%, transparent);
+  backdrop-filter: blur(20px);
 }
 
-.toolbar-container {
-  max-width: 600px;
+.app-header-inner {
+  max-width: 60rem;
   margin: 0 auto;
-  width: 100%;
+  padding: 0.95rem 1rem 1.05rem;
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.95rem;
 }
 
-.toolbar-section {
+.brand-block {
+  min-width: 0;
+}
+
+.brand-link {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-decoration: none;
+  color: var(--color-base-content);
+}
+
+.nav-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem 0.9rem;
 }
 
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 1rem;
+.nav-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.45rem;
+  align-items: center;
 }
 
-.active-link {
-  background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+.nav-group-muted {
+  position: relative;
 }
 
-.spacer {
-  flex: 1 1 auto;
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in oklab, var(--color-base-content) 68%, transparent);
+  font-size: 0.93rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.nav-link:hover {
+  background: color-mix(in oklab, var(--color-primary) 8%, white);
+  color: var(--color-base-content);
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 45%, white);
+  outline-offset: 2px;
+}
+
+.nav-link-active {
+  color: var(--color-base-content);
+  background: color-mix(in oklab, var(--color-primary) 10%, white);
+}
+
+.nav-link-muted {
+  color: color-mix(in oklab, var(--color-base-content) 54%, transparent);
+}
+
+.app-main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2.6rem 1rem 4.5rem;
+}
+
+@media (min-width: 768px) {
+  .app-header-inner {
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+  }
+
+  .nav-group-muted::before {
+    content: "";
+    width: 1px;
+    height: 1.5rem;
+    margin-right: 0.25rem;
+    background: color-mix(in oklab, var(--color-base-content) 14%, transparent);
+  }
 }

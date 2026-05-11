@@ -1,7 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
-import { MatRippleModule } from "@angular/material/core";
-import { MatToolbarModule } from "@angular/material/toolbar";
+import { Component, inject } from "@angular/core";
 import { RouterModule, Router } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { AdminSession } from "./domains/admin/services/admin-session";
@@ -9,19 +6,19 @@ import { UserSession } from "./domains/session/services/user-session";
 
 @Component({
   selector: "app-root",
-  imports: [RouterModule, MatButtonModule, MatRippleModule, MatToolbarModule],
+  imports: [RouterModule],
   templateUrl: "./app.html",
   styleUrl: "./app.scss",
 })
 export class App {
-  protected readonly title = signal("null3");
-
   private readonly userSession = inject(UserSession);
   private readonly adminSession = inject(AdminSession);
   private readonly router = inject(Router);
 
   readonly user = toSignal(this.userSession.user$, { initialValue: null });
-  readonly adminUser = toSignal(this.adminSession.user$, { initialValue: null });
+  readonly adminUser = toSignal(this.adminSession.user$, {
+    initialValue: null,
+  });
 
   constructor() {
     this.userSession.init();

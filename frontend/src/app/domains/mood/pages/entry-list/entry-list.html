@@ -1,41 +1,89 @@
-<h2>Your mood entries</h2>
+<section class="page-shell-wide space-y-8">
+  <header class="page-intro">
+    <h1 class="page-title">Your mood entries</h1>
 
-<div class="entry-list-header">
-  <mat-button-toggle-group
-    [value]="deletedSwitch() ? 'deleted' : 'active'"
-    hideSingleSelectionIndicator="true"
-    (change)="setDeletedState($event.value)"
-  >
-    <mat-button-toggle value="active">Active</mat-button-toggle>
-    <mat-button-toggle value="deleted">Deleted</mat-button-toggle>
-  </mat-button-toggle-group>
+    <div class="page-actions">
+      <button type="button" class="primary-action" (click)="createEntry()">
+        Add Entry
+      </button>
+    </div>
+  </header>
 
-  @if (page()?.totalCount; as totalCount) {
-    <mat-paginator
-      [length]="totalCount"
-      [pageSize]="pageSize()"
-      [pageSizeOptions]="[5, 10, 25, 100]"
-      (page)="changePage($event)"
-      aria-label="Select page"
+  <section class="surface-panel space-y-6">
+    <div
+      class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div class="filter-switch" aria-label="Entry status filter">
+        <button
+          type="button"
+          class="filter-switch-button"
+          [class.filter-switch-button-active]="!deletedSwitch()"
+          (click)="setDeletedState('active')"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          class="filter-switch-button"
+          [class.filter-switch-button-active]="deletedSwitch()"
+          (click)="setDeletedState('deleted')"
+        >
+          Deleted
+        </button>
+      </div>
+
+      @if (totalCount()) {
+        <div class="flex flex-col gap-3 sm:items-end">
+          <p class="m-0 text-sm text-base-content/55">
+            {{ pageStart() }}-{{ pageEnd() }} of {{ totalCount() }}
+            @if (totalPages()) {
+              <span> • {{ currentPage() }}/{{ totalPages() }}</span>
+            }
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-sm text-base-content/55" for="page-size">
+              Per page
+            </label>
+            <select
+              id="page-size"
+              class="field-select page-size-select"
+              [value]="pageSize()"
+              (change)="changePageSize($any($event.target).value)"
+            >
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size">{{ size }}</option>
+              }
+            </select>
+
+            <button
+              type="button"
+              class="quiet-action"
+              [disabled]="!canGoPrevious()"
+              (click)="goToPreviousPage()"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="quiet-action"
+              [disabled]="!canGoNext()"
+              (click)="goToNextPage()"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <app-entry-history
+      [skeleton]="isLoading()"
+      [skeletonCount]="defaultEntryCount"
+      [entries]="page()?.items ?? null"
+      [showOpen]="true"
+      emptyMessage="No entries found"
+      (open)="openEntry($event)"
     />
-  }
-</div>
-
-<app-entry-card-grid
-  [skeleton]="isLoading()"
-  [skeletonCount]="defaultCardCount"
-  [entries]="page()?.items ?? null"
-  [showOpen]="true"
-  (open)="openEntry($event)"
-/>
-
-<button
-  matFab
-  color="primary"
-  class="fab-fixed"
-  extended
-  (click)="createEntry()"
->
-  <mat-icon>add</mat-icon>
-  Add Entry
-</button>
+  </section>
+</section>

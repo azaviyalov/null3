@@ -1,0 +1,366 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes:
+    caramellatte --default,
+    silk;
+}
+
+@theme {
+  --font-sans: "Nunito Sans", sans-serif;
+  --font-serif: "Newsreader", serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  background: color-mix(in oklab, var(--color-base-200) 68%, white);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-base-content);
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      color-mix(in oklab, var(--color-secondary) 10%, transparent) 0%,
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at top,
+      color-mix(in oklab, var(--color-primary) 15%, transparent) 0%,
+      transparent 40%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-base-200) 54%, white) 0%,
+      var(--color-base-100) 18%,
+      color-mix(in oklab, var(--color-base-100) 94%, var(--color-base-200)) 100%
+    );
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--color-primary) 45%,
+    transparent
+  );
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-primary) 24%, white);
+  color: var(--color-base-content);
+}
+
+.page-shell,
+.page-shell-wide {
+  margin-inline: auto;
+  width: 100%;
+}
+
+.page-shell {
+  max-width: 48rem;
+}
+
+.page-shell-wide {
+  max-width: 60rem;
+}
+
+.page-intro {
+  display: grid;
+  gap: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(2.35rem, 5vw, 4rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.page-copy {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 1.02rem;
+  line-height: 1.72;
+  color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.surface-panel {
+  position: relative;
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 76%, transparent);
+  background: color-mix(in oklab, var(--color-base-100) 90%, white);
+  border-radius: 1.75rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 72%, transparent),
+    0 24px 50px -42px
+      color-mix(in oklab, var(--color-base-content) 22%, transparent);
+}
+
+.surface-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, white 45%, transparent) 0%,
+    transparent 24%
+  );
+}
+
+.section-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.section-copy {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+}
+
+.form-stack {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--color-base-content) 76%, transparent);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--color-error);
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+  width: 100%;
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 82%, transparent);
+  background: color-mix(in oklab, white 80%, var(--color-base-100));
+  color: var(--color-base-content);
+  border-radius: 1.25rem;
+  padding: 0.98rem 1rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+}
+
+.field-input:hover,
+.field-select:hover,
+.field-textarea:hover {
+  border-color: color-mix(
+    in oklab,
+    var(--color-primary) 20%,
+    var(--color-base-300)
+  );
+}
+
+.field-input:focus-visible,
+.field-select:focus-visible,
+.field-textarea:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklab, var(--color-primary) 56%, white);
+  box-shadow: 0 0 0 4px
+    color-mix(in oklab, var(--color-primary) 14%, transparent);
+  background: color-mix(in oklab, white 86%, var(--color-base-100));
+  transform: translateY(-1px);
+}
+
+.field-textarea {
+  min-height: 10rem;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.field-input[readonly],
+.field-select[readonly],
+.field-textarea[readonly] {
+  background: color-mix(in oklab, var(--color-base-200) 42%, white);
+  color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+}
+
+.inline-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.25rem;
+  margin-top: 1.5rem;
+  color: color-mix(in oklab, var(--color-base-content) 66%, transparent);
+}
+
+.status-message {
+  margin-top: 1.5rem;
+  border-radius: 1.25rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 72%, transparent);
+  background: color-mix(in oklab, var(--color-base-100) 92%, white);
+}
+
+.status-message.error {
+  border-color: color-mix(
+    in oklab,
+    var(--color-error) 22%,
+    var(--color-base-300)
+  );
+  background: color-mix(in oklab, var(--color-error) 9%, white);
+  color: color-mix(in oklab, var(--color-error) 74%, var(--color-base-content));
+}
+
+.status-message.success {
+  border-color: color-mix(
+    in oklab,
+    var(--color-success) 22%,
+    var(--color-base-300)
+  );
+  background: color-mix(in oklab, var(--color-success) 10%, white);
+  color: color-mix(
+    in oklab,
+    var(--color-success) 76%,
+    var(--color-base-content)
+  );
+}
+
+.secondary-meta {
+  color: color-mix(in oklab, var(--color-base-content) 54%, transparent);
+}
+
+.primary-action,
+.secondary-action,
+.quiet-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding-block: 0.7rem;
+  border-radius: 999px;
+  padding-inline: 1.1rem;
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.primary-action {
+  border: 1px solid color-mix(in oklab, var(--color-primary) 24%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 88%, white);
+  color: var(--color-primary-content);
+  box-shadow: 0 10px 24px -18px
+    color-mix(in oklab, var(--color-primary) 45%, transparent);
+}
+
+.primary-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -20px
+    color-mix(in oklab, var(--color-primary) 42%, transparent);
+}
+
+.secondary-action,
+.quiet-action {
+  border: 1px solid color-mix(in oklab, var(--color-base-300) 80%, transparent);
+  background: color-mix(in oklab, var(--color-base-100) 82%, white);
+  color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+}
+
+.secondary-action:hover,
+.quiet-action:hover {
+  color: var(--color-base-content);
+  background: color-mix(in oklab, white 86%, var(--color-base-100));
+  transform: translateY(-1px);
+}
+
+.quiet-action {
+  min-height: 2.4rem;
+  padding-block: 0.45rem;
+  padding-inline: 0.9rem;
+  font-size: 0.92rem;
+}
+
+.primary-action:focus-visible,
+.secondary-action:focus-visible,
+.quiet-action:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 42%, white);
+  outline-offset: 2px;
+}
+
+.primary-action:disabled,
+.secondary-action:disabled,
+.quiet-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .surface-panel {
+    border-radius: 1.5rem;
+    padding-inline: 1rem;
+  }
+}

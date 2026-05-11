@@ -45,6 +45,9 @@ export class AccountApi {
   }
 
   resetPassword(data: ResetPasswordRequest): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.baseUrl}/reset-password`, data);
+    return this.http.post<MessageResponse>(
+      `${this.baseUrl}/reset-password`,
+      data,
+    );
   }
 }

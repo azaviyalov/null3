@@ -1,25 +1,15 @@
-import {
-  Component,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from "@angular/core";
-import { MatInputModule } from "@angular/material/input";
+import { Component, effect, inject, input, output } from "@angular/core";
 import { EditEntryRequest, Entry } from "../../models/entry";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
-import { MatButtonModule } from "@angular/material/button";
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+} from "@angular/forms";
 
 @Component({
   selector: "app-entry-form",
-  imports: [
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    ReactiveFormsModule,
-  ],
+  imports: [ReactiveFormsModule],
   templateUrl: "./entry-form.html",
   styleUrl: "./entry-form.scss",
 })
@@ -28,8 +18,7 @@ export class EntryForm {
 
   readonly disabled = input(false);
   readonly entry = input<Entry | null>(null);
-
-  readonly errorMessage = signal<string | null>(null);
+  readonly submitLabel = input("Save entry");
 
   constructor() {
     effect(() => {
@@ -46,7 +35,7 @@ export class EntryForm {
   readonly form = this.formBuilder.group({
     feeling: this.formBuilder.control("", {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [trimmedRequired],
     }),
     note: this.formBuilder.control("", { nonNullable: true }),
   });
@@ -55,14 +44,18 @@ export class EntryForm {
 
   handleSubmit(): void {
     if (this.form.invalid) {
-      this.errorMessage.set("Please fill in all required fields.");
+      this.form.markAllAsTouched();
       return;
     }
-
-    this.errorMessage.set(null);
 
     const { feeling, note } = this.form.value;
     const payload = { feeling: feeling!.trim(), note: note?.trim() };
     this.entrySubmit.emit(payload);
   }
+}
+
+function trimmedRequired(
+  control: AbstractControl<string | null>,
+): ValidationErrors | null {
+  return control.value?.trim() ? null : { required: true };
 }

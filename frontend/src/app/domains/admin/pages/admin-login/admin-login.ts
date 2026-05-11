@@ -1,9 +1,6 @@
 import { Component, inject, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
-import { MatButtonModule } from "@angular/material/button";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
 import { Router, RouterModule } from "@angular/router";
 import { AdminSession } from "../../services/admin-session";
 import { LoginRequest } from "../../../session/models/login";
@@ -13,13 +10,7 @@ const ADMIN_HOME_ROUTE = "/admin/invites";
 @Component({
   selector: "app-admin-login",
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    RouterModule,
-  ],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: "./admin-login.html",
   styleUrl: "./admin-login.scss",
 })

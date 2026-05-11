@@ -1,24 +1,14 @@
 import { Component, computed, inject } from "@angular/core";
-import { MatCardModule } from "@angular/material/card";
 import { ActivatedRoute, Router } from "@angular/router";
 import { EntryApi } from "../../services/entry-api";
-import { MatIconModule } from "@angular/material/icon";
-import { MatButtonModule } from "@angular/material/button";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { EntryCard } from "../../components/entry-card/entry-card";
+import { EntryDetail } from "../../components/entry-detail/entry-detail";
 import { map } from "rxjs";
 import { toWritableStateSignal } from "../../../../core/utils/signal-helpers";
 import { stateError, stateSuccess } from "../../../../core/utils/state";
 @Component({
   selector: "app-entry-view",
   standalone: true,
-  imports: [
-    MatButtonModule,
-    MatCardModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    EntryCard,
-  ],
+  imports: [EntryDetail],
   templateUrl: "./entry-view.html",
   styleUrl: "./entry-view.scss",
 })
@@ -54,8 +44,7 @@ export class EntryView {
     }
 
     this.entryApi.delete(entry.id).subscribe({
-      next: (deletedEntry) =>
-        this.entryState.set(stateSuccess(deletedEntry)),
+      next: (deletedEntry) => this.entryState.set(stateSuccess(deletedEntry)),
       error: (err) => this.entryState.set(stateError(err)),
     });
   }
