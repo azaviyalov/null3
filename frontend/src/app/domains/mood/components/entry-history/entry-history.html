@@ -58,6 +58,11 @@
                     <span class="text-base-content/22" aria-hidden="true"
                       >•</span
                     >
+                    @if (entry.emoji) {
+                      <span class="text-base leading-none" aria-hidden="true">
+                        {{ entry.emoji }}
+                      </span>
+                    }
                     <span>{{ feelingLabel(entry.feeling) }}</span>
 
                     @if (entry.deletedAt) {

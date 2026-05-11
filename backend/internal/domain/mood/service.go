@@ -62,6 +62,7 @@ func (s *Service) CreateEntry(ctx context.Context, userID uint, req EditEntryReq
 	entry, err := s.repo.SaveEntry(ctx, &Entry{
 		UserID:  userID,
 		Feeling: req.Feeling,
+		Emoji:   req.Emoji,
 		Note:    req.Note,
 	})
 	if err != nil {
@@ -82,6 +83,7 @@ func (s *Service) UpdateEntry(ctx context.Context, userID, id uint, req EditEntr
 		return nil, err
 	}
 	entry.Feeling = req.Feeling
+	entry.Emoji = req.Emoji
 	entry.Note = req.Note
 	updatedEntry, err := s.repo.SaveEntry(ctx, entry)
 	if err != nil {

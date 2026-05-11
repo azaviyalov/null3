@@ -2,6 +2,7 @@ export class Entry {
   constructor(
     readonly id: number,
     readonly feeling: string,
+    readonly emoji: string | undefined,
     readonly createdAt: Date,
     readonly updatedAt: Date,
     readonly deletedAt?: Date,
@@ -12,6 +13,7 @@ export class Entry {
     return new Entry(
       data.id,
       data.feeling,
+      data.emoji || undefined,
       new Date(data.created_at),
       new Date(data.updated_at),
       data.deleted_at ? new Date(data.deleted_at) : undefined,
@@ -22,12 +24,14 @@ export class Entry {
 
 export interface EditEntryRequest {
   readonly feeling: string;
+  readonly emoji?: string;
   readonly note?: string;
 }
 
 export interface EntryResponse {
   readonly id: number;
   readonly feeling: string;
+  readonly emoji?: string;
   readonly user_id: number;
   readonly note?: string;
   readonly created_at: string;

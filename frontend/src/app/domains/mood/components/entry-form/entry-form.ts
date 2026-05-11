@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, output } from "@angular/core";
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from "@angular/core";
 import { EditEntryRequest, Entry } from "../../models/entry";
 import {
   AbstractControl,
@@ -6,6 +13,26 @@ import {
   ReactiveFormsModule,
   ValidationErrors,
 } from "@angular/forms";
+
+interface EmojiOption {
+  readonly value: string;
+  readonly label: string;
+}
+
+const EMOJI_OPTIONS: readonly EmojiOption[] = [
+  { value: "😀", label: "Joyful" },
+  { value: "🙂", label: "Good" },
+  { value: "😌", label: "Calm" },
+  { value: "🥰", label: "Loved" },
+  { value: "🤔", label: "Reflective" },
+  { value: "😴", label: "Tired" },
+  { value: "🥲", label: "Tender" },
+  { value: "😟", label: "Anxious" },
+  { value: "😔", label: "Low" },
+  { value: "😤", label: "Frustrated" },
+  { value: "😡", label: "Angry" },
+  { value: "😵‍💫", label: "Overwhelmed" },
+];
 
 @Component({
   selector: "app-entry-form",
@@ -19,6 +46,8 @@ export class EntryForm {
   readonly disabled = input(false);
   readonly entry = input<Entry | null>(null);
   readonly submitLabel = input("Save entry");
+  readonly noteExpanded = signal(false);
+  readonly emojiOptions = EMOJI_OPTIONS;
 
   constructor() {
     effect(() => {
@@ -26,9 +55,19 @@ export class EntryForm {
       if (entry) {
         this.form.patchValue({
           feeling: entry.feeling,
-          note: entry.note,
+          emoji: entry.emoji ?? "",
+          note: entry.note ?? "",
         });
+        this.noteExpanded.set(!!entry.note?.trim());
+        return;
       }
+
+      this.form.reset({
+        feeling: "",
+        emoji: "",
+        note: "",
+      });
+      this.noteExpanded.set(false);
     });
   }
 
@@ -37,10 +76,27 @@ export class EntryForm {
       nonNullable: true,
       validators: [trimmedRequired],
     }),
+    emoji: this.formBuilder.control("", { nonNullable: true }),
     note: this.formBuilder.control("", { nonNullable: true }),
   });
 
   readonly entrySubmit = output<EditEntryRequest>();
+
+  toggleNote(): void {
+    this.noteExpanded.update((expanded) => !expanded);
+  }
+
+  selectEmoji(emoji: string): void {
+    this.form.controls.emoji.setValue(emoji);
+  }
+
+  clearEmoji(): void {
+    this.form.controls.emoji.setValue("");
+  }
+
+  isEmojiSelected(emoji: string): boolean {
+    return this.form.controls.emoji.value === emoji;
+  }
 
   handleSubmit(): void {
     if (this.form.invalid) {
@@ -48,8 +104,14 @@ export class EntryForm {
       return;
     }
 
-    const { feeling, note } = this.form.value;
-    const payload = { feeling: feeling!.trim(), note: note?.trim() };
+    const { feeling, emoji, note } = this.form.value;
+    const trimmedEmoji = emoji?.trim();
+    const trimmedNote = note?.trim();
+    const payload: EditEntryRequest = {
+      feeling: feeling!.trim(),
+      ...(trimmedEmoji ? { emoji: trimmedEmoji } : {}),
+      ...(trimmedNote ? { note: trimmedNote } : {}),
+    };
     this.entrySubmit.emit(payload);
   }
 }
