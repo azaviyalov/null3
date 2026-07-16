@@ -9,7 +9,7 @@ This is a project built just for fun. It is not intended for production use.
 ## Features
 - Track mood records
 - Write diary entries in Markdown
-- Link diary entries to moods with `[[mood:<id>|label]]`
+- Link diary entries to moods with `[[mood:<id>|label]]` or `/mood-records/<id>` links
 - Follow links in either direction
 - Invite-only user registration
 - Admin page for creating one-time invite links
