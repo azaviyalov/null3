@@ -35,7 +35,7 @@ export class DiaryEntryView {
       return;
     }
 
-    this.router.navigate(["/diary/entries", entry.id, "update"]);
+    this.router.navigate(["/diary-entries", entry.id, "update"]);
   }
 
   deleteEntry(): void {
@@ -65,7 +65,7 @@ export class DiaryEntryView {
   }
 
   openMoodRecord(entry: MoodRecord): void {
-    this.router.navigate(["/mood/records", entry.id]);
+    this.router.navigate(["/mood-records", entry.id]);
   }
 
   goBack(): void {

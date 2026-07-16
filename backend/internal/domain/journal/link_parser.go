@@ -13,7 +13,7 @@ const previewMaxLength = 180
 
 var (
 	customMoodRecordLinkPattern = regexp.MustCompile(`\[\[mood:(\d+)(?:\|([^\]]+))?\]\]`)
-	legacyMoodRecordLinkPattern = regexp.MustCompile(`(?:https?://[^\s)]+)?/mood/records/(\d+)(?:[?#][^\s)]*)?`)
+	moodRecordPageLinkPattern   = regexp.MustCompile(`(?:https?://[^\s)]+)?/mood-records/(\d+)(?:[?#][^\s)]*)?`)
 	fencedCodeBlockPattern      = regexp.MustCompile("(?s)```.*?```|~~~.*?~~~")
 	inlineCodePattern           = regexp.MustCompile("`[^`\n]*`")
 	markdownLinkPattern         = regexp.MustCompile(`\[(.*?)\]\((.*?)\)`)
@@ -30,7 +30,7 @@ func ExtractMoodRecordIDs(markdown string) ([]uint, error) {
 
 	for _, pattern := range []*regexp.Regexp{
 		customMoodRecordLinkPattern,
-		legacyMoodRecordLinkPattern,
+		moodRecordPageLinkPattern,
 	} {
 		for _, match := range pattern.FindAllStringSubmatch(searchableMarkdown, -1) {
 			if len(match) < 2 {

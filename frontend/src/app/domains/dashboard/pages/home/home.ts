@@ -31,10 +31,10 @@ export class Home {
   );
 
   openMoodRecord(entry: MoodRecord): void {
-    this.router.navigate(["/mood/records", entry.id]);
+    this.router.navigate(["/mood-records", entry.id]);
   }
 
   openDiaryEntry(entry: DiaryEntry): void {
-    this.router.navigate(["/diary/entries", entry.id]);
+    this.router.navigate(["/diary-entries", entry.id]);
   }
 }

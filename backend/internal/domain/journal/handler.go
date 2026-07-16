@@ -19,19 +19,19 @@ func NewHandler(service *Service) *Handler {
 }
 
 func RegisterRoutes(e *echo.Echo, h *Handler, jwt echo.MiddlewareFunc) {
-	e.GET("/api/journal/mood/records", h.ListMoodRecords, jwt)
-	e.GET("/api/journal/mood/records/:id", h.GetMoodRecord, jwt)
-	e.POST("/api/journal/mood/records", h.CreateMoodRecord, jwt)
-	e.PUT("/api/journal/mood/records/:id", h.UpdateMoodRecord, jwt)
-	e.DELETE("/api/journal/mood/records/:id", h.DeleteMoodRecord, jwt)
-	e.POST("/api/journal/mood/records/:id/restore", h.RestoreMoodRecord, jwt)
+	e.GET("/api/journal/mood-records", h.ListMoodRecords, jwt)
+	e.GET("/api/journal/mood-records/:id", h.GetMoodRecord, jwt)
+	e.POST("/api/journal/mood-records", h.CreateMoodRecord, jwt)
+	e.PUT("/api/journal/mood-records/:id", h.UpdateMoodRecord, jwt)
+	e.DELETE("/api/journal/mood-records/:id", h.DeleteMoodRecord, jwt)
+	e.POST("/api/journal/mood-records/:id/restore", h.RestoreMoodRecord, jwt)
 
-	e.GET("/api/journal/diary/entries", h.ListDiaryEntries, jwt)
-	e.GET("/api/journal/diary/entries/:id", h.GetDiaryEntry, jwt)
-	e.POST("/api/journal/diary/entries", h.CreateDiaryEntry, jwt)
-	e.PUT("/api/journal/diary/entries/:id", h.UpdateDiaryEntry, jwt)
-	e.DELETE("/api/journal/diary/entries/:id", h.DeleteDiaryEntry, jwt)
-	e.POST("/api/journal/diary/entries/:id/restore", h.RestoreDiaryEntry, jwt)
+	e.GET("/api/journal/diary-entries", h.ListDiaryEntries, jwt)
+	e.GET("/api/journal/diary-entries/:id", h.GetDiaryEntry, jwt)
+	e.POST("/api/journal/diary-entries", h.CreateDiaryEntry, jwt)
+	e.PUT("/api/journal/diary-entries/:id", h.UpdateDiaryEntry, jwt)
+	e.DELETE("/api/journal/diary-entries/:id", h.DeleteDiaryEntry, jwt)
+	e.POST("/api/journal/diary-entries/:id/restore", h.RestoreDiaryEntry, jwt)
 }
 
 func (h *Handler) GetMoodRecord(c echo.Context) error {

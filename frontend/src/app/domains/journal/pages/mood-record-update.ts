@@ -46,7 +46,7 @@ export class MoodRecordUpdate {
 
   private handleSuccess(entry: MoodRecord): void {
     this.isSubmitting.set(false);
-    this.router.navigate(["/mood/records", entry.id]);
+    this.router.navigate(["/mood-records", entry.id]);
   }
 
   private handleError(err: unknown): void {

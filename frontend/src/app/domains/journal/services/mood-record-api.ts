@@ -14,7 +14,7 @@ import { Page, PageResponse } from "../../../core/utils/page";
 })
 export class MoodRecordApi {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/journal/mood/records`;
+  private readonly baseUrl = `${environment.apiUrl}/journal/mood-records`;
 
   getPaged(
     limit = 10,

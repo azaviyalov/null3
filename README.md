@@ -25,7 +25,7 @@ This is a project built just for fun. It is not intended for production use.
 - Backend `internal/domain` contains feature logic such as `account`, `session`, `admin`, and `journal`.
 - Frontend `src/app/core` contains shared app utilities and static app-level pages such as `about`.
 - Frontend `src/app/domains` contains feature domains such as `account`, `session`, `admin`, `dashboard`, and `journal`.
-- Journal REST endpoints are grouped under `/api/journal/mood/records` and `/api/journal/diary/entries`.
+- Journal pages use `/mood-records` and `/diary-entries`; their REST endpoints are grouped under `/api/journal/mood-records` and `/api/journal/diary-entries`.
 
 ## Running the Application
 

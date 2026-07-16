@@ -14,7 +14,7 @@ import { Page, PageResponse } from "../../../core/utils/page";
 })
 export class DiaryEntryApi {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/journal/diary/entries`;
+  private readonly baseUrl = `${environment.apiUrl}/journal/diary-entries`;
 
   getPaged(
     limit = 10,

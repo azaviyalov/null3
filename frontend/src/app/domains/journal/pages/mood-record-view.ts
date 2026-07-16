@@ -35,7 +35,7 @@ export class MoodRecordView {
       return;
     }
 
-    this.router.navigate(["/mood/records", entry.id, "update"]);
+    this.router.navigate(["/mood-records", entry.id, "update"]);
   }
 
   deleteEntry(): void {
@@ -69,11 +69,11 @@ export class MoodRecordView {
   }
 
   openDiaryEntry(entry: DiaryEntryLink): void {
-    this.router.navigate(["/diary/entries", entry.id]);
+    this.router.navigate(["/diary-entries", entry.id]);
   }
 
   createDiaryEntry(): void {
-    this.router.navigate(["/diary/entries/create"]);
+    this.router.navigate(["/diary-entries/create"]);
   }
 
   goBack(): void {

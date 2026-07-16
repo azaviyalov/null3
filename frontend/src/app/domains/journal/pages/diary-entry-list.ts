@@ -65,11 +65,11 @@ export class DiaryEntryList {
   readonly canGoNext = computed(() => this.pageEnd() < this.totalCount());
 
   openEntry(entry: DiaryEntry): void {
-    this.router.navigate(["/diary/entries", entry.id]);
+    this.router.navigate(["/diary-entries", entry.id]);
   }
 
   createEntry(): void {
-    this.router.navigate(["/diary/entries/create"]);
+    this.router.navigate(["/diary-entries/create"]);
   }
 
   changePageSize(nextPageSize: string): void {

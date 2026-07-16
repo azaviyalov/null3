@@ -65,11 +65,11 @@ export class MoodRecordList {
   readonly canGoNext = computed(() => this.pageEnd() < this.totalCount());
 
   openEntry(entry: MoodRecord): void {
-    this.router.navigate(["/mood/records", entry.id]);
+    this.router.navigate(["/mood-records", entry.id]);
   }
 
   createEntry(): void {
-    this.router.navigate(["/mood/records/create"]);
+    this.router.navigate(["/mood-records/create"]);
   }
 
   changePageSize(nextPageSize: string): void {

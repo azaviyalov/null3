@@ -46,7 +46,7 @@ export class DiaryEntryUpdate {
 
   private handleSuccess(entry: DiaryEntry): void {
     this.isSubmitting.set(false);
-    this.router.navigate(["/diary/entries", entry.id]);
+    this.router.navigate(["/diary-entries", entry.id]);
   }
 
   private handleError(err: unknown): void {

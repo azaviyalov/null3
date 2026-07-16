@@ -43,7 +43,7 @@ const moodRecordLinkExtension = {
     };
   },
   renderer(token: { moodRecordId: number; label: string }): string {
-    return `<a href="/mood/records/${token.moodRecordId}" data-mood-record-link="true">${escapeHtml(token.label)}</a>`;
+    return `<a href="/mood-records/${token.moodRecordId}" data-mood-record-link="true">${escapeHtml(token.label)}</a>`;
   },
 };
 
@@ -92,7 +92,7 @@ export class MarkdownRenderer {
     }
 
     event.preventDefault();
-    this.router.navigate(["/mood/records", moodRecordID]);
+    this.router.navigate(["/mood-records", moodRecordID]);
   }
 }
 
@@ -107,7 +107,7 @@ function parseMoodRecordID(href: string | null): number | null {
         ? "http://localhost"
         : window.location.origin;
     const url = new URL(href, baseUrl);
-    const match = /^\/mood\/records\/(\d+)\/?$/.exec(url.pathname);
+    const match = /^\/mood-records\/(\d+)\/?$/.exec(url.pathname);
     if (!match) {
       return null;
     }
