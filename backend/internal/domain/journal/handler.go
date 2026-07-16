@@ -19,12 +19,12 @@ func NewHandler(service *Service) *Handler {
 }
 
 func RegisterRoutes(e *echo.Echo, h *Handler, jwt echo.MiddlewareFunc) {
-	e.GET("/api/journal/mood/entries", h.ListMoodEntries, jwt)
-	e.GET("/api/journal/mood/entries/:id", h.GetMoodEntry, jwt)
-	e.POST("/api/journal/mood/entries", h.CreateMoodEntry, jwt)
-	e.PUT("/api/journal/mood/entries/:id", h.UpdateMoodEntry, jwt)
-	e.DELETE("/api/journal/mood/entries/:id", h.DeleteMoodEntry, jwt)
-	e.POST("/api/journal/mood/entries/:id/restore", h.RestoreMoodEntry, jwt)
+	e.GET("/api/journal/mood/records", h.ListMoodRecords, jwt)
+	e.GET("/api/journal/mood/records/:id", h.GetMoodRecord, jwt)
+	e.POST("/api/journal/mood/records", h.CreateMoodRecord, jwt)
+	e.PUT("/api/journal/mood/records/:id", h.UpdateMoodRecord, jwt)
+	e.DELETE("/api/journal/mood/records/:id", h.DeleteMoodRecord, jwt)
+	e.POST("/api/journal/mood/records/:id/restore", h.RestoreMoodRecord, jwt)
 
 	e.GET("/api/journal/diary/entries", h.ListDiaryEntries, jwt)
 	e.GET("/api/journal/diary/entries/:id", h.GetDiaryEntry, jwt)
@@ -34,13 +34,13 @@ func RegisterRoutes(e *echo.Echo, h *Handler, jwt echo.MiddlewareFunc) {
 	e.POST("/api/journal/diary/entries/:id/restore", h.RestoreDiaryEntry, jwt)
 }
 
-func (h *Handler) GetMoodEntry(c echo.Context) error {
+func (h *Handler) GetMoodRecord(c echo.Context) error {
 	id, actor, err := parseIDAndActor(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.GetMoodEntry(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.GetMoodRecord(c.Request().Context(), actor.UserID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -48,45 +48,45 @@ func (h *Handler) GetMoodEntry(c echo.Context) error {
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 
-	return c.JSON(http.StatusOK, NewMoodEntryResponse(entry))
+	return c.JSON(http.StatusOK, NewMoodRecordResponse(entry))
 }
 
-func (h *Handler) ListMoodEntries(c echo.Context) error {
+func (h *Handler) ListMoodRecords(c echo.Context) error {
 	limit, offset, deleted := parsePagination(c)
 	actor, _ := session.GetActor(c)
-	entries, err := h.service.ListMoodEntries(c.Request().Context(), actor.UserID, limit, offset, deleted)
+	entries, err := h.service.ListMoodRecords(c.Request().Context(), actor.UserID, limit, offset, deleted)
 	if err != nil {
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 	return c.JSON(http.StatusOK, entries)
 }
 
-func (h *Handler) CreateMoodEntry(c echo.Context) error {
+func (h *Handler) CreateMoodRecord(c echo.Context) error {
 	actor, _ := session.GetActor(c)
-	var req MoodEditEntryRequest
+	var req MoodEditRecordRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	entry, err := h.service.CreateMoodEntry(c.Request().Context(), actor.UserID, req)
+	entry, err := h.service.CreateMoodRecord(c.Request().Context(), actor.UserID, req)
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
 			return echo.ErrBadRequest.WithInternal(err)
 		}
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
-	return c.JSON(http.StatusCreated, NewMoodEntryResponse(entry))
+	return c.JSON(http.StatusCreated, NewMoodRecordResponse(entry))
 }
 
-func (h *Handler) UpdateMoodEntry(c echo.Context) error {
+func (h *Handler) UpdateMoodRecord(c echo.Context) error {
 	id, actor, err := parseIDAndActor(c)
 	if err != nil {
 		return err
 	}
 
-	var req MoodEditEntryRequest
+	var req MoodEditRecordRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
@@ -94,7 +94,7 @@ func (h *Handler) UpdateMoodEntry(c echo.Context) error {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
-	entry, err := h.service.UpdateMoodEntry(c.Request().Context(), actor.UserID, id, req)
+	entry, err := h.service.UpdateMoodRecord(c.Request().Context(), actor.UserID, id, req)
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
 			return echo.ErrBadRequest.WithInternal(err)
@@ -105,39 +105,39 @@ func (h *Handler) UpdateMoodEntry(c echo.Context) error {
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
 
-	return c.JSON(http.StatusOK, NewMoodEntryResponse(entry))
+	return c.JSON(http.StatusOK, NewMoodRecordResponse(entry))
 }
 
-func (h *Handler) DeleteMoodEntry(c echo.Context) error {
+func (h *Handler) DeleteMoodRecord(c echo.Context) error {
 	id, actor, err := parseIDAndActor(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.DeleteMoodEntry(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.DeleteMoodRecord(c.Request().Context(), actor.UserID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
 		}
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
-	return c.JSON(http.StatusOK, NewMoodEntryResponse(entry))
+	return c.JSON(http.StatusOK, NewMoodRecordResponse(entry))
 }
 
-func (h *Handler) RestoreMoodEntry(c echo.Context) error {
+func (h *Handler) RestoreMoodRecord(c echo.Context) error {
 	id, actor, err := parseIDAndActor(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.RestoreMoodEntry(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.RestoreMoodRecord(c.Request().Context(), actor.UserID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
 		}
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
-	return c.JSON(http.StatusOK, NewMoodEntryResponse(entry))
+	return c.JSON(http.StatusOK, NewMoodRecordResponse(entry))
 }
 
 func (h *Handler) GetDiaryEntry(c echo.Context) error {

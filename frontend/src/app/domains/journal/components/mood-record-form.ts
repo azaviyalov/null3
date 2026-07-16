@@ -6,7 +6,7 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { EditMoodEntryRequest, MoodEntry } from "../models/mood-entry";
+import { EditMoodRecordRequest, MoodRecord } from "../models/mood-record";
 import {
   AbstractControl,
   FormBuilder,
@@ -35,16 +35,16 @@ const EMOJI_OPTIONS: readonly EmojiOption[] = [
 ];
 
 @Component({
-  selector: "app-mood-entry-form",
+  selector: "app-mood-record-form",
   imports: [ReactiveFormsModule],
-  templateUrl: "./mood-entry-form.html",
-  styleUrl: "./mood-entry-form.scss",
+  templateUrl: "./mood-record-form.html",
+  styleUrl: "./mood-record-form.scss",
 })
-export class MoodEntryForm {
+export class MoodRecordForm {
   private readonly formBuilder = inject(FormBuilder);
 
   readonly disabled = input(false);
-  readonly entry = input<MoodEntry | null>(null);
+  readonly entry = input<MoodRecord | null>(null);
   readonly submitLabel = input("Save entry");
   readonly noteExpanded = signal(false);
   readonly emojiOptions = EMOJI_OPTIONS;
@@ -80,7 +80,7 @@ export class MoodEntryForm {
     note: this.formBuilder.control("", { nonNullable: true }),
   });
 
-  readonly entrySubmit = output<EditMoodEntryRequest>();
+  readonly entrySubmit = output<EditMoodRecordRequest>();
 
   toggleNote(): void {
     this.noteExpanded.update((expanded) => !expanded);
@@ -107,7 +107,7 @@ export class MoodEntryForm {
     const { feeling, emoji, note } = this.form.value;
     const trimmedEmoji = emoji?.trim();
     const trimmedNote = note?.trim();
-    const payload: EditMoodEntryRequest = {
+    const payload: EditMoodRecordRequest = {
       feeling: feeling!.trim(),
       ...(trimmedEmoji ? { emoji: trimmedEmoji } : {}),
       ...(trimmedNote ? { note: trimmedNote } : {}),

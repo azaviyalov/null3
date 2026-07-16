@@ -5,32 +5,32 @@ import (
 	"gorm.io/gorm"
 )
 
-type MoodEntryFilter struct {
+type MoodRecordFilter struct {
 	ID          *uint
 	UserID      *uint
 	DeletedMode core.DeletedFilterMode
 }
 
-func NewMoodEntryFilter() *MoodEntryFilter {
-	return &MoodEntryFilter{DeletedMode: core.DeletedModeNonDeleted}
+func NewMoodRecordFilter() *MoodRecordFilter {
+	return &MoodRecordFilter{DeletedMode: core.DeletedModeNonDeleted}
 }
 
-func (f *MoodEntryFilter) WithID(id uint) *MoodEntryFilter {
+func (f *MoodRecordFilter) WithID(id uint) *MoodRecordFilter {
 	f.ID = &id
 	return f
 }
 
-func (f *MoodEntryFilter) WithUserID(userID uint) *MoodEntryFilter {
+func (f *MoodRecordFilter) WithUserID(userID uint) *MoodRecordFilter {
 	f.UserID = &userID
 	return f
 }
 
-func (f *MoodEntryFilter) WithDeletedMode(mode core.DeletedFilterMode) *MoodEntryFilter {
+func (f *MoodRecordFilter) WithDeletedMode(mode core.DeletedFilterMode) *MoodRecordFilter {
 	f.DeletedMode = mode
 	return f
 }
 
-func (f MoodEntryFilter) Apply(db *gorm.DB) *gorm.DB {
+func (f MoodRecordFilter) Apply(db *gorm.DB) *gorm.DB {
 	if f.ID != nil {
 		db = db.Where("id = ?", *f.ID)
 	}

@@ -12,25 +12,25 @@ import (
 const previewMaxLength = 180
 
 var (
-	customMoodEntryLinkPattern = regexp.MustCompile(`\[\[mood:(\d+)(?:\|([^\]]+))?\]\]`)
-	legacyMoodEntryLinkPattern = regexp.MustCompile(`(?:https?://[^\s)]+)?/mood/entries/(\d+)(?:[?#][^\s)]*)?`)
-	fencedCodeBlockPattern     = regexp.MustCompile("(?s)```.*?```|~~~.*?~~~")
-	inlineCodePattern          = regexp.MustCompile("`[^`\n]*`")
-	markdownLinkPattern        = regexp.MustCompile(`\[(.*?)\]\((.*?)\)`)
-	markdownHeadingPattern     = regexp.MustCompile(`(?m)^\s{0,3}#{1,6}\s*`)
-	markdownQuotePattern       = regexp.MustCompile(`(?m)^\s{0,3}>\s?`)
-	markdownListPattern        = regexp.MustCompile(`(?m)^\s*([-+*]|\d+\.)\s+`)
-	markdownTokenPattern       = regexp.MustCompile("[*_`~]")
-	whitespacePattern          = regexp.MustCompile(`\s+`)
+	customMoodRecordLinkPattern = regexp.MustCompile(`\[\[mood:(\d+)(?:\|([^\]]+))?\]\]`)
+	legacyMoodRecordLinkPattern = regexp.MustCompile(`(?:https?://[^\s)]+)?/mood/records/(\d+)(?:[?#][^\s)]*)?`)
+	fencedCodeBlockPattern      = regexp.MustCompile("(?s)```.*?```|~~~.*?~~~")
+	inlineCodePattern           = regexp.MustCompile("`[^`\n]*`")
+	markdownLinkPattern         = regexp.MustCompile(`\[(.*?)\]\((.*?)\)`)
+	markdownHeadingPattern      = regexp.MustCompile(`(?m)^\s{0,3}#{1,6}\s*`)
+	markdownQuotePattern        = regexp.MustCompile(`(?m)^\s{0,3}>\s?`)
+	markdownListPattern         = regexp.MustCompile(`(?m)^\s*([-+*]|\d+\.)\s+`)
+	markdownTokenPattern        = regexp.MustCompile("[*_`~]")
+	whitespacePattern           = regexp.MustCompile(`\s+`)
 )
 
-func ExtractMoodEntryIDs(markdown string) ([]uint, error) {
+func ExtractMoodRecordIDs(markdown string) ([]uint, error) {
 	seen := make(map[uint]struct{})
 	searchableMarkdown := stripCodeSections(markdown)
 
 	for _, pattern := range []*regexp.Regexp{
-		customMoodEntryLinkPattern,
-		legacyMoodEntryLinkPattern,
+		customMoodRecordLinkPattern,
+		legacyMoodRecordLinkPattern,
 	} {
 		for _, match := range pattern.FindAllStringSubmatch(searchableMarkdown, -1) {
 			if len(match) < 2 {
@@ -39,7 +39,7 @@ func ExtractMoodEntryIDs(markdown string) ([]uint, error) {
 
 			parsed, err := strconv.ParseUint(match[1], 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("parse mood entry link %q: %w", match[1], err)
+				return nil, fmt.Errorf("parse mood record link %q: %w", match[1], err)
 			}
 			seen[uint(parsed)] = struct{}{}
 		}
@@ -59,7 +59,7 @@ func MarkdownPreview(markdown string) string {
 		return ""
 	}
 
-	preview = customMoodEntryLinkPattern.ReplaceAllStringFunc(preview, moodEntryLinkPreviewText)
+	preview = customMoodRecordLinkPattern.ReplaceAllStringFunc(preview, moodRecordLinkPreviewText)
 	preview = markdownLinkPattern.ReplaceAllString(preview, "$1")
 	preview = markdownHeadingPattern.ReplaceAllString(preview, "")
 	preview = markdownQuotePattern.ReplaceAllString(preview, "")
@@ -80,8 +80,8 @@ func MarkdownPreview(markdown string) string {
 	return strings.TrimSpace(string(runes[:previewMaxLength-1])) + "..."
 }
 
-func moodEntryLinkPreviewText(raw string) string {
-	match := customMoodEntryLinkPattern.FindStringSubmatch(raw)
+func moodRecordLinkPreviewText(raw string) string {
+	match := customMoodRecordLinkPattern.FindStringSubmatch(raw)
 	if len(match) < 2 {
 		return raw
 	}
@@ -90,7 +90,7 @@ func moodEntryLinkPreviewText(raw string) string {
 		return strings.TrimSpace(match[2])
 	}
 
-	return fmt.Sprintf("Mood entry #%s", match[1])
+	return fmt.Sprintf("Mood record #%s", match[1])
 }
 
 func stripCodeSections(markdown string) string {

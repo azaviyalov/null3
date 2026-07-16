@@ -15,9 +15,9 @@ import {
   Validators,
 } from "@angular/forms";
 import { startWith } from "rxjs";
-import { MoodEntryApi } from "../services/mood-entry-api";
+import { MoodRecordApi } from "../services/mood-record-api";
 import { DiaryEntry, EditDiaryEntryRequest } from "../models/diary-entry";
-import { MoodEntry } from "../models/mood-entry";
+import { MoodRecord } from "../models/mood-record";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 @Component({
@@ -29,17 +29,17 @@ import { MarkdownRenderer } from "./markdown-renderer";
 })
 export class DiaryEntryForm {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly moodEntryApi = inject(MoodEntryApi);
+  private readonly moodRecordApi = inject(MoodRecordApi);
 
   readonly disabled = input(false);
   readonly entry = input<DiaryEntry | null>(null);
   readonly submitLabel = input("Save entry");
 
-  readonly recentMoodEntriesPage = toSignal(this.moodEntryApi.getPaged(8), {
+  readonly recentMoodRecordsPage = toSignal(this.moodRecordApi.getPaged(8), {
     initialValue: null,
   });
-  readonly recentMoodEntries = computed(
-    () => this.recentMoodEntriesPage()?.items ?? [],
+  readonly recentMoodRecords = computed(
+    () => this.recentMoodRecordsPage()?.items ?? [],
   );
 
   constructor() {
@@ -83,14 +83,14 @@ export class DiaryEntryForm {
 
   readonly entrySubmit = output<EditDiaryEntryRequest>();
 
-  insertMoodEntryLink(entry: MoodEntry, textarea: HTMLTextAreaElement): void {
+  insertMoodRecordLink(entry: MoodRecord, textarea: HTMLTextAreaElement): void {
     const control = this.form.controls.markdown;
     const value = control.value;
     const selectionStart = textarea.selectionStart ?? value.length;
     const selectionEnd = textarea.selectionEnd ?? value.length;
     const selectedText = value.slice(selectionStart, selectionEnd).trim();
-    const label = normalizeMoodEntryLinkLabel(
-      selectedText || buildMoodEntryLinkLabel(entry),
+    const label = normalizeMoodRecordLinkLabel(
+      selectedText || buildMoodRecordLinkLabel(entry),
     );
     const link = `[[mood:${entry.id}|${label}]]`;
 
@@ -138,7 +138,7 @@ export class DiaryEntryForm {
   }
 }
 
-function buildMoodEntryLinkLabel(entry: MoodEntry): string {
+function buildMoodRecordLinkLabel(entry: MoodRecord): string {
   const dateLabel = new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",
@@ -149,7 +149,7 @@ function buildMoodEntryLinkLabel(entry: MoodEntry): string {
   return [entry.emoji, moodLabel, dateLabel].filter(Boolean).join(" ");
 }
 
-function normalizeMoodEntryLinkLabel(label: string): string {
+function normalizeMoodRecordLinkLabel(label: string): string {
   return label
     .replaceAll("|", " ")
     .replaceAll("]]", " ")

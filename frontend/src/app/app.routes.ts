@@ -59,35 +59,35 @@ export const routes: Routes = [
       import("./domains/dashboard/pages/home/home").then((m) => m.Home),
   },
   {
-    path: "mood/entries",
+    path: "mood/records",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/journal/pages/mood-entry-list").then(
-        (m) => m.MoodEntryList,
+      import("./domains/journal/pages/mood-record-list").then(
+        (m) => m.MoodRecordList,
       ),
   },
   {
-    path: "mood/entries/create",
+    path: "mood/records/create",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/journal/pages/mood-entry-create").then(
-        (m) => m.MoodEntryCreate,
+      import("./domains/journal/pages/mood-record-create").then(
+        (m) => m.MoodRecordCreate,
       ),
   },
   {
-    path: "mood/entries/:id",
+    path: "mood/records/:id",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/journal/pages/mood-entry-view").then(
-        (m) => m.MoodEntryView,
+      import("./domains/journal/pages/mood-record-view").then(
+        (m) => m.MoodRecordView,
       ),
   },
   {
-    path: "mood/entries/:id/update",
+    path: "mood/records/:id/update",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/journal/pages/mood-entry-update").then(
-        (m) => m.MoodEntryUpdate,
+      import("./domains/journal/pages/mood-record-update").then(
+        (m) => m.MoodRecordUpdate,
       ),
   },
   {

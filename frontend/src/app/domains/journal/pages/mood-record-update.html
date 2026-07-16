@@ -1,6 +1,6 @@
 <section class="page-shell space-y-6">
   <header class="page-intro">
-    <h1 class="page-title">Edit mood entry</h1>
+    <h1 class="page-title">Edit mood record</h1>
   </header>
 
   @if (errorMessage(); as errorMessage) {
@@ -15,7 +15,7 @@
     </section>
   } @else {
     <section class="surface-panel">
-      <app-mood-entry-form
+      <app-mood-record-form
         [entry]="entry()"
         [disabled]="isSubmitting()"
         submitLabel="Save changes"

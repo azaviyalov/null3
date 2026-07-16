@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type MoodEntry struct {
+type MoodRecord struct {
 	ID           uint           `gorm:"primarykey" json:"id"`
 	UserID       uint           `json:"user_id"`
 	Feeling      string         `json:"feeling" validate:"required"`
@@ -15,7 +15,11 @@ type MoodEntry struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	DiaryEntries []DiaryEntry   `gorm:"many2many:mood_entry_diary_entries;->" json:"diary_entries,omitempty"`
+	DiaryEntries []DiaryEntry   `gorm:"many2many:mood_record_diary_entries;joinForeignKey:MoodRecordID;joinReferences:DiaryEntryID;->" json:"diary_entries,omitempty"`
+}
+
+func (MoodRecord) TableName() string {
+	return "mood_records"
 }
 
 type DiaryEntry struct {
@@ -27,5 +31,5 @@ type DiaryEntry struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	MoodEntries []MoodEntry    `gorm:"many2many:mood_entry_diary_entries;" json:"mood_entries,omitempty"`
+	MoodRecords []MoodRecord   `gorm:"many2many:mood_record_diary_entries;joinForeignKey:DiaryEntryID;joinReferences:MoodRecordID" json:"mood_records,omitempty"`
 }

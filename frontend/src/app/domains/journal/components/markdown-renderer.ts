@@ -9,11 +9,11 @@ import {
 import { Router } from "@angular/router";
 import { marked } from "marked";
 
-const MOOD_ENTRY_LINK_PATTERN = /^\[\[mood:(\d+)(?:\|([^\]]+))?\]\]/;
+const MOOD_RECORD_LINK_PATTERN = /^\[\[mood:(\d+)(?:\|([^\]]+))?\]\]/;
 let markedConfigured = false;
 
-const moodEntryLinkExtension = {
-  name: "moodEntryLink",
+const moodRecordLinkExtension = {
+  name: "moodRecordLink",
   level: "inline" as const,
   start(src: string): number | undefined {
     const index = src.indexOf("[[mood:");
@@ -23,27 +23,27 @@ const moodEntryLinkExtension = {
     | {
         type: string;
         raw: string;
-        moodEntryId: number;
+        moodRecordId: number;
         label: string;
       }
     | undefined {
-    const match = MOOD_ENTRY_LINK_PATTERN.exec(src);
+    const match = MOOD_RECORD_LINK_PATTERN.exec(src);
     if (!match) {
       return undefined;
     }
 
-    const moodEntryId = Number(match[1]);
-    const label = match[2]?.trim() || `Mood entry #${match[1]}`;
+    const moodRecordId = Number(match[1]);
+    const label = match[2]?.trim() || `Mood record #${match[1]}`;
 
     return {
-      type: "moodEntryLink",
+      type: "moodRecordLink",
       raw: match[0],
-      moodEntryId,
+      moodRecordId,
       label,
     };
   },
-  renderer(token: { moodEntryId: number; label: string }): string {
-    return `<a href="/mood/entries/${token.moodEntryId}" data-mood-entry-link="true">${escapeHtml(token.label)}</a>`;
+  renderer(token: { moodRecordId: number; label: string }): string {
+    return `<a href="/mood/records/${token.moodRecordId}" data-mood-record-link="true">${escapeHtml(token.label)}</a>`;
   },
 };
 
@@ -86,17 +86,17 @@ export class MarkdownRenderer {
       return;
     }
 
-    const moodEntryID = parseMoodEntryID(anchor.getAttribute("href"));
-    if (!moodEntryID) {
+    const moodRecordID = parseMoodRecordID(anchor.getAttribute("href"));
+    if (!moodRecordID) {
       return;
     }
 
     event.preventDefault();
-    this.router.navigate(["/mood/entries", moodEntryID]);
+    this.router.navigate(["/mood/records", moodRecordID]);
   }
 }
 
-function parseMoodEntryID(href: string | null): number | null {
+function parseMoodRecordID(href: string | null): number | null {
   if (!href) {
     return null;
   }
@@ -107,7 +107,7 @@ function parseMoodEntryID(href: string | null): number | null {
         ? "http://localhost"
         : window.location.origin;
     const url = new URL(href, baseUrl);
-    const match = /^\/mood\/entries\/(\d+)\/?$/.exec(url.pathname);
+    const match = /^\/mood\/records\/(\d+)\/?$/.exec(url.pathname);
     if (!match) {
       return null;
     }
@@ -126,7 +126,7 @@ function configureMarked(): void {
   marked.use({
     breaks: true,
     gfm: true,
-    extensions: [moodEntryLinkExtension],
+    extensions: [moodRecordLinkExtension],
   });
   markedConfigured = true;
 }

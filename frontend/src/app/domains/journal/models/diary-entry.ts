@@ -1,4 +1,4 @@
-import { MoodEntry, MoodEntryResponse } from "./mood-entry";
+import { MoodRecord, MoodRecordResponse } from "./mood-record";
 
 export class DiaryEntry {
   constructor(
@@ -10,7 +10,7 @@ export class DiaryEntry {
     readonly createdAt: Date,
     readonly updatedAt: Date,
     readonly deletedAt: Date | undefined,
-    readonly referencedMoodEntries: MoodEntry[],
+    readonly referencedMoodRecords: MoodRecord[],
   ) {}
 
   get headline(): string {
@@ -31,7 +31,7 @@ export class DiaryEntry {
       new Date(data.created_at),
       new Date(data.updated_at),
       data.deleted_at ? new Date(data.deleted_at) : undefined,
-      (data.referenced_mood_entries ?? []).map(MoodEntry.fromResponse),
+      (data.referenced_mood_records ?? []).map(MoodRecord.fromResponse),
     );
   }
 }
@@ -52,5 +52,5 @@ export interface DiaryEntryResponse {
   readonly created_at: string;
   readonly updated_at: string;
   readonly deleted_at: string | null;
-  readonly referenced_mood_entries?: MoodEntryResponse[];
+  readonly referenced_mood_records?: MoodRecordResponse[];
 }

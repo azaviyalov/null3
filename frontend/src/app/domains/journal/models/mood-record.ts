@@ -24,7 +24,7 @@ export class DiaryEntryLink {
   }
 }
 
-export class MoodEntry {
+export class MoodRecord {
   constructor(
     readonly id: number,
     readonly feeling: string,
@@ -36,8 +36,8 @@ export class MoodEntry {
     readonly diaryEntryLinks: DiaryEntryLink[] = [],
   ) {}
 
-  static fromResponse(data: MoodEntryResponse): MoodEntry {
-    return new MoodEntry(
+  static fromResponse(data: MoodRecordResponse): MoodRecord {
+    return new MoodRecord(
       data.id,
       data.feeling,
       data.emoji || undefined,
@@ -50,13 +50,13 @@ export class MoodEntry {
   }
 }
 
-export interface EditMoodEntryRequest {
+export interface EditMoodRecordRequest {
   readonly feeling: string;
   readonly emoji?: string;
   readonly note?: string;
 }
 
-export interface MoodEntryResponse {
+export interface MoodRecordResponse {
   readonly id: number;
   readonly feeling: string;
   readonly emoji?: string;

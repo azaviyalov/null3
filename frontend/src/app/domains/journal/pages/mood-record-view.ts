@@ -1,27 +1,27 @@
 import { Component, computed, inject } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { MoodEntryApi } from "../services/mood-entry-api";
-import { MoodEntryDetail } from "../components/mood-entry-detail";
+import { MoodRecordApi } from "../services/mood-record-api";
+import { MoodRecordDetail } from "../components/mood-record-detail";
 import { map } from "rxjs";
 import { toWritableStateSignal } from "../../../core/utils/signal-helpers";
 import { stateError, stateSuccess } from "../../../core/utils/state";
-import { DiaryEntryLink } from "../models/mood-entry";
+import { DiaryEntryLink } from "../models/mood-record";
 
 @Component({
-  selector: "app-mood-entry-view",
+  selector: "app-mood-record-view",
   standalone: true,
-  imports: [MoodEntryDetail],
-  templateUrl: "./mood-entry-view.html",
-  styleUrl: "./mood-entry-view.scss",
+  imports: [MoodRecordDetail],
+  templateUrl: "./mood-record-view.html",
+  styleUrl: "./mood-record-view.scss",
 })
-export class MoodEntryView {
+export class MoodRecordView {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly moodEntryApi = inject(MoodEntryApi);
+  private readonly moodRecordApi = inject(MoodRecordApi);
 
   private readonly entryState = toWritableStateSignal({
     trigger: this.route.params.pipe(map((params) => Number(params["id"]))),
-    project: (id) => this.moodEntryApi.getById(id),
+    project: (id) => this.moodRecordApi.getById(id),
   });
 
   readonly entry = computed(() => this.entryState().value);
@@ -35,7 +35,7 @@ export class MoodEntryView {
       return;
     }
 
-    this.router.navigate(["/mood/entries", entry.id, "update"]);
+    this.router.navigate(["/mood/records", entry.id, "update"]);
   }
 
   deleteEntry(): void {
@@ -45,7 +45,7 @@ export class MoodEntryView {
       return;
     }
 
-    this.moodEntryApi.delete(entry.id).subscribe({
+    this.moodRecordApi.delete(entry.id).subscribe({
       next: (deletedEntry) => this.entryState.set(stateSuccess(deletedEntry)),
       error: (err) => this.entryState.set(stateError(err)),
     });
@@ -58,7 +58,7 @@ export class MoodEntryView {
       return;
     }
 
-    this.moodEntryApi.restore(entry.id).subscribe({
+    this.moodRecordApi.restore(entry.id).subscribe({
       next: (restoredEntry) => {
         this.entryState.set(stateSuccess(restoredEntry));
       },

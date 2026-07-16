@@ -46,7 +46,7 @@ func New() *App {
 	}
 
 	err = db.AutoMigrate(database,
-		&journal.MoodEntry{},
+		&journal.MoodRecord{},
 		&journal.DiaryEntry{},
 		&account.User{},
 		&session.RefreshToken{},

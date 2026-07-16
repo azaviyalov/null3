@@ -1,14 +1,14 @@
 import { CommonModule } from "@angular/common";
 import { Component, computed, input, output } from "@angular/core";
 import { DiaryEntry } from "../models/diary-entry";
-import { MoodEntry } from "../models/mood-entry";
-import { MoodEntryHistory } from "./mood-entry-history";
+import { MoodRecord } from "../models/mood-record";
+import { MoodRecordHistory } from "./mood-record-history";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 @Component({
   selector: "app-diary-entry-detail",
   standalone: true,
-  imports: [CommonModule, MarkdownRenderer, MoodEntryHistory],
+  imports: [CommonModule, MarkdownRenderer, MoodRecordHistory],
   templateUrl: "./diary-entry-detail.html",
   styleUrl: "./diary-entry-detail.scss",
 })
@@ -40,5 +40,5 @@ export class DiaryEntryDetail {
   readonly edit = output<void>();
   readonly delete = output<void>();
   readonly restore = output<void>();
-  readonly openMood = output<MoodEntry>();
+  readonly openMood = output<MoodRecord>();
 }

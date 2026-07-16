@@ -6,7 +6,7 @@
   @if (errorMessage()) {
     <div class="status-message error">{{ errorMessage() }}</div>
   } @else {
-    <app-mood-entry-detail
+    <app-mood-record-detail
       [entry]="entry()"
       [skeleton]="isLoading()"
       [showEdit]="!entry()?.deletedAt"

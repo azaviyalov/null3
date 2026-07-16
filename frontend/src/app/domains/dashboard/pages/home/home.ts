@@ -1,26 +1,26 @@
 import { Component, inject } from "@angular/core";
 import { Router, RouterModule } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { MoodEntryHistory } from "../../../journal/components/mood-entry-history";
-import { MoodEntryApi } from "../../../journal/services/mood-entry-api";
+import { MoodRecordHistory } from "../../../journal/components/mood-record-history";
+import { MoodRecordApi } from "../../../journal/services/mood-record-api";
 import { DiaryEntryApi } from "../../../journal/services/diary-entry-api";
 import { DiaryEntryFeed } from "../../../journal/components/diary-entry-feed";
 import { DiaryEntry } from "../../../journal/models/diary-entry";
-import { MoodEntry } from "../../../journal/models/mood-entry";
+import { MoodRecord } from "../../../journal/models/mood-record";
 
 @Component({
   selector: "app-home",
-  imports: [RouterModule, MoodEntryHistory, DiaryEntryFeed],
+  imports: [RouterModule, MoodRecordHistory, DiaryEntryFeed],
   templateUrl: "./home.html",
   styleUrl: "./home.scss",
 })
 export class Home {
-  private readonly moodEntryApi = inject(MoodEntryApi);
+  private readonly moodRecordApi = inject(MoodRecordApi);
   private readonly diaryEntryApi = inject(DiaryEntryApi);
   private readonly router = inject(Router);
   private readonly limit = 6;
 
-  readonly moodEntriesPage = toSignal(this.moodEntryApi.getPaged(this.limit), {
+  readonly moodRecordsPage = toSignal(this.moodRecordApi.getPaged(this.limit), {
     initialValue: null,
   });
   readonly diaryEntriesPage = toSignal(
@@ -30,8 +30,8 @@ export class Home {
     },
   );
 
-  openMoodEntry(entry: MoodEntry): void {
-    this.router.navigate(["/mood/entries", entry.id]);
+  openMoodRecord(entry: MoodRecord): void {
+    this.router.navigate(["/mood/records", entry.id]);
   }
 
   openDiaryEntry(entry: DiaryEntry): void {

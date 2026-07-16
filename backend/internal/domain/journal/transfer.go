@@ -6,13 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type MoodEditEntryRequest struct {
+type MoodEditRecordRequest struct {
 	Feeling string `json:"feeling" validate:"required"`
 	Emoji   string `json:"emoji,omitempty"`
 	Note    string `json:"note,omitempty"`
 }
 
-type MoodEntryResponse struct {
+type MoodRecordResponse struct {
 	ID              uint                     `json:"id"`
 	UserID          uint                     `json:"user_id"`
 	Feeling         string                   `json:"feeling"`
@@ -24,8 +24,8 @@ type MoodEntryResponse struct {
 	DiaryEntryLinks []DiaryEntryLinkResponse `json:"diary_entry_links,omitempty"`
 }
 
-func NewMoodEntryResponse(entry *MoodEntry) MoodEntryResponse {
-	return MoodEntryResponse{
+func NewMoodRecordResponse(entry *MoodRecord) MoodRecordResponse {
+	return MoodRecordResponse{
 		ID:              entry.ID,
 		UserID:          entry.UserID,
 		Feeling:         entry.Feeling,
@@ -74,16 +74,16 @@ type DiaryEditEntryRequest struct {
 }
 
 type DiaryEntryResponse struct {
-	ID                    uint                `json:"id"`
-	UserID                uint                `json:"user_id"`
-	Title                 string              `json:"title,omitempty"`
-	Markdown              string              `json:"markdown"`
-	Preview               string              `json:"preview,omitempty"`
-	OccurredAt            time.Time           `json:"occurred_at"`
-	CreatedAt             time.Time           `json:"created_at"`
-	UpdatedAt             time.Time           `json:"updated_at"`
-	DeletedAt             gorm.DeletedAt      `json:"deleted_at"`
-	ReferencedMoodEntries []MoodEntryResponse `json:"referenced_mood_entries,omitempty"`
+	ID                    uint                 `json:"id"`
+	UserID                uint                 `json:"user_id"`
+	Title                 string               `json:"title,omitempty"`
+	Markdown              string               `json:"markdown"`
+	Preview               string               `json:"preview,omitempty"`
+	OccurredAt            time.Time            `json:"occurred_at"`
+	CreatedAt             time.Time            `json:"created_at"`
+	UpdatedAt             time.Time            `json:"updated_at"`
+	DeletedAt             gorm.DeletedAt       `json:"deleted_at"`
+	ReferencedMoodRecords []MoodRecordResponse `json:"referenced_mood_records,omitempty"`
 }
 
 func NewDiaryEntryResponse(entry *DiaryEntry) DiaryEntryResponse {
@@ -97,18 +97,18 @@ func NewDiaryEntryResponse(entry *DiaryEntry) DiaryEntryResponse {
 		CreatedAt:             entry.CreatedAt,
 		UpdatedAt:             entry.UpdatedAt,
 		DeletedAt:             entry.DeletedAt,
-		ReferencedMoodEntries: NewReferencedMoodEntryResponses(entry.MoodEntries),
+		ReferencedMoodRecords: NewReferencedMoodRecordResponses(entry.MoodRecords),
 	}
 }
 
-func NewReferencedMoodEntryResponses(entries []MoodEntry) []MoodEntryResponse {
+func NewReferencedMoodRecordResponses(entries []MoodRecord) []MoodRecordResponse {
 	if len(entries) == 0 {
 		return nil
 	}
 
-	result := make([]MoodEntryResponse, 0, len(entries))
+	result := make([]MoodRecordResponse, 0, len(entries))
 	for _, entry := range entries {
-		result = append(result, MoodEntryResponse{
+		result = append(result, MoodRecordResponse{
 			ID:        entry.ID,
 			UserID:    entry.UserID,
 			Feeling:   entry.Feeling,

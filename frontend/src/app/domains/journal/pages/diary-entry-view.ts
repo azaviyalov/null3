@@ -1,7 +1,7 @@
 import { Component, computed, inject } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { map } from "rxjs";
-import { MoodEntry } from "../models/mood-entry";
+import { MoodRecord } from "../models/mood-record";
 import { toWritableStateSignal } from "../../../core/utils/signal-helpers";
 import { stateError, stateSuccess } from "../../../core/utils/state";
 import { DiaryEntryApi } from "../services/diary-entry-api";
@@ -64,8 +64,8 @@ export class DiaryEntryView {
     });
   }
 
-  openMoodEntry(entry: MoodEntry): void {
-    this.router.navigate(["/mood/entries", entry.id]);
+  openMoodRecord(entry: MoodRecord): void {
+    this.router.navigate(["/mood/records", entry.id]);
   }
 
   goBack(): void {

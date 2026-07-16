@@ -7,7 +7,7 @@ A small personal journal for quick mood notes and longer diary entries. The API 
 This is a project built just for fun. It is not intended for production use.
 
 ## Features
-- Track mood entries
+- Track mood records
 - Write diary entries in Markdown
 - Link diary entries to moods with `[[mood:<id>|label]]`
 - Follow links in either direction
@@ -25,7 +25,7 @@ This is a project built just for fun. It is not intended for production use.
 - Backend `internal/domain` contains feature logic such as `account`, `session`, `admin`, and `journal`.
 - Frontend `src/app/core` contains shared app utilities and static app-level pages such as `about`.
 - Frontend `src/app/domains` contains feature domains such as `account`, `session`, `admin`, `dashboard`, and `journal`.
-- Journal REST endpoints are grouped under `/api/journal/mood/entries` and `/api/journal/diary/entries`.
+- Journal REST endpoints are grouped under `/api/journal/mood/records` and `/api/journal/diary/entries`.
 
 ## Running the Application
 

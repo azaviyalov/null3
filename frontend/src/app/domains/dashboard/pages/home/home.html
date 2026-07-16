@@ -7,13 +7,13 @@
   </header>
 
   <section class="space-y-4">
-    <h2 class="section-title">Latest mood entries</h2>
+    <h2 class="section-title">Latest mood records</h2>
 
-    <app-mood-entry-history
-      [entries]="moodEntriesPage()?.items ?? null"
+    <app-mood-record-history
+      [entries]="moodRecordsPage()?.items ?? null"
       [showOpen]="true"
-      emptyMessage="No mood entries yet."
-      (open)="openMoodEntry($event)"
+      emptyMessage="No mood records yet."
+      (open)="openMoodRecord($event)"
     />
   </section>
 

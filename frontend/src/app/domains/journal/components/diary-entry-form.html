@@ -38,36 +38,36 @@
       <section class="surface-panel diary-helper-panel">
         <div class="space-y-2">
           <h3 class="m-0 font-serif text-2xl tracking-tight text-base-content">
-            Link mood entries
+            Link mood records
           </h3>
           <p class="m-0 text-sm leading-6 text-base-content/60">
-            Select text below, then choose a mood entry to link it. The saved
+            Select text below, then choose a mood record to link it. The saved
             syntax is <code>[[mood:42|your text]]</code>.
           </p>
         </div>
 
-        @if (recentMoodEntriesPage() === null) {
+        @if (recentMoodRecordsPage() === null) {
           <p class="m-0 text-sm text-base-content/55">
-            Loading recent mood entries...
+            Loading recent mood records...
           </p>
-        } @else if (!recentMoodEntries().length) {
+        } @else if (!recentMoodRecords().length) {
           <p class="m-0 text-sm text-base-content/55">
-            Create a mood entry first and it will appear here.
+            Create a mood record first and it will appear here.
           </p>
         } @else {
           <div class="flex flex-wrap gap-2">
-            @for (moodEntry of recentMoodEntries(); track moodEntry.id) {
+            @for (moodRecord of recentMoodRecords(); track moodRecord.id) {
               <button
                 type="button"
                 class="diary-link-chip"
                 [disabled]="disabled()"
-                (click)="insertMoodEntryLink(moodEntry, markdownField)"
+                (click)="insertMoodRecordLink(moodRecord, markdownField)"
               >
-                @if (moodEntry.emoji) {
-                  <span aria-hidden="true">{{ moodEntry.emoji }}</span>
+                @if (moodRecord.emoji) {
+                  <span aria-hidden="true">{{ moodRecord.emoji }}</span>
                 }
                 <span class="truncate">{{
-                  moodEntry.note || moodEntry.feeling
+                  moodRecord.note || moodRecord.feeling
                 }}</span>
               </button>
             }
@@ -82,7 +82,7 @@
           Preview
         </h3>
         <p class="m-0 text-sm leading-6 text-base-content/60">
-          Mood entry links work here and in the saved entry.
+          Mood record links work here and in the saved entry.
         </p>
       </div>
 

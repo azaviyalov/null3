@@ -1,8 +1,8 @@
 import { Component, computed, inject, signal } from "@angular/core";
-import { MoodEntry } from "../models/mood-entry";
-import { MoodEntryApi } from "../services/mood-entry-api";
+import { MoodRecord } from "../models/mood-record";
+import { MoodRecordApi } from "../services/mood-record-api";
 import { ActivatedRoute, Router } from "@angular/router";
-import { MoodEntryHistory } from "../components/mood-entry-history";
+import { MoodRecordHistory } from "../components/mood-record-history";
 import {
   toWritableSignal,
   toWritableStateSignal,
@@ -11,18 +11,18 @@ import { toObservable } from "@angular/core/rxjs-interop";
 import { combineLatest, map } from "rxjs";
 
 @Component({
-  selector: "app-mood-entry-list",
+  selector: "app-mood-record-list",
   standalone: true,
-  imports: [MoodEntryHistory],
-  templateUrl: "./mood-entry-list.html",
-  styleUrl: "./mood-entry-list.scss",
+  imports: [MoodRecordHistory],
+  templateUrl: "./mood-record-list.html",
+  styleUrl: "./mood-record-list.scss",
 })
-export class MoodEntryList {
+export class MoodRecordList {
   readonly defaultPageSize = 10;
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly moodEntryApi = inject(MoodEntryApi);
+  private readonly moodRecordApi = inject(MoodRecordApi);
 
   readonly pageSize = signal(this.defaultPageSize);
   readonly pageOffset = signal(0);
@@ -40,7 +40,7 @@ export class MoodEntryList {
       toObservable(this.showDeleted),
     ]),
     project: ([size, offset, deleted]) =>
-      this.moodEntryApi.getPaged(size, offset, deleted),
+      this.moodRecordApi.getPaged(size, offset, deleted),
   });
 
   readonly page = computed(() => this.pageState().value);
@@ -64,12 +64,12 @@ export class MoodEntryList {
   readonly canGoPrevious = computed(() => this.pageOffset() > 0);
   readonly canGoNext = computed(() => this.pageEnd() < this.totalCount());
 
-  openEntry(entry: MoodEntry): void {
-    this.router.navigate(["/mood/entries", entry.id]);
+  openEntry(entry: MoodRecord): void {
+    this.router.navigate(["/mood/records", entry.id]);
   }
 
   createEntry(): void {
-    this.router.navigate(["/mood/entries/create"]);
+    this.router.navigate(["/mood/records/create"]);
   }
 
   changePageSize(nextPageSize: string): void {

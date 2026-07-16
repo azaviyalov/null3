@@ -96,19 +96,19 @@
     <div class="space-y-8 pt-6">
       <app-markdown-renderer [markdown]="e.markdown" />
 
-      @if (e.referencedMoodEntries.length) {
+      @if (e.referencedMoodRecords.length) {
         <section class="space-y-4">
           <div class="space-y-2">
-            <h2 class="section-title text-3xl">Linked mood entries</h2>
+            <h2 class="section-title text-3xl">Linked mood records</h2>
             <p class="section-copy">
-              These mood entries are linked from the text above.
+              These mood records are linked from the text above.
             </p>
           </div>
 
-          <app-mood-entry-history
-            [entries]="e.referencedMoodEntries"
+          <app-mood-record-history
+            [entries]="e.referencedMoodRecords"
             [showOpen]="true"
-            emptyMessage="No mood entries are linked from this entry."
+            emptyMessage="No mood records are linked from this entry."
             (open)="openMood.emit($event)"
           />
         </section>

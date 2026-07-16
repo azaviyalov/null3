@@ -1,30 +1,30 @@
 import { Component, computed, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { MoodEntry } from "../models/mood-entry";
+import { MoodRecord } from "../models/mood-record";
 import { feelingLabel } from "../utils/feeling-presenter";
 
 interface EntryGroup {
   readonly key: string;
   readonly label: string;
-  readonly entries: MoodEntry[];
+  readonly entries: MoodRecord[];
 }
 
 @Component({
-  selector: "app-mood-entry-history",
+  selector: "app-mood-record-history",
   standalone: true,
   imports: [CommonModule],
-  templateUrl: "./mood-entry-history.html",
-  styleUrl: "./mood-entry-history.scss",
+  templateUrl: "./mood-record-history.html",
+  styleUrl: "./mood-record-history.scss",
 })
-export class MoodEntryHistory {
+export class MoodRecordHistory {
   readonly skeleton = input(false);
   readonly skeletonCount = input(10);
-  readonly entries = input<MoodEntry[] | null>(null);
+  readonly entries = input<MoodRecord[] | null>(null);
   readonly showOpen = input(false);
   readonly showEdit = input(false);
   readonly showDelete = input(false);
   readonly showRestore = input(false);
-  readonly emptyMessage = input("No mood entries found.");
+  readonly emptyMessage = input("No mood records found.");
 
   readonly groupedEntries = computed<EntryGroup[]>(() =>
     groupEntriesByDate(this.entries() ?? []),
@@ -33,10 +33,10 @@ export class MoodEntryHistory {
     Array.from({ length: this.skeletonCount() }, (_, index) => index),
   );
 
-  readonly open = output<MoodEntry>();
-  readonly edit = output<MoodEntry>();
-  readonly delete = output<MoodEntry>();
-  readonly restore = output<MoodEntry>();
+  readonly open = output<MoodRecord>();
+  readonly edit = output<MoodRecord>();
+  readonly delete = output<MoodRecord>();
+  readonly restore = output<MoodRecord>();
 
   readonly showActions = computed(
     () =>
@@ -48,10 +48,10 @@ export class MoodEntryHistory {
   readonly feelingLabel = feelingLabel;
 
   trackByGroup = (_: number, group: EntryGroup): string => group.key;
-  trackByEntry = (_: number, entry: MoodEntry): number => entry.id;
+  trackByEntry = (_: number, entry: MoodRecord): number => entry.id;
 }
 
-function groupEntriesByDate(entries: MoodEntry[]): EntryGroup[] {
+function groupEntriesByDate(entries: MoodRecord[]): EntryGroup[] {
   const groups = new Map<string, EntryGroup>();
 
   for (const entry of entries) {

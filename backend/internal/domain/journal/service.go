@@ -17,33 +17,33 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) ListMoodEntries(ctx context.Context, userID uint, limit, offset int, deleted bool) (core.Page[MoodEntry], error) {
-	filter := NewMoodEntryFilter().WithUserID(userID)
+func (s *Service) ListMoodRecords(ctx context.Context, userID uint, limit, offset int, deleted bool) (core.Page[MoodRecord], error) {
+	filter := NewMoodRecordFilter().WithUserID(userID)
 	if deleted {
 		filter = filter.WithDeletedMode(core.DeletedModeDeletedOnly)
 	}
 
-	entries, err := s.repo.ListMoodEntries(ctx, filter, limit, offset)
+	entries, err := s.repo.ListMoodRecords(ctx, filter, limit, offset)
 	if err != nil {
-		return core.Page[MoodEntry]{}, err
+		return core.Page[MoodRecord]{}, err
 	}
-	totalCount, err := s.repo.CountMoodEntries(ctx, filter)
+	totalCount, err := s.repo.CountMoodRecords(ctx, filter)
 	if err != nil {
-		return core.Page[MoodEntry]{}, err
+		return core.Page[MoodRecord]{}, err
 	}
 	if entries == nil {
-		entries = []MoodEntry{}
+		entries = []MoodRecord{}
 	}
-	return core.Page[MoodEntry]{Items: entries, TotalCount: totalCount}, nil
+	return core.Page[MoodRecord]{Items: entries, TotalCount: totalCount}, nil
 }
 
-func (s *Service) GetMoodEntry(ctx context.Context, userID, id uint) (*MoodEntry, error) {
-	filter := NewMoodEntryFilter().WithUserID(userID).WithID(id).WithDeletedMode(core.DeletedModeAll)
-	return s.repo.GetMoodEntry(ctx, filter)
+func (s *Service) GetMoodRecord(ctx context.Context, userID, id uint) (*MoodRecord, error) {
+	filter := NewMoodRecordFilter().WithUserID(userID).WithID(id).WithDeletedMode(core.DeletedModeAll)
+	return s.repo.GetMoodRecord(ctx, filter)
 }
 
-func (s *Service) CreateMoodEntry(ctx context.Context, userID uint, req MoodEditEntryRequest) (*MoodEntry, error) {
-	return s.repo.SaveMoodEntry(ctx, &MoodEntry{
+func (s *Service) CreateMoodRecord(ctx context.Context, userID uint, req MoodEditRecordRequest) (*MoodRecord, error) {
+	return s.repo.SaveMoodRecord(ctx, &MoodRecord{
 		UserID:  userID,
 		Feeling: req.Feeling,
 		Emoji:   req.Emoji,
@@ -51,31 +51,31 @@ func (s *Service) CreateMoodEntry(ctx context.Context, userID uint, req MoodEdit
 	})
 }
 
-func (s *Service) UpdateMoodEntry(ctx context.Context, userID, id uint, req MoodEditEntryRequest) (*MoodEntry, error) {
-	filter := NewMoodEntryFilter().WithUserID(userID).WithID(id)
-	entry, err := s.repo.GetMoodEntry(ctx, filter)
+func (s *Service) UpdateMoodRecord(ctx context.Context, userID, id uint, req MoodEditRecordRequest) (*MoodRecord, error) {
+	filter := NewMoodRecordFilter().WithUserID(userID).WithID(id)
+	entry, err := s.repo.GetMoodRecord(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 	entry.Feeling = req.Feeling
 	entry.Emoji = req.Emoji
 	entry.Note = req.Note
-	return s.repo.SaveMoodEntry(ctx, entry)
+	return s.repo.SaveMoodRecord(ctx, entry)
 }
 
-func (s *Service) DeleteMoodEntry(ctx context.Context, userID, id uint) (*MoodEntry, error) {
-	filter := NewMoodEntryFilter().WithUserID(userID).WithID(id)
-	return s.repo.DeleteMoodEntry(ctx, filter)
+func (s *Service) DeleteMoodRecord(ctx context.Context, userID, id uint) (*MoodRecord, error) {
+	filter := NewMoodRecordFilter().WithUserID(userID).WithID(id)
+	return s.repo.DeleteMoodRecord(ctx, filter)
 }
 
-func (s *Service) RestoreMoodEntry(ctx context.Context, userID, id uint) (*MoodEntry, error) {
-	filter := NewMoodEntryFilter().WithUserID(userID).WithID(id).WithDeletedMode(core.DeletedModeDeletedOnly)
-	entry, err := s.repo.GetMoodEntry(ctx, filter)
+func (s *Service) RestoreMoodRecord(ctx context.Context, userID, id uint) (*MoodRecord, error) {
+	filter := NewMoodRecordFilter().WithUserID(userID).WithID(id).WithDeletedMode(core.DeletedModeDeletedOnly)
+	entry, err := s.repo.GetMoodRecord(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 	entry.DeletedAt.Valid = false
-	return s.repo.SaveMoodEntry(ctx, entry)
+	return s.repo.SaveMoodRecord(ctx, entry)
 }
 
 func (s *Service) ListDiaryEntries(ctx context.Context, userID uint, limit, offset int, deleted bool) (core.Page[DiaryEntry], error) {
@@ -109,7 +109,7 @@ func (s *Service) CreateDiaryEntry(ctx context.Context, userID uint, req DiaryEd
 		return nil, err
 	}
 
-	moodEntries, err := s.resolveDiaryMoodEntries(ctx, userID, markdown)
+	moodRecords, err := s.resolveDiaryMoodRecords(ctx, userID, markdown)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *Service) CreateDiaryEntry(ctx context.Context, userID uint, req DiaryEd
 		Title:       title,
 		Markdown:    markdown,
 		OccurredAt:  occurredAt,
-		MoodEntries: moodEntries,
+		MoodRecords: moodRecords,
 	})
 }
 
@@ -134,7 +134,7 @@ func (s *Service) UpdateDiaryEntry(ctx context.Context, userID, id uint, req Dia
 		return nil, err
 	}
 
-	moodEntries, err := s.resolveDiaryMoodEntries(ctx, userID, markdown)
+	moodRecords, err := s.resolveDiaryMoodRecords(ctx, userID, markdown)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (s *Service) UpdateDiaryEntry(ctx context.Context, userID, id uint, req Dia
 	entry.Title = title
 	entry.Markdown = markdown
 	entry.OccurredAt = occurredAt
-	entry.MoodEntries = moodEntries
+	entry.MoodRecords = moodRecords
 	return s.repo.SaveDiaryEntry(ctx, entry)
 }
 
@@ -180,20 +180,20 @@ func normalizeDiaryRequest(req DiaryEditEntryRequest) (string, string, time.Time
 	return title, markdown, occurredAt, nil
 }
 
-func (s *Service) resolveDiaryMoodEntries(ctx context.Context, userID uint, markdown string) ([]MoodEntry, error) {
-	ids, err := ExtractMoodEntryIDs(markdown)
+func (s *Service) resolveDiaryMoodRecords(ctx context.Context, userID uint, markdown string) ([]MoodRecord, error) {
+	ids, err := ExtractMoodRecordIDs(markdown)
 	if err != nil {
 		return nil, fmt.Errorf("%w: invalid mood references", core.ErrInvalidItem)
 	}
 
-	moodEntries, err := s.repo.ListMoodEntriesByIDs(ctx, userID, ids)
+	moodRecords, err := s.repo.ListMoodRecordsByIDs(ctx, userID, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(moodEntries) != len(ids) {
-		return nil, fmt.Errorf("%w: one or more referenced mood entries do not exist", core.ErrInvalidItem)
+	if len(moodRecords) != len(ids) {
+		return nil, fmt.Errorf("%w: one or more referenced mood records do not exist", core.ErrInvalidItem)
 	}
 
-	return moodEntries, nil
+	return moodRecords, nil
 }

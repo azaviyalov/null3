@@ -1,18 +1,18 @@
 import { Component, computed, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { DiaryEntryLink, MoodEntry } from "../models/mood-entry";
+import { DiaryEntryLink, MoodRecord } from "../models/mood-record";
 import { feelingLabel } from "../utils/feeling-presenter";
 
 @Component({
-  selector: "app-mood-entry-detail",
+  selector: "app-mood-record-detail",
   standalone: true,
   imports: [CommonModule],
-  templateUrl: "./mood-entry-detail.html",
-  styleUrl: "./mood-entry-detail.scss",
+  templateUrl: "./mood-record-detail.html",
+  styleUrl: "./mood-record-detail.scss",
 })
-export class MoodEntryDetail {
+export class MoodRecordDetail {
   readonly skeleton = input(false);
-  readonly entry = input<MoodEntry | null>(null);
+  readonly entry = input<MoodRecord | null>(null);
   readonly showOpen = input(false);
   readonly showEdit = input(false);
   readonly showDelete = input(false);

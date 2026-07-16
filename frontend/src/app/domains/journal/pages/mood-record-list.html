@@ -1,10 +1,10 @@
 <section class="page-shell-wide space-y-8">
   <header class="page-intro">
-    <h1 class="page-title">Mood entries</h1>
+    <h1 class="page-title">Mood records</h1>
 
     <div class="page-actions">
       <button type="button" class="primary-action" (click)="createEntry()">
-        New mood entry
+        New mood record
       </button>
     </div>
   </header>
@@ -13,7 +13,7 @@
     <div
       class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
     >
-      <div class="filter-switch" aria-label="Mood entry status filter">
+      <div class="filter-switch" aria-label="Mood record status filter">
         <button
           type="button"
           class="filter-switch-button"
@@ -77,12 +77,12 @@
       }
     </div>
 
-    <app-mood-entry-history
+    <app-mood-record-history
       [skeleton]="isLoading()"
       [skeletonCount]="defaultPageSize"
       [entries]="page()?.items ?? null"
       [showOpen]="true"
-      emptyMessage="No mood entries found."
+      emptyMessage="No mood records found."
       (open)="openEntry($event)"
     />
   </section>
