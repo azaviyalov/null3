@@ -1,15 +1,13 @@
 package session
 
 import (
-	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/azaviyalov/null3/backend/internal/core/logging"
 )
 
 type Config struct {
@@ -41,7 +39,7 @@ func GetConfig() (Config, error) {
 			return Config{}, fmt.Errorf("JWT_SECRET must be set in production mode")
 		}
 
-		logging.Warn(context.Background(), "JWT_SECRET is not set, using randomly generated secret")
+		slog.Warn("JWT_SECRET is not set, using randomly generated secret")
 		jwtSecret, err := generateRandomSecret()
 		if err != nil {
 			return Config{}, fmt.Errorf("generate JWT_SECRET: %w", err)

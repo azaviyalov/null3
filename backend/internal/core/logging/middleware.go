@@ -10,6 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const echoErrorKey = "internal/logging_error"
+
 func RequestLogger() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -19,9 +21,7 @@ func RequestLogger() echo.MiddlewareFunc {
 				reqID = generateRequestID()
 			}
 			c.Response().Header().Set("X-Request-Id", reqID)
-			baseReqLogger := slog.Default().With("request_id", reqID)
-			reqLogger := &callerInjector{l: baseReqLogger}
-			addLogger(c, reqLogger)
+			reqLogger := slog.Default().With("request_id", reqID)
 			c.Response().After(func() {
 				req := c.Request()
 				res := c.Response()
@@ -35,13 +35,13 @@ func RequestLogger() echo.MiddlewareFunc {
 				}
 				if v := c.Get(echoErrorKey); v != nil {
 					if status >= 500 {
-						Error(c, "HTTP request completed with error", append(attrs, "error", v)...)
+						reqLogger.Error("HTTP request completed with error", append(attrs, "error", v)...)
 					} else {
-						Warn(c, "HTTP request completed with non-fatal error", append(attrs, "error", v)...)
+						reqLogger.Warn("HTTP request completed with non-fatal error", append(attrs, "error", v)...)
 					}
 					return
 				}
-				Info(c, "HTTP request completed", attrs...)
+				reqLogger.Info("HTTP request completed", attrs...)
 			})
 			err := next(c)
 			if err != nil {

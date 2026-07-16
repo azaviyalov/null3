@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"strconv"
 
@@ -25,7 +26,7 @@ type App struct {
 
 func New() *App {
 	if strconv.IntSize != 64 {
-		logging.Error(context.Background(), "unsupported architecture: only 64-bit systems are supported")
+		slog.Error("unsupported architecture: only 64-bit systems are supported")
 		os.Exit(1)
 	}
 
@@ -33,7 +34,7 @@ func New() *App {
 
 	config, err := GetConfig()
 	if err != nil {
-		logging.Error(context.Background(), "failed to get configuration", "error", err)
+		slog.Error("failed to get configuration", "error", err)
 		os.Exit(1)
 	}
 
@@ -41,7 +42,7 @@ func New() *App {
 
 	database, err := db.Connect(config.DB)
 	if err != nil {
-		logging.Error(context.Background(), "failed to connect to database", "error", err)
+		slog.Error("failed to connect to database", "error", err)
 		os.Exit(1)
 	}
 
@@ -54,7 +55,7 @@ func New() *App {
 		&account.Invite{},
 	)
 	if err != nil {
-		logging.Error(context.Background(), "database migration failed", "error", err)
+		slog.Error("database migration failed", "error", err)
 		os.Exit(1)
 	}
 
@@ -68,7 +69,7 @@ func New() *App {
 	accountRepository := account.NewRepository(database)
 	accountService := account.NewService(accountRepository, sessionService, config.Account)
 	if err := accountService.SeedAdminUser(context.Background()); err != nil {
-		logging.Error(context.Background(), "failed to seed admin user", "error", err)
+		slog.Error("failed to seed admin user", "error", err)
 		os.Exit(1)
 	}
 	accountHandler := account.NewHandler(accountService, sessionService, config.Account, config.Session)
@@ -107,12 +108,12 @@ func New() *App {
 
 func (a *App) Start() {
 	if err := a.sessionService.DeleteExpiredRefreshTokens(context.Background()); err != nil {
-		logging.Error(context.Background(), "failed to delete expired refresh tokens", "error", err)
+		slog.Error("failed to delete expired refresh tokens", "error", err)
 		os.Exit(1)
 	}
 
 	if err := server.StartServer(a.echo, a.config.Server); err != nil {
-		logging.Error(context.Background(), "server stopped with an error", "error", err)
+		slog.Error("server stopped with an error", "error", err)
 		os.Exit(1)
 	}
 }

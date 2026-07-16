@@ -44,7 +44,7 @@ func (h *FancyHandler) formatRecordAttrs(r slog.Record) string {
 		attrLines = append(attrLines, h.formatAttr(a))
 	}
 	if h.addSource {
-		if fileLine := findExternalSource(); fileLine != "" {
+		if fileLine := sourceFromPC(r.PC); fileLine != "" {
 			attrLines = append(attrLines, h.formatAttr(slog.Attr{Key: "source", Value: slog.StringValue(fileLine)}))
 		}
 	}

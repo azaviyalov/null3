@@ -2,11 +2,11 @@ package journal
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
-	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
 	"github.com/labstack/echo/v4"
 )
@@ -271,7 +271,12 @@ func parseIDAndActor(c echo.Context) (uint, *session.Actor, error) {
 	actor, _ := session.GetActor(c)
 	id, err := strconv.ParseUint(idParam, 10, 64)
 	if err != nil {
-		logging.Warn(c, "invalid id param", "id", idParam, "user_id", actor.UserID)
+		slog.Warn(
+			"invalid id param",
+			"request_id", c.Response().Header().Get("X-Request-Id"),
+			"id", idParam,
+			"user_id", actor.UserID,
+		)
 		return 0, nil, echo.ErrBadRequest.WithInternal(err)
 	}
 	return uint(id), actor, nil

@@ -11,68 +11,26 @@ func ReplaceSourceAttr(groups []string, a slog.Attr) slog.Attr {
 	if a.Key != "source" {
 		return a
 	}
-	fileLine := findExternalSource()
-	if fileLine == "" {
+	source, ok := a.Value.Any().(*slog.Source)
+	if !ok || source == nil {
 		return a
 	}
-	return slog.Attr{Key: "source", Value: slog.StringValue(fileLine)}
+	return slog.String("source", formatSource(source.File, source.Line))
 }
 
-func findExternalSource() string {
-	pcs := make([]uintptr, 64)
-	n := runtime.Callers(3, pcs)
-	if n == 0 {
+func sourceFromPC(pc uintptr) string {
+	if pc == 0 {
 		return ""
 	}
-	frames := runtime.CallersFrames(pcs[:n])
-	for {
-		frame, more := frames.Next()
-		if frame.File == "" {
-			if !more {
-				break
-			}
-			continue
-		}
-		if isLogFrame(frame) {
-			if !more {
-				break
-			}
-			continue
-		}
-		return trimRepoPrefix(frame.File) + ":" + strconv.Itoa(frame.Line)
-	}
-	return ""
-}
-
-func findExternalFuncName() string {
-	pcs := make([]uintptr, 64)
-	n := runtime.Callers(3, pcs)
-	if n == 0 {
+	frame, _ := runtime.CallersFrames([]uintptr{pc}).Next()
+	if frame.File == "" {
 		return ""
 	}
-	frames := runtime.CallersFrames(pcs[:n])
-	for {
-		frame, more := frames.Next()
-		if frame.Function == "" || frame.File == "" {
-			if !more {
-				break
-			}
-			continue
-		}
-		if isLogFrame(frame) {
-			if !more {
-				break
-			}
-			continue
-		}
-		return trimFunctionName(frame.Function)
-	}
-	return ""
+	return formatSource(frame.File, frame.Line)
 }
 
-func trimFunctionName(name string) string {
-	parts := strings.Split(name, "/")
-	return parts[len(parts)-1]
+func formatSource(file string, line int) string {
+	return trimRepoPrefix(file) + ":" + strconv.Itoa(line)
 }
 
 func trimRepoPrefix(file string) string {
@@ -81,17 +39,4 @@ func trimRepoPrefix(file string) string {
 		return file[idx+len(marker):]
 	}
 	return file
-}
-
-func isLogFrame(frame runtime.Frame) bool {
-	if frame.File != "" {
-		if strings.Contains(frame.File, "/log/slog") || strings.Contains(frame.File, "log/slog") {
-			return true
-		}
-		if strings.Contains(frame.File, "backend/internal/core/logging") {
-			middlewarePath := "backend/internal/core/logging/middleware.go"
-			return frame.File != middlewarePath
-		}
-	}
-	return false
 }

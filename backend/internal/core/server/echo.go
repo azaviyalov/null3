@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -38,7 +39,7 @@ func NewEchoServer(config Config) *echo.Echo {
 }
 
 func StartServer(e *echo.Echo, config Config) error {
-	logging.Info(context.Background(), "starting HTTP server", "address", config.Address)
+	slog.Info("starting HTTP server", "address", config.Address)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
@@ -53,17 +54,17 @@ func StartServer(e *echo.Echo, config Config) error {
 
 	select {
 	case <-quit:
-		logging.Info(context.Background(), "received shutdown signal, shutting down server gracefully")
+		slog.Info("received shutdown signal, shutting down server gracefully")
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
 		if err := e.Shutdown(shutdownCtx); err != nil {
-			logging.Error(context.Background(), "graceful shutdown failed", "error", err)
+			slog.Error("graceful shutdown failed", "error", err)
 			return err
 		}
-		logging.Info(context.Background(), "server stopped gracefully")
+		slog.Info("server stopped gracefully")
 		return nil
 	case err := <-serverErr:
-		logging.Error(context.Background(), "server start failed", "error", err)
+		slog.Error("server start failed", "error", err)
 		return err
 	}
 }
