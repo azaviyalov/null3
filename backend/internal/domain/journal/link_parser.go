@@ -1,4 +1,4 @@
-package diary
+package journal
 
 import (
 	"fmt"
@@ -90,7 +90,7 @@ func moodEntryLinkPreviewText(raw string) string {
 		return strings.TrimSpace(match[2])
 	}
 
-	return fmt.Sprintf("Mood Entry #%s", match[1])
+	return fmt.Sprintf("Mood entry #%s", match[1])
 }
 
 func stripCodeSections(markdown string) string {

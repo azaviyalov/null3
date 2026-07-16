@@ -11,8 +11,7 @@ import (
 	"github.com/azaviyalov/null3/backend/internal/core/server"
 	"github.com/azaviyalov/null3/backend/internal/domain/account"
 	"github.com/azaviyalov/null3/backend/internal/domain/admin"
-	"github.com/azaviyalov/null3/backend/internal/domain/diary"
-	"github.com/azaviyalov/null3/backend/internal/domain/mood"
+	"github.com/azaviyalov/null3/backend/internal/domain/journal"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -47,9 +46,8 @@ func New() *App {
 	}
 
 	err = db.AutoMigrate(database,
-		&mood.Entry{},
-		&diary.Entry{},
-		&diary.MoodEntryLink{},
+		&journal.MoodEntry{},
+		&journal.DiaryEntry{},
 		&account.User{},
 		&session.RefreshToken{},
 		&account.PasswordResetToken{},
@@ -94,15 +92,11 @@ func New() *App {
 	account.RegisterRoutes(e, accountHandler, userJWTMiddleware)
 	admin.RegisterRoutes(e, adminHandler, adminJWTMiddleware)
 
-	moodRepo := mood.NewRepository(database)
-	diaryRepo := diary.NewRepository(database)
-	diaryService := diary.NewService(diaryRepo)
-	moodService := mood.NewService(moodRepo, diaryService)
-	moodHandler := mood.NewHandler(moodService)
-	diaryHandler := diary.NewHandler(diaryService)
+	journalRepository := journal.NewRepository(database)
+	journalService := journal.NewService(journalRepository)
+	journalHandler := journal.NewHandler(journalService)
 
-	mood.RegisterRoutes(e, moodHandler, userJWTMiddleware)
-	diary.RegisterRoutes(e, diaryHandler, userJWTMiddleware)
+	journal.RegisterRoutes(e, journalHandler, userJWTMiddleware)
 
 	return &App{
 		sessionService: sessionService,
@@ -118,7 +112,7 @@ func (a *App) Start() {
 	}
 
 	if err := server.StartServer(a.echo, a.config.Server); err != nil {
-		logging.Error(context.Background(), "general server failure", "error", err)
+		logging.Error(context.Background(), "server stopped with an error", "error", err)
 		os.Exit(1)
 	}
 }
