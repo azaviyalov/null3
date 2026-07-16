@@ -20,7 +20,6 @@ func ReplaceSourceAttr(groups []string, a slog.Attr) slog.Attr {
 
 func findExternalSource() string {
 	pcs := make([]uintptr, 64)
-	// skip runtime.Callers + this function + ReplaceAttr etc; start at 3
 	n := runtime.Callers(3, pcs)
 	if n == 0 {
 		return ""

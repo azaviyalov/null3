@@ -92,7 +92,6 @@ func (h *FancyHandler) WithGroup(name string) slog.Handler {
 	if name == "" {
 		return h
 	}
-	// Prepend group name to all current attrs
 	newAttrs := make([]slog.Attr, len(h.attrs))
 	for i, a := range h.attrs {
 		a.Key = name + "." + a.Key

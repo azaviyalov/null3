@@ -21,7 +21,6 @@ func RegisterRoutes(e *echo.Echo, config Config) {
 		panic("failed to sub fs: " + err.Error())
 	}
 
-	// Traverse and patch files
 	patchedFiles := make(map[string][]byte)
 	fs.WalkDir(frontendFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
@@ -37,7 +36,6 @@ func RegisterRoutes(e *echo.Echo, config Config) {
 			return nil
 		}
 
-		// Patch API URL placeholder
 		if bytes.Contains(content, []byte("%%API_URL%%")) {
 			content = bytes.ReplaceAll(content, []byte("%%API_URL%%"), []byte(config.APIURL))
 			patchedFiles[path] = content

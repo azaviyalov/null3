@@ -7,27 +7,17 @@ type callerInjector struct {
 }
 
 func (a *callerInjector) addCallerFields(args ...any) []any {
-	// compute function name
 	fn := findExternalFuncName()
 	if fn == "" {
 		return args
 	}
-	// avoid duplicating keys if caller already present in args
-	hasKey := func(key string) bool {
-		for i := 0; i+1 < len(args); i += 2 {
-			if k, ok := args[i].(string); ok && k == key {
-				return true
-			}
+	for i := 0; i+1 < len(args); i += 2 {
+		if key, ok := args[i].(string); ok && key == "caller" {
+			return args
 		}
-		return false
 	}
-	newArgs := make([]any, 0, len(args)+2)
-	// Only inject caller here. Handlers produce the canonical "source" attr.
-	if !hasKey("caller") && fn != "" {
-		newArgs = append(newArgs, "caller", fn)
-	}
-	newArgs = append(newArgs, args...)
-	return newArgs
+
+	return append([]any{"caller", fn}, args...)
 }
 
 func (a *callerInjector) Debug(msg string, args ...any) {

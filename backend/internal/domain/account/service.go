@@ -480,7 +480,7 @@ func hashPassword(password string) (string, error) {
 func generateRandomToken() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
-		return "", fmt.Errorf("failed to generate random token: %v", err)
+		return "", fmt.Errorf("generate random token: %w", err)
 	}
 	return base64.RawURLEncoding.EncodeToString(b), nil
 }

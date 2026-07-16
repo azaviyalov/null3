@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
-	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
 	"gorm.io/gorm"
 )
@@ -36,7 +35,7 @@ func (r *Repository) GetUserByID(ctx context.Context, id uint) (*User, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, core.ErrItemNotFound
 		}
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("get user %d: %w", id, err)
 	}
 	return &user, nil
 }
@@ -47,7 +46,7 @@ func (r *Repository) GetUserByLogin(ctx context.Context, login string) (*User, e
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, core.ErrItemNotFound
 		}
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("get user by login: %w", err)
 	}
 	return &user, nil
 }
@@ -58,34 +57,28 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*User, e
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, core.ErrItemNotFound
 		}
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("get user by email: %w", err)
 	}
 	return &user, nil
 }
 
 func (r *Repository) CreateUser(ctx context.Context, user *User) (*User, error) {
-	logging.Debug(ctx, "CreateUser called", "login", user.Login, "email", user.Email)
 	if err := r.db.WithContext(ctx).Create(user).Error; err != nil {
-		logging.Error(ctx, "db error in CreateUser", "error", err, "login", user.Login, "email", user.Email)
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("create user: %w", err)
 	}
 	return user, nil
 }
 
 func (r *Repository) UpdateUserPassword(ctx context.Context, userID uint, passwordHash string) error {
-	logging.Debug(ctx, "UpdateUserPassword called", "user_id", userID)
 	if err := r.db.WithContext(ctx).Model(&User{}).Where("id = ?", userID).Update("password_hash", passwordHash).Error; err != nil {
-		logging.Error(ctx, "db error in UpdateUserPassword", "error", err, "user_id", userID)
-		return fmt.Errorf("db error: %w", err)
+		return fmt.Errorf("update password for user %d: %w", userID, err)
 	}
 	return nil
 }
 
 func (r *Repository) CreatePasswordResetToken(ctx context.Context, token *PasswordResetToken) (*PasswordResetToken, error) {
-	logging.Debug(ctx, "CreatePasswordResetToken called", "user_id", token.UserID, "expires_at", token.ExpiresAt)
 	if err := r.db.WithContext(ctx).Create(token).Error; err != nil {
-		logging.Error(ctx, "db error in CreatePasswordResetToken", "error", err, "user_id", token.UserID)
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("create password reset token: %w", err)
 	}
 	return token, nil
 }
@@ -96,32 +89,28 @@ func (r *Repository) GetPasswordResetTokenByHash(ctx context.Context, tokenHash 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, core.ErrItemNotFound
 		}
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("get password reset token: %w", err)
 	}
 	return &token, nil
 }
 
 func (r *Repository) DeletePasswordResetToken(ctx context.Context, token *PasswordResetToken) error {
 	if err := r.db.WithContext(ctx).Delete(token).Error; err != nil {
-		logging.Error(ctx, "db error in DeletePasswordResetToken", "error", err, "user_id", token.UserID)
-		return fmt.Errorf("db error: %w", err)
+		return fmt.Errorf("delete password reset token: %w", err)
 	}
 	return nil
 }
 
 func (r *Repository) DeletePasswordResetTokensByUser(ctx context.Context, userID uint) error {
 	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Delete(&PasswordResetToken{}).Error; err != nil {
-		logging.Error(ctx, "db error in DeletePasswordResetTokensByUser", "error", err, "user_id", userID)
-		return fmt.Errorf("db error: %w", err)
+		return fmt.Errorf("delete password reset tokens for user %d: %w", userID, err)
 	}
 	return nil
 }
 
 func (r *Repository) CreateInvite(ctx context.Context, invite *Invite) (*Invite, error) {
-	logging.Debug(ctx, "CreateInvite called", "created_by_user_id", invite.CreatedByUserID, "expires_at", invite.ExpiresAt)
 	if err := r.db.WithContext(ctx).Create(invite).Error; err != nil {
-		logging.Error(ctx, "db error in CreateInvite", "error", err, "created_by_user_id", invite.CreatedByUserID)
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("create invite: %w", err)
 	}
 	return invite, nil
 }
@@ -132,15 +121,14 @@ func (r *Repository) GetInviteByHash(ctx context.Context, tokenHash string) (*In
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, core.ErrItemNotFound
 		}
-		return nil, fmt.Errorf("db error: %w", err)
+		return nil, fmt.Errorf("get invite: %w", err)
 	}
 	return &invite, nil
 }
 
 func (r *Repository) SaveInvite(ctx context.Context, invite *Invite) error {
 	if err := r.db.WithContext(ctx).Save(invite).Error; err != nil {
-		logging.Error(ctx, "db error in SaveInvite", "error", err, "invite_id", invite.ID)
-		return fmt.Errorf("db error: %w", err)
+		return fmt.Errorf("save invite %d: %w", invite.ID, err)
 	}
 	return nil
 }
