@@ -2,33 +2,30 @@
 
 (pronounced as nulls, *NUHLZ*)
 
-A web application for mood tracking, built with Go (backend) and Angular (frontend).
+A small personal journal for quick mood notes and longer diary entries. The API is written in Go; the browser app uses Angular.
 
-This is a pet project, focusing on simplicity and ease of development. Written for fun. It is not intended for production use (you can use it in production, but do so at your own risk).
+This is a project built just for fun. It is not intended for production use.
 
 ## Features
-- Track and manage mood entries
+- Track mood entries
+- Write diary entries in Markdown
+- Link diary entries to moods with `[[mood:<id>|label]]`
+- Follow links in either direction
 - Invite-only user registration
-- Separate admin area for generating one-time registration links
-- Cookie-based login with password reset flow
-- Angular frontend
-- RESTful Go backend
-- Simple local development and build workflow
+- Admin page for creating one-time invite links
+- Cookie-based sessions and password resets
 
 ## Requirements
 - Go 1.26.3
 - Node.js 24.15.x
 - npm 11.14.x
 
-## Usage
-- See the Makefile for available commands.
-- Backend and frontend are managed in their respective directories.
-
 ## Project Structure
 - Backend `internal/core` contains infrastructure and shared runtime concerns such as database, logging, HTTP server setup, and frontend asset serving.
-- Backend `internal/domain` contains feature logic such as `account`, `session`, `admin`, and `mood`.
+- Backend `internal/domain` contains feature logic such as `account`, `session`, `admin`, and `journal`.
 - Frontend `src/app/core` contains shared app utilities and static app-level pages such as `about`.
-- Frontend `src/app/domains` contains feature domains such as `account`, `session`, `admin`, `mood`, and `dashboard`.
+- Frontend `src/app/domains` contains feature domains such as `account`, `session`, `admin`, `dashboard`, and `journal`.
+- Journal REST endpoints are grouped under `/api/journal/mood/entries` and `/api/journal/diary/entries`.
 
 ## Running the Application
 
@@ -44,7 +41,7 @@ This is a pet project, focusing on simplicity and ease of development. Written f
    npm ci
    npm start
    ```
-3. Open your browser and navigate to `http://localhost:4200` to access the application.
+3. Open `http://localhost:4200`.
 
 ### Production Build
 1. Build the binary
@@ -55,24 +52,25 @@ This is a pet project, focusing on simplicity and ease of development. Written f
    ```bash
    PRODUCTION=true ./null3-server
    ```
-3. Open your browser and navigate to `http://localhost:8080` to access the application.
+3. Open `http://localhost:8080`.
 
 ## Configuration
-Environment variables can be set in the `.env` file.
-- `ADDRESS` is used to set the backend server address. Default is `localhost:8080`.
-- `ENABLE_CORS` is used to enable CORS. Default is `false`.
-- `FRONTEND_URL` is used to set the URL of the frontend application (needed for CORS). Default is `http://localhost:4200`. Not applicable if `ENABLE_CORS` is set to `false`.
-- `PRODUCTION` is used to set the application to production mode. Default is `false`.
-- `JWT_SECRET` is used to sign JWT tokens. Default is generated randomly. Required if `PRODUCTION` is set to `true`.
-- `JWT_EXPIRATION` is used to set the JWT token expiration time in seconds. Default is `24h`. Must be a positive duration.
-- `REFRESH_TOKEN_EXPIRATION` is used to set the refresh token expiration time. Default is `168h` (7 days). Must be a positive duration.
-- `PASSWORD_RESET_TOKEN_EXPIRATION` is used to set the password reset token expiration time. Default is `1h`. Must be a positive duration.
-- `SECURE_COOKIES` is used to enable secure cookies. Default is `false`. Set to `true` in production environments to ensure cookies are only sent over HTTPS.
-- `DATABASE_URL` is used to configure the SQLite database. Default is `file:null3.db?_fk=1`.
-- `LOG_LEVEL` is used to set the logging level. Default is `info`. Options are `debug`, `info`, `warn` and `error`.
-- `LOG_FORMAT` is used to set the logging format. Default is `text`. Options are `fancy`, `text` and `json`.
-- `ENABLE_FRONTEND_DIST` is used to enable serving the frontend from the backend. Default is `false`.
-- `API_URL` is used to replace the `%%API_URL%%` placeholder in the frontend build with the actual API URL. Default is `http://localhost:8080/api`. Not applicable if `ENABLE_FRONTEND_DIST` is set to `false`.
+Environment variables can be set in `.env`.
+
+- `ADDRESS`: backend listen address. Default: `localhost:8080`.
+- `ENABLE_CORS`: enable CORS. Default: `false`.
+- `FRONTEND_URL`: allowed frontend origin when CORS is enabled. Default: `http://localhost:4200`.
+- `PRODUCTION`: production mode. Default: `false`.
+- `JWT_SECRET`: JWT signing key. Generated at startup outside production; required in production.
+- `JWT_EXPIRATION`: JWT lifetime. Default: `24h`; must be positive.
+- `REFRESH_TOKEN_EXPIRATION`: refresh-token lifetime. Default: `168h`; must be positive.
+- `PASSWORD_RESET_TOKEN_EXPIRATION`: password-reset lifetime. Default: `1h`; must be positive.
+- `SECURE_COOKIES`: send cookies only over HTTPS. Default: `false`.
+- `DATABASE_URL`: SQLite connection string. Default: `file:null3.db?_fk=1`.
+- `LOG_LEVEL`: `debug`, `info`, `warn`, or `error`. Default: `info`.
+- `LOG_FORMAT`: `fancy`, `text`, or `json`. Default: `text`.
+- `ENABLE_FRONTEND_DIST`: serve the embedded frontend. Default: `false`.
+- `API_URL`: API URL inserted when the embedded frontend is enabled. Default: `http://localhost:8080/api`.
 
 ## Seeded admin account
 The application seeds a single admin account on startup if user `1` does not exist:
