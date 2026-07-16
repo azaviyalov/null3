@@ -16,7 +16,7 @@ This is a project built just for fun. It is not intended for production use.
 - Cookie-based sessions and password resets
 
 ## Requirements
-- Go 1.26.3
+- Go 1.26.5
 - Node.js 24.15.x
 - npm 11.14.x
 
