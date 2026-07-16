@@ -2,28 +2,28 @@
   <header class="page-intro">
     <h1 class="page-title">Welcome to null3</h1>
     <p class="page-copy">
-      Capture quick Mood Entries, then expand them into fuller Diary Entries.
+      Keep quick mood notes and longer diary entries in one place.
     </p>
   </header>
 
   <section class="space-y-4">
-    <h2 class="section-title">Latest Mood Entries</h2>
+    <h2 class="section-title">Latest mood entries</h2>
 
-    <app-entry-history
+    <app-mood-entry-history
       [entries]="moodEntriesPage()?.items ?? null"
       [showOpen]="true"
-      emptyMessage="No Mood Entries found"
+      emptyMessage="No mood entries yet."
       (open)="openMoodEntry($event)"
     />
   </section>
 
   <section class="space-y-4">
-    <h2 class="section-title">Latest Diary Entries</h2>
+    <h2 class="section-title">Latest diary entries</h2>
 
     <app-diary-entry-feed
       [entries]="diaryEntriesPage()?.items ?? null"
       [showOpen]="true"
-      emptyMessage="No Diary Entries found"
+      emptyMessage="No diary entries yet."
       (open)="openDiaryEntry($event)"
     />
   </section>

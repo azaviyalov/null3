@@ -62,64 +62,64 @@ export const routes: Routes = [
     path: "mood/entries",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/mood/pages/entry-list/entry-list").then(
-        (m) => m.EntryList,
+      import("./domains/journal/pages/mood-entry-list").then(
+        (m) => m.MoodEntryList,
       ),
   },
   {
     path: "mood/entries/create",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/mood/pages/entry-create/entry-create").then(
-        (m) => m.EntryCreate,
+      import("./domains/journal/pages/mood-entry-create").then(
+        (m) => m.MoodEntryCreate,
       ),
   },
   {
     path: "mood/entries/:id",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/mood/pages/entry-view/entry-view").then(
-        (m) => m.EntryView,
+      import("./domains/journal/pages/mood-entry-view").then(
+        (m) => m.MoodEntryView,
       ),
   },
   {
     path: "mood/entries/:id/update",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/mood/pages/entry-update/entry-update").then(
-        (m) => m.EntryUpdate,
+      import("./domains/journal/pages/mood-entry-update").then(
+        (m) => m.MoodEntryUpdate,
       ),
   },
   {
     path: "diary/entries",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/diary/pages/entry-list/entry-list").then(
-        (m) => m.EntryList,
+      import("./domains/journal/pages/diary-entry-list").then(
+        (m) => m.DiaryEntryList,
       ),
   },
   {
     path: "diary/entries/create",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/diary/pages/entry-create/entry-create").then(
-        (m) => m.EntryCreate,
+      import("./domains/journal/pages/diary-entry-create").then(
+        (m) => m.DiaryEntryCreate,
       ),
   },
   {
     path: "diary/entries/:id",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/diary/pages/entry-view/entry-view").then(
-        (m) => m.EntryView,
+      import("./domains/journal/pages/diary-entry-view").then(
+        (m) => m.DiaryEntryView,
       ),
   },
   {
     path: "diary/entries/:id/update",
     canActivate: [RequireUserSessionGuard],
     loadComponent: () =>
-      import("./domains/diary/pages/entry-update/entry-update").then(
-        (m) => m.EntryUpdate,
+      import("./domains/journal/pages/diary-entry-update").then(
+        (m) => m.DiaryEntryUpdate,
       ),
   },
   {

@@ -1,9 +1,0 @@
-@if (html()) {
-  <div
-    class="markdown-renderer"
-    [innerHTML]="html()"
-    (click)="handleClick($event)"
-  ></div>
-} @else {
-  <p class="markdown-empty">{{ emptyMessage() }}</p>
-}

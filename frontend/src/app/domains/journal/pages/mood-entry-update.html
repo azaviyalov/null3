@@ -1,0 +1,26 @@
+<section class="page-shell space-y-6">
+  <header class="page-intro">
+    <h1 class="page-title">Edit mood entry</h1>
+  </header>
+
+  @if (errorMessage(); as errorMessage) {
+    <div class="status-message error">{{ errorMessage }}</div>
+  }
+
+  @if (isLoading()) {
+    <section class="surface-panel space-y-4">
+      <div class="skeleton h-5 w-40"></div>
+      <div class="skeleton h-12 w-full rounded-2xl"></div>
+      <div class="skeleton h-40 w-full rounded-[1.5rem]"></div>
+    </section>
+  } @else {
+    <section class="surface-panel">
+      <app-mood-entry-form
+        [entry]="entry()"
+        [disabled]="isSubmitting()"
+        submitLabel="Save changes"
+        (entrySubmit)="submit($event)"
+      />
+    </section>
+  }
+</section>

@@ -1,0 +1,92 @@
+<section class="page-shell-wide space-y-8">
+  <header class="page-intro">
+    <h1 class="page-title">Diary entries</h1>
+    <p class="page-copy">
+      Longer notes and reflections, with links to your mood entries.
+    </p>
+
+    <div class="page-actions">
+      <button type="button" class="primary-action" (click)="createEntry()">
+        New diary entry
+      </button>
+    </div>
+  </header>
+
+  <section class="surface-panel space-y-6">
+    <div
+      class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div class="filter-switch" aria-label="Diary entry status filter">
+        <button
+          type="button"
+          class="filter-switch-button"
+          [class.filter-switch-button-active]="!showDeleted()"
+          (click)="setDeletedState('active')"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          class="filter-switch-button"
+          [class.filter-switch-button-active]="showDeleted()"
+          (click)="setDeletedState('deleted')"
+        >
+          Deleted
+        </button>
+      </div>
+
+      @if (totalCount()) {
+        <div class="flex flex-col gap-3 sm:items-end">
+          <p class="m-0 text-sm text-base-content/55">
+            {{ pageStart() }}-{{ pageEnd() }} of {{ totalCount() }}
+            @if (totalPages()) {
+              <span> • {{ currentPage() }}/{{ totalPages() }}</span>
+            }
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-sm text-base-content/55" for="page-size">
+              Per page
+            </label>
+            <select
+              id="page-size"
+              class="field-select page-size-select"
+              [value]="pageSize()"
+              (change)="changePageSize($any($event.target).value)"
+            >
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size">{{ size }}</option>
+              }
+            </select>
+
+            <button
+              type="button"
+              class="quiet-action"
+              [disabled]="!canGoPrevious()"
+              (click)="goToPreviousPage()"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="quiet-action"
+              [disabled]="!canGoNext()"
+              (click)="goToNextPage()"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <app-diary-entry-feed
+      [skeleton]="isLoading()"
+      [skeletonCount]="defaultPageSize"
+      [entries]="page()?.items ?? null"
+      [showOpen]="true"
+      emptyMessage="No diary entries found."
+      (open)="openEntry($event)"
+    />
+  </section>
+</section>

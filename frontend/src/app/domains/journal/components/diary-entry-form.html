@@ -1,0 +1,124 @@
+<form [formGroup]="form" (ngSubmit)="handleSubmit()" class="diary-form-stack">
+  <div class="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+    <div class="form-stack">
+      <div class="form-field">
+        <label class="field-label" for="title">Title (optional)</label>
+        <input
+          id="title"
+          class="field-input"
+          formControlName="title"
+          autocomplete="off"
+          [disabled]="disabled()"
+          placeholder="What happened?"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="occurred-at"
+          >When did this happen?</label
+        >
+        <input
+          id="occurred-at"
+          class="field-input"
+          type="datetime-local"
+          formControlName="occurredAt"
+          [disabled]="disabled()"
+          required
+        />
+        @if (
+          form.controls["occurredAt"].hasError("required") &&
+          form.controls["occurredAt"].touched
+        ) {
+          <p class="field-error">
+            Choose the date and time this entry is about.
+          </p>
+        }
+      </div>
+
+      <section class="surface-panel diary-helper-panel">
+        <div class="space-y-2">
+          <h3 class="m-0 font-serif text-2xl tracking-tight text-base-content">
+            Link mood entries
+          </h3>
+          <p class="m-0 text-sm leading-6 text-base-content/60">
+            Select text below, then choose a mood entry to link it. The saved
+            syntax is <code>[[mood:42|your text]]</code>.
+          </p>
+        </div>
+
+        @if (recentMoodEntriesPage() === null) {
+          <p class="m-0 text-sm text-base-content/55">
+            Loading recent mood entries...
+          </p>
+        } @else if (!recentMoodEntries().length) {
+          <p class="m-0 text-sm text-base-content/55">
+            Create a mood entry first and it will appear here.
+          </p>
+        } @else {
+          <div class="flex flex-wrap gap-2">
+            @for (moodEntry of recentMoodEntries(); track moodEntry.id) {
+              <button
+                type="button"
+                class="diary-link-chip"
+                [disabled]="disabled()"
+                (click)="insertMoodEntryLink(moodEntry, markdownField)"
+              >
+                @if (moodEntry.emoji) {
+                  <span aria-hidden="true">{{ moodEntry.emoji }}</span>
+                }
+                <span class="truncate">{{
+                  moodEntry.note || moodEntry.feeling
+                }}</span>
+              </button>
+            }
+          </div>
+        }
+      </section>
+    </div>
+
+    <section class="surface-panel diary-preview-panel">
+      <div class="space-y-2">
+        <h3 class="m-0 font-serif text-2xl tracking-tight text-base-content">
+          Preview
+        </h3>
+        <p class="m-0 text-sm leading-6 text-base-content/60">
+          Mood entry links work here and in the saved entry.
+        </p>
+      </div>
+
+      <app-markdown-renderer
+        [markdown]="markdownValue()"
+        emptyMessage="Start writing to see the page take shape."
+      />
+    </section>
+  </div>
+
+  <div class="form-field">
+    <label class="field-label" for="markdown">Entry text</label>
+    <textarea
+      #markdownField
+      id="markdown"
+      class="field-textarea diary-markdown-field"
+      formControlName="markdown"
+      rows="16"
+      [disabled]="disabled()"
+      placeholder="Write in Markdown. Link a mood with [[mood:42|this moment]]."
+    ></textarea>
+    @if (
+      form.controls["markdown"].hasError("required") &&
+      form.controls["markdown"].touched
+    ) {
+      <p class="field-error">Write at least a little before saving.</p>
+    }
+  </div>
+
+  <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+    <button
+      type="submit"
+      class="primary-action"
+      [disabled]="form.invalid || disabled()"
+    >
+      {{ submitLabel() }}
+    </button>
+  </div>
+</form>
