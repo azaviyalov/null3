@@ -431,7 +431,7 @@ func (s *Service) ensureUserIdentityAvailable(ctx context.Context, repo *Reposit
 	if err == nil {
 		return ErrLoginAlreadyTaken
 	}
-	if err != nil && !errors.Is(err, core.ErrItemNotFound) {
+	if !errors.Is(err, core.ErrItemNotFound) {
 		return err
 	}
 
@@ -439,7 +439,7 @@ func (s *Service) ensureUserIdentityAvailable(ctx context.Context, repo *Reposit
 	if err == nil {
 		return ErrEmailAlreadyTaken
 	}
-	if err != nil && !errors.Is(err, core.ErrItemNotFound) {
+	if !errors.Is(err, core.ErrItemNotFound) {
 		return err
 	}
 
