@@ -8,7 +8,6 @@ import (
 
 	"github.com/azaviyalov/null3/backend/internal/core"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,7 +25,6 @@ func RegisterRoutes(e *echo.Echo, handler *Handler, userJWT echo.MiddlewareFunc)
 type Handler struct {
 	service        *Service
 	sessionService *session.Service
-	validator      *validator.Validate
 	config         Config
 	sessionConfig  session.Config
 }
@@ -37,7 +35,6 @@ func NewHandler(service *Service, sessionService *session.Service, config Config
 		sessionService: sessionService,
 		config:         config,
 		sessionConfig:  sessionConfig,
-		validator:      validator.New(validator.WithRequiredStructEnabled()),
 	}
 }
 
@@ -46,7 +43,7 @@ func (h *Handler) Login(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	if err := h.validator.Struct(req); err != nil {
+	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
@@ -124,7 +121,7 @@ func (h *Handler) RegisterWithInvite(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	if err := h.validator.Struct(req); err != nil {
+	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
@@ -151,7 +148,7 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	if err := h.validator.Struct(req); err != nil {
+	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
@@ -175,7 +172,7 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	if err := h.validator.Struct(req); err != nil {
+	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 

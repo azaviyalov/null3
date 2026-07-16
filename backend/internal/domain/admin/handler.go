@@ -8,7 +8,6 @@ import (
 
 	"github.com/azaviyalov/null3/backend/internal/domain/account"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,7 +22,6 @@ func RegisterRoutes(e *echo.Echo, handler *Handler, adminJWT echo.MiddlewareFunc
 type Handler struct {
 	accountService *account.Service
 	sessionService *session.Service
-	validator      *validator.Validate
 	config         Config
 	sessionConfig  session.Config
 }
@@ -34,7 +32,6 @@ func NewHandler(accountService *account.Service, sessionService *session.Service
 		sessionService: sessionService,
 		config:         config,
 		sessionConfig:  sessionConfig,
-		validator:      validator.New(validator.WithRequiredStructEnabled()),
 	}
 }
 
@@ -43,7 +40,7 @@ func (h *Handler) Login(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	if err := h.validator.Struct(req); err != nil {
+	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
