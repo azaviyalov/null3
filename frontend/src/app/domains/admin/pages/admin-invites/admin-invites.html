@@ -16,7 +16,7 @@
       Generate invite link
     </button>
 
-    @if (invite()) {
+    @if (invite(); as generatedInvite) {
       <div
         class="space-y-4 rounded-[1.5rem] border border-base-300/80 bg-base-100/70 p-4"
       >
@@ -26,12 +26,12 @@
             id="invite-url"
             class="field-input"
             readonly
-            [value]="invite()?.invite_url ?? ''"
+            [value]="generatedInvite.invite_url"
           />
         </div>
 
         <p class="m-0 text-sm leading-6 text-base-content/60">
-          Expires {{ invite()?.expires_at | date: "medium" }}
+          Expires {{ generatedInvite.expires_at | date: "medium" }}
         </p>
 
         <div class="flex flex-wrap items-center gap-3">
