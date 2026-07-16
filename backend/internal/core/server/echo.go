@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -58,14 +59,15 @@ func StartServer(e *echo.Echo, config Config) error {
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
 		if err := e.Shutdown(shutdownCtx); err != nil {
-			slog.Error("graceful shutdown failed", "error", err)
-			return err
+			return fmt.Errorf("shut down HTTP server: %w", err)
 		}
 		slog.Info("server stopped gracefully")
 		return nil
-	case err := <-serverErr:
-		slog.Error("server start failed", "error", err)
-		return err
+	case err, ok := <-serverErr:
+		if !ok {
+			return nil
+		}
+		return fmt.Errorf("start HTTP server: %w", err)
 	}
 }
 

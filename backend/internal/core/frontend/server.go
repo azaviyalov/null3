@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"io/fs"
+	"log/slog"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -12,7 +13,7 @@ import (
 
 func RegisterRoutes(e *echo.Echo, config Config) {
 	if !config.EnableFrontendDist {
-		e.Logger.Info("Frontend dist is disabled, skipping static file serving")
+		slog.Info("frontend dist is disabled, skipping static file serving")
 		return
 	}
 

@@ -31,14 +31,13 @@ func New() *App {
 	}
 
 	_ = godotenv.Load()
+	logging.Setup(logging.GetConfig())
 
 	config, err := GetConfig()
 	if err != nil {
 		slog.Error("failed to get configuration", "error", err)
 		os.Exit(1)
 	}
-
-	logging.Setup(config.Logging)
 
 	database, err := db.Connect(config.DB)
 	if err != nil {

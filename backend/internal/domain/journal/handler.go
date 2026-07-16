@@ -2,7 +2,6 @@ package journal
 
 import (
 	"errors"
-	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -271,12 +270,6 @@ func parseIDAndActor(c echo.Context) (uint, *session.Actor, error) {
 	actor, _ := session.GetActor(c)
 	id, err := strconv.ParseUint(idParam, 10, 64)
 	if err != nil {
-		slog.Warn(
-			"invalid id param",
-			"request_id", c.Response().Header().Get("X-Request-Id"),
-			"id", idParam,
-			"user_id", actor.UserID,
-		)
 		return 0, nil, echo.ErrBadRequest.WithInternal(err)
 	}
 	return uint(id), actor, nil

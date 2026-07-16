@@ -62,12 +62,7 @@ func (h *FancyHandler) formatAttr(a slog.Attr) string {
 	if h.replaceAttrs != nil {
 		a = h.replaceAttrs(nil, a)
 	}
-	val := a.Value
-	if lv, ok := val.Any().(slog.LogValuer); ok {
-		val = lv.LogValue()
-	} else if fv, ok := val.Any().(FieldValuer); ok {
-		val = fv.ToFieldValue().toSlogValue()
-	}
+	val := a.Value.Resolve()
 	key := fmt.Sprintf("\033[1;34m%s\033[0m", a.Key)
 	valStr := fmt.Sprintf("%v", val)
 	if s, ok := val.Any().(string); ok {

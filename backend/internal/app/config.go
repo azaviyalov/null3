@@ -3,7 +3,6 @@ package app
 import (
 	"github.com/azaviyalov/null3/backend/internal/core/db"
 	"github.com/azaviyalov/null3/backend/internal/core/frontend"
-	"github.com/azaviyalov/null3/backend/internal/core/logging"
 	"github.com/azaviyalov/null3/backend/internal/core/server"
 	"github.com/azaviyalov/null3/backend/internal/domain/account"
 	"github.com/azaviyalov/null3/backend/internal/domain/admin"
@@ -15,7 +14,6 @@ type Config struct {
 	Account  account.Config
 	DB       db.Config
 	Frontend frontend.Config
-	Logging  logging.Config
 	Session  session.Config
 	Server   server.Config
 }
@@ -38,8 +36,6 @@ func GetConfig() (Config, error) {
 		return Config{}, err
 	}
 
-	loggingConfig := logging.GetConfig()
-
 	serverConfig, err := server.GetConfig()
 	if err != nil {
 		return Config{}, err
@@ -55,7 +51,6 @@ func GetConfig() (Config, error) {
 		Account:  accountConfig,
 		DB:       dbConfig,
 		Frontend: frontendConfig,
-		Logging:  loggingConfig,
 		Session:  sessionConfig,
 		Server:   serverConfig,
 	}, nil

@@ -1,10 +1,6 @@
 package account
 
-import (
-	"time"
-
-	"github.com/azaviyalov/null3/backend/internal/core/logging"
-)
+import "time"
 
 type User struct {
 	ID           uint      `json:"id" gorm:"primaryKey"`
@@ -15,28 +11,12 @@ type User struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-func (u User) ToFieldValue() logging.FieldValue {
-	return logging.CombineFields(
-		logging.NewField("id", logging.NewUint64Value(uint64(u.ID))),
-		logging.NewField("login", logging.NewStringValue(u.Login)),
-		logging.NewField("email", logging.NewStringValue(u.Email)),
-	)
-}
-
 type PasswordResetToken struct {
 	ID        uint      `gorm:"primaryKey"`
 	UserID    uint      `gorm:"not null;index"`
 	TokenHash string    `gorm:"not null;uniqueIndex"`
 	CreatedAt time.Time `gorm:"not null"`
 	ExpiresAt time.Time `gorm:"not null;index"`
-}
-
-func (t PasswordResetToken) ToFieldValue() logging.FieldValue {
-	return logging.CombineFields(
-		logging.NewField("user_id", logging.NewUint64Value(uint64(t.UserID))),
-		logging.NewField("created_at", logging.NewTimeValue(t.CreatedAt)),
-		logging.NewField("expires_at", logging.NewTimeValue(t.ExpiresAt)),
-	)
 }
 
 type Invite struct {
@@ -49,32 +29,9 @@ type Invite struct {
 	RegisteredUserID *uint      `gorm:"index"`
 }
 
-func (i Invite) ToFieldValue() logging.FieldValue {
-	fields := []logging.Field{
-		logging.NewField("id", logging.NewUint64Value(uint64(i.ID))),
-		logging.NewField("created_by_user_id", logging.NewUint64Value(uint64(i.CreatedByUserID))),
-		logging.NewField("created_at", logging.NewTimeValue(i.CreatedAt)),
-		logging.NewField("expires_at", logging.NewTimeValue(i.ExpiresAt)),
-	}
-	if i.RegisteredUserID != nil {
-		fields = append(fields, logging.NewField("registered_user_id", logging.NewUint64Value(uint64(*i.RegisteredUserID))))
-	}
-	if i.UsedAt != nil {
-		fields = append(fields, logging.NewField("used_at", logging.NewTimeValue(*i.UsedAt)))
-	}
-	return logging.CombineFields(fields...)
-}
-
 type LoginRequest struct {
 	Login    string `json:"login" validate:"required"`
 	Password string `json:"password" validate:"required"`
-}
-
-func (r LoginRequest) ToFieldValue() logging.FieldValue {
-	return logging.CombineFields(
-		logging.NewField("login", logging.NewStringValue(r.Login)),
-		logging.NewField("password", logging.NewStringValue("[REDACTED]")),
-	)
 }
 
 type ForgotPasswordRequest struct {
