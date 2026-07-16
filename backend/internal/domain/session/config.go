@@ -29,7 +29,7 @@ func GetConfig() (Config, error) {
 	if productionParam := os.Getenv("PRODUCTION"); productionParam != "" {
 		production, err := strconv.ParseBool(productionParam)
 		if err != nil {
-			return Config{}, fmt.Errorf("invalid value for PRODUCTION: %v", err)
+			return Config{}, fmt.Errorf("parse PRODUCTION: %w", err)
 		}
 		config.Production = production
 	}
@@ -44,7 +44,7 @@ func GetConfig() (Config, error) {
 		logging.Warn(context.Background(), "JWT_SECRET is not set, using randomly generated secret")
 		jwtSecret, err := generateRandomSecret()
 		if err != nil {
-			return Config{}, fmt.Errorf("failed to generate JWT_SECRET: %v", err)
+			return Config{}, fmt.Errorf("generate JWT_SECRET: %w", err)
 		}
 		config.JWTSecret = jwtSecret
 	}
@@ -52,7 +52,7 @@ func GetConfig() (Config, error) {
 	if jwtExpirationParam := os.Getenv("JWT_EXPIRATION"); jwtExpirationParam != "" {
 		jwtExpiration, err := time.ParseDuration(jwtExpirationParam)
 		if err != nil {
-			return Config{}, fmt.Errorf("invalid JWT_EXPIRATION: %v", err)
+			return Config{}, fmt.Errorf("parse JWT_EXPIRATION: %w", err)
 		}
 		if jwtExpiration <= 0 {
 			return Config{}, fmt.Errorf("JWT_EXPIRATION must be a positive duration")
@@ -63,7 +63,7 @@ func GetConfig() (Config, error) {
 	if refreshExpirationParam := os.Getenv("REFRESH_TOKEN_EXPIRATION"); refreshExpirationParam != "" {
 		refreshExpiration, err := time.ParseDuration(refreshExpirationParam)
 		if err != nil {
-			return Config{}, fmt.Errorf("invalid REFRESH_TOKEN_EXPIRATION: %v", err)
+			return Config{}, fmt.Errorf("parse REFRESH_TOKEN_EXPIRATION: %w", err)
 		}
 		if refreshExpiration <= 0 {
 			return Config{}, fmt.Errorf("REFRESH_TOKEN_EXPIRATION must be a positive duration")
@@ -74,7 +74,7 @@ func GetConfig() (Config, error) {
 	if secureCookiesParam := os.Getenv("SECURE_COOKIES"); secureCookiesParam != "" {
 		secureCookies, err := strconv.ParseBool(secureCookiesParam)
 		if err != nil {
-			return Config{}, fmt.Errorf("invalid SECURE_COOKIES: %v", err)
+			return Config{}, fmt.Errorf("parse SECURE_COOKIES: %w", err)
 		}
 		config.SecureCookies = secureCookies
 	}
@@ -87,7 +87,7 @@ func generateRandomSecret() (string, error) {
 	b := make([]byte, secretLen)
 	_, err := rand.Read(b)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate random secret: %v", err)
+		return "", fmt.Errorf("generate random secret: %w", err)
 	}
 
 	return base64.RawURLEncoding.EncodeToString(b), nil

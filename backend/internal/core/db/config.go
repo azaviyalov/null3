@@ -7,10 +7,7 @@ type Config struct {
 }
 
 func GetConfig() Config {
-	config := Config{}
-
-	// Defaults
-	config.DatabaseURL = "file:null3.db?_fk=1"
+	config := Config{DatabaseURL: "file:null3.db?_fk=1"}
 
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
 		config.DatabaseURL = dbURL

@@ -12,17 +12,12 @@ type Config struct {
 }
 
 func GetConfig() (Config, error) {
-	config := Config{}
-
-	// Defaults
-	config.EnableFrontendDist = false
-	// Default API URL placeholder replacement when frontend distribution is enabled
-	config.APIURL = "http://localhost:8080/api"
+	config := Config{APIURL: "http://localhost:8080/api"}
 
 	if enableFrontendDistParam := os.Getenv("ENABLE_FRONTEND_DIST"); enableFrontendDistParam != "" {
 		enableFrontendDist, err := strconv.ParseBool(enableFrontendDistParam)
 		if err != nil {
-			return config, fmt.Errorf("invalid value for ENABLE_FRONTEND_DIST: %v", err)
+			return config, fmt.Errorf("parse ENABLE_FRONTEND_DIST: %w", err)
 		}
 		config.EnableFrontendDist = enableFrontendDist
 	}

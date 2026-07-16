@@ -13,12 +13,10 @@ type Config struct {
 }
 
 func GetConfig() (Config, error) {
-	config := Config{}
-
-	// Defaults
-	config.Address = "localhost:8080"
-	config.EnableCORS = false
-	config.FrontendURL = "http://localhost:4200" // Default frontend URL (used when CORS is enabled)
+	config := Config{
+		Address:     "localhost:8080",
+		FrontendURL: "http://localhost:4200",
+	}
 
 	if address := os.Getenv("ADDRESS"); address != "" {
 		config.Address = address
@@ -27,7 +25,7 @@ func GetConfig() (Config, error) {
 	if enableCORSParam := os.Getenv("ENABLE_CORS"); enableCORSParam != "" {
 		enable, err := strconv.ParseBool(enableCORSParam)
 		if err != nil {
-			return config, fmt.Errorf("invalid value for ENABLE_CORS: %v", err)
+			return config, fmt.Errorf("parse ENABLE_CORS: %w", err)
 		}
 		config.EnableCORS = enable
 	}

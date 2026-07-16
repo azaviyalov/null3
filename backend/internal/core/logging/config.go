@@ -8,11 +8,10 @@ type Config struct {
 }
 
 func GetConfig() Config {
-	config := Config{}
-
-	// Defaults
-	config.Level = LevelInfo
-	config.Format = FormatText
+	config := Config{
+		Level:  LevelInfo,
+		Format: FormatText,
+	}
 
 	if level := os.Getenv("LOG_LEVEL"); level != "" {
 		config.Level = LevelFromString(level)
