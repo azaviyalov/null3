@@ -1,4 +1,4 @@
-.PHONY: prepare build lint staticcheck vet clean clean-db build-all
+.PHONY: prepare build lint staticcheck vet clean clean-db
 
 FRONTEND_DIST=internal/core/frontend/fs
 
