@@ -71,12 +71,8 @@ func (h *Handler) Logout(c echo.Context) error {
 }
 
 func (h *Handler) Me(c echo.Context) error {
-	actor, err := session.GetActor(c)
-	if err != nil {
-		return echo.ErrUnauthorized.WithInternal(err)
-	}
-
-	user, err := h.service.GetUserByID(c.Request().Context(), actor.UserID)
+	userID := session.GetUserID(c)
+	user, err := h.service.GetUserByID(c.Request().Context(), userID)
 	if err != nil {
 		return echo.ErrUnauthorized.WithInternal(err)
 	}

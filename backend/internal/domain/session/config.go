@@ -1,17 +1,14 @@
 package session
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
-	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type Config struct {
-	Production             bool
 	JWTSecret              string
 	JWTExpiration          time.Duration
 	SecureCookies          bool
@@ -24,27 +21,9 @@ func GetConfig() (Config, error) {
 		RefreshTokenExpiration: 7 * 24 * time.Hour,
 	}
 
-	if productionParam := os.Getenv("PRODUCTION"); productionParam != "" {
-		production, err := strconv.ParseBool(productionParam)
-		if err != nil {
-			return Config{}, fmt.Errorf("parse PRODUCTION: %w", err)
-		}
-		config.Production = production
-	}
-
-	if jwtSecret := os.Getenv("JWT_SECRET"); jwtSecret != "" {
-		config.JWTSecret = jwtSecret
-	} else {
-		if config.Production {
-			return Config{}, fmt.Errorf("JWT_SECRET must be set in production mode")
-		}
-
-		slog.Warn("JWT_SECRET is not set, using randomly generated secret")
-		jwtSecret, err := generateRandomSecret()
-		if err != nil {
-			return Config{}, fmt.Errorf("generate JWT_SECRET: %w", err)
-		}
-		config.JWTSecret = jwtSecret
+	config.JWTSecret = os.Getenv("JWT_SECRET")
+	if strings.TrimSpace(config.JWTSecret) == "" {
+		return Config{}, fmt.Errorf("JWT_SECRET must be set and non-empty")
 	}
 
 	if jwtExpirationParam := os.Getenv("JWT_EXPIRATION"); jwtExpirationParam != "" {
@@ -78,15 +57,4 @@ func GetConfig() (Config, error) {
 	}
 
 	return config, nil
-}
-
-func generateRandomSecret() (string, error) {
-	const secretLen = 32
-	b := make([]byte, secretLen)
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", fmt.Errorf("generate random secret: %w", err)
-	}
-
-	return base64.RawURLEncoding.EncodeToString(b), nil
 }

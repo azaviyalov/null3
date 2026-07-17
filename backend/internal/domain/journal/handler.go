@@ -35,12 +35,12 @@ func RegisterRoutes(e *echo.Echo, h *Handler, jwt echo.MiddlewareFunc) {
 }
 
 func (h *Handler) GetMoodRecord(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.GetMoodRecord(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.GetMoodRecord(c.Request().Context(), userID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -53,8 +53,8 @@ func (h *Handler) GetMoodRecord(c echo.Context) error {
 
 func (h *Handler) ListMoodRecords(c echo.Context) error {
 	limit, offset, deleted := parsePagination(c)
-	actor, _ := session.GetActor(c)
-	entries, err := h.service.ListMoodRecords(c.Request().Context(), actor.UserID, limit, offset, deleted)
+	userID := session.GetUserID(c)
+	entries, err := h.service.ListMoodRecords(c.Request().Context(), userID, limit, offset, deleted)
 	if err != nil {
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
@@ -62,7 +62,7 @@ func (h *Handler) ListMoodRecords(c echo.Context) error {
 }
 
 func (h *Handler) CreateMoodRecord(c echo.Context) error {
-	actor, _ := session.GetActor(c)
+	userID := session.GetUserID(c)
 	var req MoodEditRecordRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
@@ -70,7 +70,7 @@ func (h *Handler) CreateMoodRecord(c echo.Context) error {
 	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	entry, err := h.service.CreateMoodRecord(c.Request().Context(), actor.UserID, req)
+	entry, err := h.service.CreateMoodRecord(c.Request().Context(), userID, req)
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
 			return echo.ErrBadRequest.WithInternal(err)
@@ -81,7 +81,7 @@ func (h *Handler) CreateMoodRecord(c echo.Context) error {
 }
 
 func (h *Handler) UpdateMoodRecord(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (h *Handler) UpdateMoodRecord(c echo.Context) error {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
-	entry, err := h.service.UpdateMoodRecord(c.Request().Context(), actor.UserID, id, req)
+	entry, err := h.service.UpdateMoodRecord(c.Request().Context(), userID, id, req)
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
 			return echo.ErrBadRequest.WithInternal(err)
@@ -109,12 +109,12 @@ func (h *Handler) UpdateMoodRecord(c echo.Context) error {
 }
 
 func (h *Handler) DeleteMoodRecord(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.DeleteMoodRecord(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.DeleteMoodRecord(c.Request().Context(), userID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -125,12 +125,12 @@ func (h *Handler) DeleteMoodRecord(c echo.Context) error {
 }
 
 func (h *Handler) RestoreMoodRecord(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.RestoreMoodRecord(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.RestoreMoodRecord(c.Request().Context(), userID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -141,12 +141,12 @@ func (h *Handler) RestoreMoodRecord(c echo.Context) error {
 }
 
 func (h *Handler) GetDiaryEntry(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.GetDiaryEntry(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.GetDiaryEntry(c.Request().Context(), userID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -159,8 +159,8 @@ func (h *Handler) GetDiaryEntry(c echo.Context) error {
 
 func (h *Handler) ListDiaryEntries(c echo.Context) error {
 	limit, offset, deleted := parsePagination(c)
-	actor, _ := session.GetActor(c)
-	entries, err := h.service.ListDiaryEntries(c.Request().Context(), actor.UserID, limit, offset, deleted)
+	userID := session.GetUserID(c)
+	entries, err := h.service.ListDiaryEntries(c.Request().Context(), userID, limit, offset, deleted)
 	if err != nil {
 		return echo.ErrInternalServerError.WithInternal(err)
 	}
@@ -168,7 +168,7 @@ func (h *Handler) ListDiaryEntries(c echo.Context) error {
 }
 
 func (h *Handler) CreateDiaryEntry(c echo.Context) error {
-	actor, _ := session.GetActor(c)
+	userID := session.GetUserID(c)
 	var req DiaryEditEntryRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
@@ -176,7 +176,7 @@ func (h *Handler) CreateDiaryEntry(c echo.Context) error {
 	if err := c.Validate(&req); err != nil {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
-	entry, err := h.service.CreateDiaryEntry(c.Request().Context(), actor.UserID, req)
+	entry, err := h.service.CreateDiaryEntry(c.Request().Context(), userID, req)
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
 			return echo.ErrBadRequest.WithInternal(err)
@@ -187,7 +187,7 @@ func (h *Handler) CreateDiaryEntry(c echo.Context) error {
 }
 
 func (h *Handler) UpdateDiaryEntry(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (h *Handler) UpdateDiaryEntry(c echo.Context) error {
 		return echo.ErrBadRequest.WithInternal(err)
 	}
 
-	entry, err := h.service.UpdateDiaryEntry(c.Request().Context(), actor.UserID, id, req)
+	entry, err := h.service.UpdateDiaryEntry(c.Request().Context(), userID, id, req)
 	if err != nil {
 		if errors.Is(err, core.ErrInvalidItem) {
 			return echo.ErrBadRequest.WithInternal(err)
@@ -215,12 +215,12 @@ func (h *Handler) UpdateDiaryEntry(c echo.Context) error {
 }
 
 func (h *Handler) DeleteDiaryEntry(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.DeleteDiaryEntry(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.DeleteDiaryEntry(c.Request().Context(), userID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -231,12 +231,12 @@ func (h *Handler) DeleteDiaryEntry(c echo.Context) error {
 }
 
 func (h *Handler) RestoreDiaryEntry(c echo.Context) error {
-	id, actor, err := parseIDAndActor(c)
+	id, userID, err := parseIDAndUserID(c)
 	if err != nil {
 		return err
 	}
 
-	entry, err := h.service.RestoreDiaryEntry(c.Request().Context(), actor.UserID, id)
+	entry, err := h.service.RestoreDiaryEntry(c.Request().Context(), userID, id)
 	if err != nil {
 		if errors.Is(err, core.ErrItemNotFound) {
 			return echo.ErrNotFound.WithInternal(err)
@@ -265,12 +265,12 @@ func parsePagination(c echo.Context) (int, int, bool) {
 	return limit, offset, deleted
 }
 
-func parseIDAndActor(c echo.Context) (uint, *session.Actor, error) {
+func parseIDAndUserID(c echo.Context) (uint, uint, error) {
 	idParam := c.Param("id")
-	actor, _ := session.GetActor(c)
+	userID := session.GetUserID(c)
 	id, err := strconv.ParseUint(idParam, 10, 64)
 	if err != nil {
-		return 0, nil, echo.ErrBadRequest.WithInternal(err)
+		return 0, 0, echo.ErrBadRequest.WithInternal(err)
 	}
-	return uint(id), actor, nil
+	return uint(id), userID, nil
 }

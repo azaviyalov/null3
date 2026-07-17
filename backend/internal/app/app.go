@@ -67,27 +67,17 @@ func New() *App {
 
 	accountRepository := account.NewRepository(database)
 	accountService := account.NewService(accountRepository, sessionService, config.Account)
-	if err := accountService.SeedAdminUser(context.Background()); err != nil {
-		slog.Error("failed to seed admin user", "error", err)
-		os.Exit(1)
-	}
 	accountHandler := account.NewHandler(accountService, sessionService, config.Account, config.Session)
-	adminHandler := admin.NewHandler(accountService, sessionService, config.Admin, config.Session)
+	adminService := admin.NewService(config.Admin.Password, sessionService)
+	adminHandler := admin.NewHandler(accountService, adminService, config.Admin, config.Session)
 
-	resolveActor := func(ctx context.Context, userID uint) (*session.Actor, error) {
-		user, err := accountService.GetUserByID(ctx, userID)
-		if err != nil {
-			return nil, err
-		}
-
-		return &session.Actor{
-			UserID:  user.ID,
-			IsAdmin: accountService.IsAdmin(user),
-		}, nil
+	validateUser := func(ctx context.Context, userID uint) error {
+		_, err := accountService.GetUserByID(ctx, userID)
+		return err
 	}
 
-	userJWTMiddleware := session.UserJWTMiddleware(sessionService, resolveActor)
-	adminJWTMiddleware := session.AdminJWTMiddleware(sessionService, resolveActor)
+	userJWTMiddleware := session.UserJWTMiddleware(sessionService, validateUser)
+	adminJWTMiddleware := session.AdminJWTMiddleware(sessionService)
 
 	account.RegisterRoutes(e, accountHandler, userJWTMiddleware)
 	admin.RegisterRoutes(e, adminHandler, adminJWTMiddleware)

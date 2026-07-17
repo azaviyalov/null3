@@ -2,29 +2,12 @@
   <header class="page-intro">
     <h1 class="page-title">Admin Login</h1>
     <p class="page-copy">
-      Use the seeded admin account to create one-time invite links.
+      Enter the configured admin password to create one-time invite links.
     </p>
   </header>
 
   <section class="surface-panel">
     <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack">
-      <div class="form-field">
-        <label class="field-label" for="admin-login">Login</label>
-        <input
-          id="admin-login"
-          class="field-input"
-          formControlName="login"
-          autocomplete="username"
-          required
-        />
-        @if (
-          form.controls["login"].hasError("required") &&
-          form.controls["login"].touched
-        ) {
-          <p class="field-error">This field is required.</p>
-        }
-      </div>
-
       <div class="form-field">
         <label class="field-label" for="admin-password">Password</label>
         <input

@@ -60,7 +60,7 @@
         </nav>
 
         <nav class="nav-group nav-group-muted" aria-label="Admin navigation">
-          @if (!adminUser()) {
+          @if (!adminAuthenticated()) {
             <a
               routerLink="/admin/login"
               routerLinkActive="nav-link-active"

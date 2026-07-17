@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Router, RouterModule } from "@angular/router";
 import { AdminSession } from "../../services/admin-session";
-import { LoginRequest } from "../../../session/models/login";
+import { AdminLoginRequest } from "../../models/admin-login";
 
 const ADMIN_HOME_ROUTE = "/admin/invites";
 
@@ -20,7 +20,6 @@ export class AdminLogin {
   private readonly fb = inject(FormBuilder);
 
   readonly form = this.fb.group({
-    login: ["", Validators.required],
     password: ["", Validators.required],
   });
 
@@ -36,8 +35,7 @@ export class AdminLogin {
     this.error.set(null);
     this.isSubmitting.set(true);
 
-    const req: LoginRequest = {
-      login: this.form.value.login!,
+    const req: AdminLoginRequest = {
       password: this.form.value.password!,
     };
 

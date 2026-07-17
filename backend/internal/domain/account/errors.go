@@ -4,7 +4,6 @@ import "errors"
 
 var (
 	ErrInvalidCredentials        = errors.New("invalid credentials")
-	ErrAdminAccessRequired       = errors.New("admin access required")
 	ErrLoginAlreadyTaken         = errors.New("login already taken")
 	ErrEmailAlreadyTaken         = errors.New("email already taken")
 	ErrInviteInvalid             = errors.New("invalid invite")

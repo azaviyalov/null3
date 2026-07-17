@@ -16,7 +16,7 @@ export class App {
   private readonly router = inject(Router);
 
   readonly user = toSignal(this.userSession.user$, { initialValue: null });
-  readonly adminUser = toSignal(this.adminSession.user$, {
+  readonly adminAuthenticated = toSignal(this.adminSession.isAuthenticated$, {
     initialValue: null,
   });
 

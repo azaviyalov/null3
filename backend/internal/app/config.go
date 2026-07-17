@@ -41,9 +41,11 @@ func GetConfig() (Config, error) {
 		return Config{}, err
 	}
 
-	adminConfig := admin.Config{
-		FrontendURL: serverConfig.FrontendURL,
+	adminConfig, err := admin.GetConfig()
+	if err != nil {
+		return Config{}, err
 	}
+	adminConfig.FrontendURL = serverConfig.FrontendURL
 	accountConfig.FrontendURL = serverConfig.FrontendURL
 
 	return Config{

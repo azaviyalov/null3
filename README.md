@@ -50,7 +50,9 @@ This is a project built just for fun. It is not intended for production use.
     ```
 2. Run the built binary:
    ```bash
-   PRODUCTION=true ./null3-server
+   JWT_SECRET=replace-with-a-long-random-secret \
+   ADMIN_PASSWORD=replace-with-a-long-random-password \
+   ENABLE_FRONTEND_DIST=true ./null3-server
    ```
 3. Open `http://localhost:8080`.
 
@@ -60,8 +62,8 @@ Environment variables can be set in `.env`.
 - `ADDRESS`: backend listen address. Default: `localhost:8080`.
 - `ENABLE_CORS`: enable CORS. Default: `false`.
 - `FRONTEND_URL`: allowed frontend origin when CORS is enabled. Default: `http://localhost:4200`.
-- `PRODUCTION`: production mode. Default: `false`.
-- `JWT_SECRET`: JWT signing key. Generated at startup outside production; required in production.
+- `JWT_SECRET`: required JWT signing key. Use a long random value; there is no default.
+- `ADMIN_PASSWORD`: required password for the configuration-only administrator. Use a long random value; there is no default.
 - `JWT_EXPIRATION`: JWT lifetime. Default: `24h`; must be positive.
 - `REFRESH_TOKEN_EXPIRATION`: refresh-token lifetime. Default: `168h`; must be positive.
 - `PASSWORD_RESET_TOKEN_EXPIRATION`: password-reset lifetime. Default: `1h`; must be positive.
@@ -72,14 +74,22 @@ Environment variables can be set in `.env`.
 - `ENABLE_FRONTEND_DIST`: serve the embedded frontend. Default: `false`.
 - `API_URL`: API URL inserted when the embedded frontend is enabled. Default: `http://localhost:8080/api`.
 
-## Seeded admin account
-The application seeds a single admin account on startup if user `1` does not exist:
-- user_id: `1`.
-- login: `admin`.
-- password: `password`.
-- email: `admin@example.com`.
+## Administrator access
 
-Use this account only on the separate admin login page at `/admin/login`. Regular user accounts are created through invite links generated from the admin area.
+Set `ADMIN_PASSWORD=replace-with-a-long-random-password`, restart the application, and open `/admin/login`. The form accepts only the configured password. The administrator is not stored in the database.
+
+The admin access token lasts 30 minutes and has no refresh token. After expiration, enter the password again. Changing the password requires updating the environment and restarting the application.
+
+## Generate secrets
+
+The optional helper below generates `JWT_SECRET` and `ADMIN_PASSWORD` and writes them to the specified env file:
+
+```bash
+cd backend
+go run ./cmd/generate-secrets .env
+```
+
+The command creates the file if needed. It exits without changing the file if either variable is already present. The helper uses only the Go standard library and is not included in the release binary.
 
 ## TODOs
 - [ ] Add more home page features (e.g., mood statistics, charts)

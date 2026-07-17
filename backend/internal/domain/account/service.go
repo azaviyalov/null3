@@ -18,13 +18,9 @@ import (
 )
 
 const (
-	adminUserID       uint = 1
-	adminLogin             = "admin"
-	adminEmail             = "admin@example.com"
-	adminPassword          = "password"
-	inviteExpiration       = 24 * time.Hour
-	minPasswordLength      = 8
-	maxPasswordLength      = 72
+	inviteExpiration  = 24 * time.Hour
+	minPasswordLength = 8
+	maxPasswordLength = 72
 )
 
 var loginPattern = regexp.MustCompile(`^[a-z0-9_-]{3,32}$`)
@@ -43,63 +39,12 @@ func NewService(repo *Repository, sessionService *session.Service, config Config
 	}
 }
 
-func (s *Service) SeedAdminUser(ctx context.Context) error {
-	_, err := s.repo.GetUserByID(ctx, adminUserID)
-	if err == nil {
-		return nil
-	}
-	if !errors.Is(err, core.ErrItemNotFound) {
-		return err
-	}
-
-	passwordHash, err := hashPassword(adminPassword)
-	if err != nil {
-		return fmt.Errorf("failed to hash admin password: %w", err)
-	}
-
-	_, err = s.repo.CreateUser(ctx, &User{
-		ID:           adminUserID,
-		Login:        adminLogin,
-		Email:        adminEmail,
-		PasswordHash: passwordHash,
-	})
-	if err != nil {
-		if isUniqueConstraintError(err) {
-			return nil
-		}
-		return fmt.Errorf("failed to seed admin user: %w", err)
-	}
-
-	return nil
-}
-
-func (s *Service) AuthenticateUser(ctx context.Context, req LoginRequest) (*UserResponse, *session.TokenData, error) {
+func (s *Service) AuthenticateUser(ctx context.Context, req LoginRequest) (*UserResponse, *session.UserSessionTokens, error) {
 	user, err := s.authenticateByLogin(ctx, req)
 	if err != nil {
 		return nil, nil, err
 	}
-	if s.IsAdmin(user) {
-		return nil, nil, ErrInvalidCredentials
-	}
-
 	tokenData, err := s.createUserSession(ctx, user)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return NewUserResponse(user), tokenData, nil
-}
-
-func (s *Service) AuthenticateAdmin(ctx context.Context, req LoginRequest) (*UserResponse, *session.TokenData, error) {
-	user, err := s.authenticateByLogin(ctx, req)
-	if err != nil {
-		return nil, nil, err
-	}
-	if !s.IsAdmin(user) {
-		return nil, nil, ErrInvalidCredentials
-	}
-
-	tokenData, err := s.createAdminSession(ctx, user)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -131,19 +76,7 @@ func (s *Service) GetUserByID(ctx context.Context, id uint) (*User, error) {
 	return s.repo.GetUserByID(ctx, id)
 }
 
-func (s *Service) IsAdmin(user *User) bool {
-	return user != nil && user.ID == adminUserID
-}
-
-func (s *Service) RefreshUserSession(ctx context.Context, tokenString string) (*UserResponse, *session.TokenData, error) {
-	return s.refreshSession(ctx, tokenString, false)
-}
-
-func (s *Service) RefreshAdminSession(ctx context.Context, tokenString string) (*UserResponse, *session.TokenData, error) {
-	return s.refreshSession(ctx, tokenString, true)
-}
-
-func (s *Service) refreshSession(ctx context.Context, tokenString string, requireAdmin bool) (*UserResponse, *session.TokenData, error) {
+func (s *Service) RefreshUserSession(ctx context.Context, tokenString string) (*UserResponse, *session.UserSessionTokens, error) {
 	sessionRepo := s.repo.SessionRepository()
 
 	token, err := sessionRepo.GetRefreshToken(ctx, tokenString)
@@ -167,20 +100,11 @@ func (s *Service) refreshSession(ctx context.Context, tokenString string, requir
 		return nil, nil, err
 	}
 
-	if requireAdmin != s.IsAdmin(user) {
-		return nil, nil, session.ErrRefreshTokenInvalid
-	}
-
 	if err := sessionRepo.DeleteRefreshToken(ctx, token); err != nil {
 		return nil, nil, err
 	}
 
-	var tokenData *session.TokenData
-	if requireAdmin {
-		tokenData, err = s.createAdminSession(ctx, user)
-	} else {
-		tokenData, err = s.createUserSession(ctx, user)
-	}
+	tokenData, err := s.createUserSession(ctx, user)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -188,11 +112,7 @@ func (s *Service) refreshSession(ctx context.Context, tokenString string, requir
 	return NewUserResponse(user), tokenData, nil
 }
 
-func (s *Service) CreateInvite(ctx context.Context, adminUser *User) (string, *Invite, error) {
-	if !s.IsAdmin(adminUser) {
-		return "", nil, ErrAdminAccessRequired
-	}
-
+func (s *Service) CreateInvite(ctx context.Context) (string, *Invite, error) {
 	now := time.Now()
 	rawToken, err := generateRandomToken()
 	if err != nil {
@@ -200,10 +120,9 @@ func (s *Service) CreateInvite(ctx context.Context, adminUser *User) (string, *I
 	}
 
 	invite := &Invite{
-		TokenHash:       hashToken(rawToken),
-		CreatedByUserID: adminUser.ID,
-		CreatedAt:       now,
-		ExpiresAt:       now.Add(inviteExpiration),
+		TokenHash: hashToken(rawToken),
+		CreatedAt: now,
+		ExpiresAt: now.Add(inviteExpiration),
 	}
 	createdInvite, err := s.repo.CreateInvite(ctx, invite)
 	if err != nil {
@@ -232,7 +151,7 @@ func (s *Service) ValidateInvite(ctx context.Context, rawToken string) (*Invite,
 	return invite, nil
 }
 
-func (s *Service) RegisterWithInvite(ctx context.Context, rawToken string, req InviteRegistrationRequest) (*UserResponse, *session.TokenData, error) {
+func (s *Service) RegisterWithInvite(ctx context.Context, rawToken string, req InviteRegistrationRequest) (*UserResponse, *session.UserSessionTokens, error) {
 	login := normalizeLogin(req.Login)
 	email := normalizeEmail(req.Email)
 
@@ -302,12 +221,15 @@ func (s *Service) RegisterWithInvite(ctx context.Context, rawToken string, req I
 		return nil, nil, err
 	}
 
-	jwtToken, err := s.sessionService.GenerateJWT(createdUser.ID)
+	accessToken, err := s.sessionService.GenerateUserAccessToken(createdUser.ID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return NewUserResponse(createdUser), session.NewTokenData(jwtToken, refreshToken), nil
+	return NewUserResponse(createdUser), &session.UserSessionTokens{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (s *Service) RequestPasswordReset(ctx context.Context, req ForgotPasswordRequest) (string, error) {
@@ -319,10 +241,6 @@ func (s *Service) RequestPasswordReset(ctx context.Context, req ForgotPasswordRe
 		}
 		return "", err
 	}
-	if s.IsAdmin(user) {
-		return "", nil
-	}
-
 	rawToken, err := generateRandomToken()
 	if err != nil {
 		return "", fmt.Errorf("failed to generate password reset token: %w", err)
@@ -381,10 +299,6 @@ func (s *Service) ResetPassword(ctx context.Context, req ResetPasswordRequest) e
 			}
 			return err
 		}
-		if s.IsAdmin(user) {
-			return ErrPasswordResetTokenInvalid
-		}
-
 		if err := repo.UpdateUserPassword(ctx, user.ID, passwordHash); err != nil {
 			return err
 		}
@@ -398,22 +312,8 @@ func (s *Service) ResetPassword(ctx context.Context, req ResetPasswordRequest) e
 	})
 }
 
-func (s *Service) createUserSession(ctx context.Context, user *User) (*session.TokenData, error) {
-	if s.IsAdmin(user) {
-		return nil, ErrInvalidCredentials
-	}
-	return s.createSession(ctx, user)
-}
-
-func (s *Service) createAdminSession(ctx context.Context, user *User) (*session.TokenData, error) {
-	if !s.IsAdmin(user) {
-		return nil, ErrAdminAccessRequired
-	}
-	return s.createSession(ctx, user)
-}
-
-func (s *Service) createSession(ctx context.Context, user *User) (*session.TokenData, error) {
-	jwtToken, err := s.sessionService.GenerateJWT(user.ID)
+func (s *Service) createUserSession(ctx context.Context, user *User) (*session.UserSessionTokens, error) {
+	accessToken, err := s.sessionService.GenerateUserAccessToken(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -423,7 +323,10 @@ func (s *Service) createSession(ctx context.Context, user *User) (*session.Token
 		return nil, err
 	}
 
-	return session.NewTokenData(jwtToken, refreshToken), nil
+	return &session.UserSessionTokens{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (s *Service) ensureUserIdentityAvailable(ctx context.Context, repo *Repository, login, email string) error {

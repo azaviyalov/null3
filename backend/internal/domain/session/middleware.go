@@ -6,42 +6,38 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ActorResolver func(ctx context.Context, userID uint) (*Actor, error)
-
-func UserJWTMiddleware(service *Service, resolveActor ActorResolver) echo.MiddlewareFunc {
-	return jwtMiddleware(service, resolveActor, UserCookieName, false)
-}
-
-func AdminJWTMiddleware(service *Service, resolveActor ActorResolver) echo.MiddlewareFunc {
-	return jwtMiddleware(service, resolveActor, AdminCookieName, true)
-}
-
-func jwtMiddleware(service *Service, resolveActor ActorResolver, cookieName string, requireAdmin bool) echo.MiddlewareFunc {
+func UserJWTMiddleware(service *Service, validateUser func(context.Context, uint) error) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cookie, err := c.Cookie(cookieName)
+			cookie, err := c.Cookie(UserCookieName)
+			if err != nil {
+				return echo.ErrUnauthorized.WithInternal(err)
+			}
+			userID, err := service.ParseUserAccessToken(cookie.Value)
+			if err != nil {
+				return echo.ErrUnauthorized.WithInternal(err)
+			}
+			if err := validateUser(c.Request().Context(), userID); err != nil {
+				return echo.ErrUnauthorized.WithInternal(err)
+			}
+			setUserID(c, userID)
+			return next(c)
+		}
+	}
+}
+
+func AdminJWTMiddleware(service *Service) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cookie, err := c.Cookie(AdminCookieName)
 			if err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
 
-			token, err := service.ParseJWT(cookie.Value)
-			if err != nil {
+			if err := service.ValidateAdminAccessToken(cookie.Value); err != nil {
 				return echo.ErrUnauthorized.WithInternal(err)
 			}
 
-			actor, err := resolveActor(c.Request().Context(), token.UserID)
-			if err != nil {
-				return echo.ErrUnauthorized.WithInternal(err)
-			}
-
-			if requireAdmin && !actor.IsAdmin {
-				return echo.ErrForbidden.WithInternal(ErrAdminAccessRequired)
-			}
-			if !requireAdmin && actor.IsAdmin {
-				return echo.ErrUnauthorized.WithInternal(ErrUserScopeRequired)
-			}
-
-			setActor(c, actor)
 			return next(c)
 		}
 	}
