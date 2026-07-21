@@ -31,18 +31,11 @@ This is a project built just for fun. It is not intended for production use.
 ## Running the Application
 
 ### Development
-1. Start the backend server (no hot-reloading):
+1. Start the backend and frontend development servers:
    ```bash
-   cd backend
-   go run cmd/server/main.go
+   make run
    ```
-2. Start the frontend development server:
-   ```bash
-   cd frontend
-   npm ci
-   npm start
-   ```
-3. Open `http://localhost:4200`.
+2. Open `http://localhost:4200`. Press `Ctrl+C` to stop both servers.
 
 ### Production Build
 1. Build the binary
@@ -80,26 +73,29 @@ Environment variables can be set in `.env`.
 Run unit tests without SQLite integration tests:
 
 ```bash
-make test-backend-unit
+cd backend
+go test -short ./...
 ```
 
 Run the complete backend suite, including isolated SQLite integration tests:
 
 ```bash
-make test-backend
+cd backend
+go test ./...
 ```
 
 Run the complete backend suite and print total production-code statement
 coverage (the full profile is saved to `backend/coverage.out`):
 
 ```bash
-make coverage-backend
+make coverage
 ```
 
 Generate an HTML coverage report at `backend/coverage.html`:
 
 ```bash
-make coverage-backend-html
+cd backend
+go tool cover -html=coverage.out -o coverage.html
 ```
 
 ## Administrator access
