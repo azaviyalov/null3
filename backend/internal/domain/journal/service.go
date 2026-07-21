@@ -157,6 +157,11 @@ func (s *Service) RestoreDiaryEntry(ctx context.Context, userID, id uint) (*Diar
 	if err != nil {
 		return nil, err
 	}
+	moodRecords, err := s.resolveDiaryMoodRecords(ctx, userID, entry.Markdown)
+	if err != nil {
+		return nil, err
+	}
+	entry.MoodRecords = moodRecords
 	entry.DeletedAt.Valid = false
 	return s.repo.SaveDiaryEntry(ctx, entry)
 }

@@ -42,19 +42,16 @@ func NewEchoServer(config Config) *echo.Echo {
 func StartServer(e *echo.Echo, config Config) error {
 	slog.Info("starting HTTP server", "address", config.Address)
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	shutdownSignal, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	serverErr := make(chan error, 1)
 	go func() {
-		defer close(serverErr)
-		if err := e.Start(config.Address); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			serverErr <- err
-		}
+		serverErr <- e.Start(config.Address)
 	}()
 
 	select {
-	case <-quit:
+	case <-shutdownSignal.Done():
 		slog.Info("received shutdown signal, shutting down server gracefully")
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
@@ -63,8 +60,8 @@ func StartServer(e *echo.Echo, config Config) error {
 		}
 		slog.Info("server stopped gracefully")
 		return nil
-	case err, ok := <-serverErr:
-		if !ok {
+	case err := <-serverErr:
+		if err == nil || errors.Is(err, http.ErrServerClosed) {
 			return nil
 		}
 		return fmt.Errorf("start HTTP server: %w", err)

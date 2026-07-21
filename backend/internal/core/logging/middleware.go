@@ -1,62 +1,47 @@
 package logging
 
 import (
-	"crypto/rand"
-	"encoding/hex"
-	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-const echoErrorKey = "internal/logging_error"
-
 func RequestLogger() echo.MiddlewareFunc {
+	requestID := middleware.RequestID()
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return requestID(func(c echo.Context) error {
 			start := time.Now()
-			reqID := c.Request().Header.Get("X-Request-Id")
-			if reqID == "" {
-				reqID = generateRequestID()
-			}
-			c.Response().Header().Set("X-Request-Id", reqID)
-			reqLogger := slog.Default().With("request_id", reqID)
-			c.Response().After(func() {
-				req := c.Request()
-				res := c.Response()
-				status := res.Status
-				attrs := []any{
-					"method", req.Method,
-					"path", req.URL.Path,
-					"status", status,
-					"latency", time.Since(start).String(),
-					"ip", c.RealIP(),
-				}
-				if v := c.Get(echoErrorKey); v != nil {
-					if status >= 500 {
-						reqLogger.Error("HTTP request completed with error", append(attrs, "error", v)...)
-					} else {
-						reqLogger.Warn("HTTP request completed with non-fatal error", append(attrs, "error", v)...)
-					}
-					return
-				}
-				reqLogger.Info("HTTP request completed", attrs...)
-			})
+			request := c.Request()
+			response := c.Response()
+
 			err := next(c)
 			if err != nil {
-				c.Set(echoErrorKey, err)
+				c.Error(err)
+			}
+
+			logger := slog.Default().With("request_id", response.Header().Get(echo.HeaderXRequestID))
+			path := c.Path()
+			if path == "" {
+				path = request.URL.Path
+			}
+			attrs := []any{
+				"method", request.Method,
+				"path", path,
+				"status", response.Status,
+				"latency", time.Since(start).String(),
+				"ip", c.RealIP(),
+			}
+			switch {
+			case err == nil:
+				logger.Info("HTTP request completed", attrs...)
+			case response.Status >= 500:
+				logger.Error("HTTP request completed with error", append(attrs, "error", err)...)
+			default:
+				logger.Warn("HTTP request completed with non-fatal error", append(attrs, "error", err)...)
 			}
 			return err
-		}
+		})
 	}
-}
-
-func generateRequestID() string {
-	b := make([]byte, 16)
-	_, err := rand.Read(b)
-	if err != nil {
-		return fmt.Sprintf("%d", time.Now().UnixNano())
-	}
-	return hex.EncodeToString(b)
 }

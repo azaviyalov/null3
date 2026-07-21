@@ -14,8 +14,6 @@ const previewMaxLength = 180
 var (
 	customMoodRecordLinkPattern = regexp.MustCompile(`\[\[mood:(\d+)(?:\|([^\]]+))?\]\]`)
 	moodRecordPageLinkPattern   = regexp.MustCompile(`(?:https?://[^\s)]+)?/mood-records/(\d+)(?:[?#][^\s)]*)?`)
-	fencedCodeBlockPattern      = regexp.MustCompile("(?s)```.*?```|~~~.*?~~~")
-	inlineCodePattern           = regexp.MustCompile("`[^`\n]*`")
 	markdownLinkPattern         = regexp.MustCompile(`\[(.*?)\]\((.*?)\)`)
 	markdownHeadingPattern      = regexp.MustCompile(`(?m)^\s{0,3}#{1,6}\s*`)
 	markdownQuotePattern        = regexp.MustCompile(`(?m)^\s{0,3}>\s?`)
@@ -94,6 +92,125 @@ func moodRecordLinkPreviewText(raw string) string {
 }
 
 func stripCodeSections(markdown string) string {
-	withoutFencedCode := fencedCodeBlockPattern.ReplaceAllString(markdown, " ")
-	return inlineCodePattern.ReplaceAllString(withoutFencedCode, " ")
+	var result strings.Builder
+	inFence := false
+	var fenceCharacter byte
+	fenceLength := 0
+
+	for _, rawLine := range strings.SplitAfter(markdown, "\n") {
+		line, hasNewline := strings.CutSuffix(rawLine, "\n")
+		if inFence {
+			if isClosingFence(line, fenceCharacter, fenceLength) {
+				inFence = false
+			}
+			if hasNewline {
+				result.WriteByte('\n')
+			} else {
+				result.WriteByte(' ')
+			}
+			continue
+		}
+
+		if character, length, ok := openingFence(line); ok {
+			inFence = true
+			fenceCharacter = character
+			fenceLength = length
+			if hasNewline {
+				result.WriteByte('\n')
+			} else {
+				result.WriteByte(' ')
+			}
+			continue
+		}
+
+		result.WriteString(line)
+		if hasNewline {
+			result.WriteByte('\n')
+		}
+	}
+
+	return stripInlineCode(result.String())
+}
+
+func openingFence(line string) (byte, int, bool) {
+	line, ok := trimFenceIndent(line)
+	if !ok || len(line) < 3 || (line[0] != '`' && line[0] != '~') {
+		return 0, 0, false
+	}
+
+	character := line[0]
+	length := countRun(line, character)
+	if length < 3 || character == '`' && strings.ContainsRune(line[length:], '`') {
+		return 0, 0, false
+	}
+	return character, length, true
+}
+
+func isClosingFence(line string, character byte, minimumLength int) bool {
+	line, ok := trimFenceIndent(line)
+	if !ok || len(line) == 0 || line[0] != character {
+		return false
+	}
+	length := countRun(line, character)
+	return length >= minimumLength && strings.TrimSpace(line[length:]) == ""
+}
+
+func trimFenceIndent(line string) (string, bool) {
+	indent := 0
+	for indent < len(line) && line[indent] == ' ' {
+		indent++
+	}
+	if indent > 3 {
+		return "", false
+	}
+	return line[indent:], true
+}
+
+func stripInlineCode(markdown string) string {
+	var result strings.Builder
+	for position := 0; position < len(markdown); {
+		start := strings.IndexByte(markdown[position:], '`')
+		if start < 0 {
+			result.WriteString(markdown[position:])
+			break
+		}
+		start += position
+		result.WriteString(markdown[position:start])
+
+		length := countRun(markdown[start:], '`')
+		end := findBacktickRun(markdown, start+length, length)
+		if end < 0 {
+			result.WriteString(markdown[start : start+length])
+			position = start + length
+			continue
+		}
+
+		result.WriteByte(' ')
+		position = end + length
+	}
+	return result.String()
+}
+
+func findBacktickRun(line string, position, length int) int {
+	for position < len(line) {
+		index := strings.IndexByte(line[position:], '`')
+		if index < 0 {
+			return -1
+		}
+		index += position
+		runLength := countRun(line[index:], '`')
+		if runLength == length {
+			return index
+		}
+		position = index + runLength
+	}
+	return -1
+}
+
+func countRun(value string, character byte) int {
+	length := 0
+	for length < len(value) && value[length] == character {
+		length++
+	}
+	return length
 }

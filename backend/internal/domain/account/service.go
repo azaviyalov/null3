@@ -15,6 +15,7 @@ import (
 	"github.com/azaviyalov/null3/backend/internal/core"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 const (
@@ -196,7 +197,7 @@ func (s *Service) RegisterWithInvite(ctx context.Context, rawToken string, req I
 			PasswordHash: passwordHash,
 		})
 		if err != nil {
-			if isUniqueConstraintError(err) {
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				if _, loginErr := repo.GetUserByLogin(ctx, login); loginErr == nil {
 					return ErrLoginAlreadyTaken
 				}
@@ -246,11 +247,12 @@ func (s *Service) RequestPasswordReset(ctx context.Context, req ForgotPasswordRe
 		return "", fmt.Errorf("failed to generate password reset token: %w", err)
 	}
 
+	now := time.Now()
 	resetToken := &PasswordResetToken{
 		UserID:    user.ID,
 		TokenHash: hashToken(rawToken),
-		CreatedAt: time.Now(),
-		ExpiresAt: time.Now().Add(s.config.PasswordResetTokenExpiration),
+		CreatedAt: now,
+		ExpiresAt: now.Add(s.config.PasswordResetTokenExpiration),
 	}
 
 	err = s.repo.WithTx(ctx, func(repo *Repository) error {

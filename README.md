@@ -10,10 +10,11 @@ This is a project built just for fun. It is not intended for production use.
 - Track mood records
 - Write diary entries in Markdown
 - Link diary entries to moods with `[[mood:<id>|label]]` or `/mood-records/<id>` links
+- Ignore mood-like references inside Markdown code spans and fenced code blocks
 - Follow links in either direction
 - Invite-only user registration
 - Admin page for creating one-time invite links
-- Cookie-based sessions and password resets
+- Cookie-based sessions with hashed refresh-token storage and password resets
 
 ## Requirements
 - Go 1.26.5
@@ -61,7 +62,7 @@ Environment variables can be set in `.env`.
 
 - `ADDRESS`: backend listen address. Default: `localhost:8080`.
 - `ENABLE_CORS`: enable CORS. Default: `false`.
-- `FRONTEND_URL`: allowed frontend origin when CORS is enabled. Default: `http://localhost:4200`.
+- `FRONTEND_URL`: base URL for generated invite and password-reset links, and the allowed frontend origin when CORS is enabled. Default: `http://localhost:4200`.
 - `JWT_SECRET`: required JWT signing key. Use a long random value; there is no default.
 - `ADMIN_PASSWORD`: required password for the configuration-only administrator. Use a long random value; there is no default.
 - `JWT_EXPIRATION`: JWT lifetime. Default: `24h`; must be positive.
@@ -73,6 +74,33 @@ Environment variables can be set in `.env`.
 - `LOG_FORMAT`: `fancy`, `text`, or `json`. Default: `text`.
 - `ENABLE_FRONTEND_DIST`: serve the embedded frontend. Default: `false`.
 - `API_URL`: API URL inserted when the embedded frontend is enabled. Default: `http://localhost:8080/api`.
+
+## Backend tests
+
+Run unit tests without SQLite integration tests:
+
+```bash
+make test-backend-unit
+```
+
+Run the complete backend suite, including isolated SQLite integration tests:
+
+```bash
+make test-backend
+```
+
+Run the complete backend suite and print total production-code statement
+coverage (the full profile is saved to `backend/coverage.out`):
+
+```bash
+make coverage-backend
+```
+
+Generate an HTML coverage report at `backend/coverage.html`:
+
+```bash
+make coverage-backend-html
+```
 
 ## Administrator access
 

@@ -26,6 +26,7 @@ backend/internal/core/frontend/fs/*
 !backend/internal/core/frontend/fs/.gitkeep
 backend/null3.db
 backend/coverage.out
+backend/coverage.html
 
 # Editor
 *.swp

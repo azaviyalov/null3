@@ -30,10 +30,8 @@ func GetConfig() (Config, error) {
 		config.EnableCORS = enable
 	}
 
-	if config.EnableCORS {
-		if frontendURL := os.Getenv("FRONTEND_URL"); frontendURL != "" {
-			config.FrontendURL = frontendURL
-		}
+	if frontendURL := os.Getenv("FRONTEND_URL"); frontendURL != "" {
+		config.FrontendURL = frontendURL
 	}
 
 	return config, nil

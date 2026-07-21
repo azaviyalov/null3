@@ -1,13 +1,25 @@
-.PHONY: prepare build lint staticcheck vet clean clean-db
+.DEFAULT_GOAL := build
 
-FRONTEND_DIST=internal/core/frontend/fs
+.PHONY: build test-unit test coverage coverage-html lint staticcheck vet format clean clean-db
 
-prepare:
-	go mod tidy
-	go mod download
+COVERAGE_PACKAGES=$(shell go list ./... | grep -v /internal/testutil)
 
 build:
-	go build -ldflags="-s -w" -o bin/server ./cmd/server/main.go
+	mkdir -p bin
+	go build -ldflags="-s -w" -o bin/server ./cmd/server
+
+test-unit:
+	go test -short ./...
+
+test:
+	go test ./...
+
+coverage:
+	go test -coverprofile=coverage.out $(COVERAGE_PACKAGES)
+	go tool cover -func=coverage.out | tail -n 1
+
+coverage-html: coverage
+	go tool cover -html=coverage.out -o coverage.html
 
 lint: staticcheck vet
 
@@ -21,7 +33,8 @@ format:
 	go fmt ./...
 
 clean:
-	rm -rf bin/ $(FRONTEND_DIST)/*
+	rm -rf bin/ internal/core/frontend/fs/*
+	rm -f coverage.out coverage.html
 
 clean-db:
 	rm -f null3.db

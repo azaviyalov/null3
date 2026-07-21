@@ -1,8 +1,8 @@
 package logging
 
 import (
+	"io"
 	"log/slog"
-	"os"
 )
 
 type Format int
@@ -13,24 +13,16 @@ const (
 	FormatFancy
 )
 
-func (f Format) IsValid() bool {
-	switch f {
-	case FormatText, FormatJSON, FormatFancy:
-		return true
-	}
-	return false
-}
-
-func (f Format) NewSLogHandler(options *slog.HandlerOptions) slog.Handler {
+func (f Format) NewSLogHandler(writer io.Writer, options *slog.HandlerOptions) slog.Handler {
 	switch f {
 	case FormatJSON:
-		return slog.NewJSONHandler(os.Stdout, options)
+		return slog.NewJSONHandler(writer, options)
 	case FormatFancy:
-		return NewFancyHandler(options)
+		return NewFancyHandler(writer, options)
 	case FormatText:
 		fallthrough
 	default:
-		return slog.NewTextHandler(os.Stdout, options)
+		return slog.NewTextHandler(writer, options)
 	}
 }
 

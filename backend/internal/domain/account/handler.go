@@ -157,7 +157,7 @@ func (h *Handler) ForgotPassword(c echo.Context) error {
 		Message: "If an account exists for that email, a reset link has been generated.",
 	}
 	if rawToken != "" {
-		resp.ResetURL = h.frontendURL(c, fmt.Sprintf("/reset-password?token=%s", rawToken))
+		resp.ResetURL = h.frontendURL(fmt.Sprintf("/reset-password?token=%s", rawToken))
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -188,19 +188,7 @@ func (h *Handler) ResetPassword(c echo.Context) error {
 	})
 }
 
-func (h *Handler) frontendURL(c echo.Context, path string) string {
-	if origin := c.Request().Header.Get(echo.HeaderOrigin); origin != "" {
-		return strings.TrimRight(origin, "/") + path
-	}
-
-	if host := c.Request().Host; host != "" {
-		scheme := "http"
-		if c.IsTLS() || strings.EqualFold(c.Request().Header.Get("X-Forwarded-Proto"), "https") {
-			scheme = "https"
-		}
-		return fmt.Sprintf("%s://%s%s", scheme, host, path)
-	}
-
+func (h *Handler) frontendURL(path string) string {
 	baseURL := strings.TrimRight(h.config.FrontendURL, "/")
 	if baseURL == "" {
 		baseURL = "http://localhost:4200"

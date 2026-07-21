@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"io/fs"
 	"path"
-	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -15,25 +13,22 @@ type memFS struct {
 }
 
 func (m *memFS) Open(name string) (fs.File, error) {
-	cleanName := path.Clean(strings.TrimPrefix(name, "/"))
-	if data, ok := m.files[cleanName]; ok {
+	if data, ok := m.files[name]; ok {
 		return &memFile{
 			reader: bytes.NewReader(data),
-			name:   cleanName,
-			size:   int64(len(data)),
+			name:   name,
 		}, nil
 	}
-	return m.orig.Open(cleanName)
+	return m.orig.Open(name)
 }
 
 type memFile struct {
 	reader *bytes.Reader
 	name   string
-	size   int64
 }
 
 func (f *memFile) Stat() (fs.FileInfo, error) {
-	return &memFileInfo{name: f.name, size: f.size}, nil
+	return &memFileInfo{name: f.name, size: f.reader.Size()}, nil
 }
 func (f *memFile) Read(p []byte) (int, error) { return f.reader.Read(p) }
 func (f *memFile) Close() error               { return nil }
@@ -46,7 +41,7 @@ type memFileInfo struct {
 	size int64
 }
 
-func (fi *memFileInfo) Name() string       { return filepath.Base(fi.name) }
+func (fi *memFileInfo) Name() string       { return path.Base(fi.name) }
 func (fi *memFileInfo) Size() int64        { return fi.size }
 func (fi *memFileInfo) Mode() fs.FileMode  { return 0444 }
 func (fi *memFileInfo) ModTime() time.Time { return time.Time{} }

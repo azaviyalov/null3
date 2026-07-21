@@ -2,7 +2,6 @@ package admin
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -67,25 +66,13 @@ func (h *Handler) CreateInvite(c echo.Context) error {
 	}
 
 	resp := account.InviteResponse{
-		InviteURL: h.frontendURL(c, fmt.Sprintf("/invite/%s", rawToken)),
+		InviteURL: h.frontendURL("/invite/" + rawToken),
 		ExpiresAt: invite.ExpiresAt,
 	}
 	return c.JSON(http.StatusCreated, resp)
 }
 
-func (h *Handler) frontendURL(c echo.Context, path string) string {
-	if origin := c.Request().Header.Get(echo.HeaderOrigin); origin != "" {
-		return strings.TrimRight(origin, "/") + path
-	}
-
-	if host := c.Request().Host; host != "" {
-		scheme := "http"
-		if c.IsTLS() || strings.EqualFold(c.Request().Header.Get("X-Forwarded-Proto"), "https") {
-			scheme = "https"
-		}
-		return fmt.Sprintf("%s://%s%s", scheme, host, path)
-	}
-
+func (h *Handler) frontendURL(path string) string {
 	baseURL := strings.TrimRight(h.config.FrontendURL, "/")
 	if baseURL == "" {
 		baseURL = "http://localhost:4200"

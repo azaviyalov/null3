@@ -3,7 +3,9 @@ package session
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strconv"
@@ -14,7 +16,6 @@ import (
 )
 
 const (
-	clockSkew  = time.Minute
 	userScope  = "user"
 	adminScope = "admin"
 )
@@ -64,28 +65,23 @@ func (s *Service) generateAccessToken(subject, scope string, expiration time.Dur
 }
 
 func (s *Service) parseAccessTokenClaims(tokenStr string) (*accessTokenClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &accessTokenClaims{}, func(token *jwt.Token) (any, error) {
-		if token.Method != jwt.SigningMethodHS256 {
-			return nil, ErrJWTInvalidClaims
-		}
+	token, err := jwt.ParseWithClaims(tokenStr, &accessTokenClaims{}, func(_ *jwt.Token) (any, error) {
 		return []byte(s.config.JWTSecret), nil
-	})
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}), jwt.WithIssuer("null3"), jwt.WithExpirationRequired())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrJWTInvalid, err)
-	}
-	if !token.Valid {
-		return nil, ErrJWTInvalidClaims
+		switch {
+		case errors.Is(err, jwt.ErrTokenExpired):
+			return nil, fmt.Errorf("%w: %w", ErrJWTExpired, err)
+		case errors.Is(err, jwt.ErrTokenInvalidIssuer), errors.Is(err, jwt.ErrTokenRequiredClaimMissing):
+			return nil, fmt.Errorf("%w: %w", ErrJWTInvalidClaims, err)
+		default:
+			return nil, fmt.Errorf("%w: %w", ErrJWTInvalid, err)
+		}
 	}
 
 	tokenClaims, ok := token.Claims.(*accessTokenClaims)
 	if !ok || tokenClaims.Subject == "" || tokenClaims.ExpiresAt == nil {
 		return nil, ErrJWTInvalidClaims
-	}
-	if tokenClaims.ExpiresAt.Time.Before(time.Now().Add(clockSkew)) {
-		return nil, fmt.Errorf("%w: JWT has expired", ErrJWTExpired)
-	}
-	if tokenClaims.Issuer != "null3" {
-		return nil, fmt.Errorf("%w: invalid JWT issuer", ErrJWTInvalidClaims)
 	}
 	return tokenClaims, nil
 }
@@ -132,18 +128,19 @@ func (s *Service) CreateRefreshTokenWithRepo(ctx context.Context, repo *Reposito
 		return nil, fmt.Errorf("%w: %v", ErrRefreshTokenCreationFailed, err)
 	}
 
-	token := &RefreshToken{
+	storedToken := &RefreshToken{
 		UserID:    userID,
-		Value:     tokenString,
+		Value:     hashRefreshToken(tokenString),
 		CreatedAt: now,
 		ExpiresAt: now.Add(s.config.RefreshTokenExpiration),
 	}
 
-	createdToken, err := repo.SaveRefreshToken(ctx, token)
+	createdToken, err := repo.SaveRefreshToken(ctx, storedToken)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrRefreshTokenCreationFailed, err)
+		return nil, fmt.Errorf("%w: %w", ErrRefreshTokenCreationFailed, err)
 	}
 
+	createdToken.Value = tokenString
 	return createdToken, nil
 }
 
@@ -170,4 +167,9 @@ func generateRandomToken() (string, error) {
 	}
 
 	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
+func hashRefreshToken(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
 }

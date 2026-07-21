@@ -1,4 +1,4 @@
-.PHONY: all backend frontend prepare-backend prepare-frontend prepare build-backend build-frontend build lint-backend lint-frontend lint format-backend format-frontend format clean-backend clean-frontend clean release
+.PHONY: all backend frontend prepare-frontend prepare build-backend build-frontend build test-backend-unit test-backend coverage-backend coverage-backend-html lint-backend lint-frontend lint format-backend format-frontend format clean-backend clean-frontend clean release
 
 all: build-backend build-frontend
 
@@ -8,13 +8,10 @@ backend:
 frontend:
 	$(MAKE) -C frontend
 
-prepare-backend:
-	$(MAKE) -C backend prepare
-
 prepare-frontend:
 	$(MAKE) -C frontend prepare
 
-prepare: prepare-backend prepare-frontend
+prepare: prepare-frontend
 
 build-backend:
 	$(MAKE) -C backend build
@@ -23,6 +20,18 @@ build-frontend:
 	$(MAKE) -C frontend build
 
 build: build-backend build-frontend
+
+test-backend-unit:
+	$(MAKE) -C backend test-unit
+
+test-backend:
+	$(MAKE) -C backend test
+
+coverage-backend:
+	$(MAKE) -C backend coverage
+
+coverage-backend-html:
+	$(MAKE) -C backend coverage-html
 
 lint-backend:
 	$(MAKE) -C backend lint

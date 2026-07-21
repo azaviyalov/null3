@@ -22,7 +22,10 @@ func (r *Repository) GetMoodRecord(ctx context.Context, filter *MoodRecordFilter
 	var entry MoodRecord
 	query := filter.Apply(r.db.WithContext(ctx)).
 		Preload("DiaryEntries", func(db *gorm.DB) *gorm.DB {
-			return db.Order("occurred_at DESC").Order("created_at DESC")
+			return db.
+				Where("diary_entries.deleted_at IS NULL").
+				Order("occurred_at DESC").
+				Order("created_at DESC")
 		})
 	if err := query.First(&entry).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -81,7 +84,9 @@ func (r *Repository) GetDiaryEntry(ctx context.Context, filter *DiaryEntryFilter
 	var entry DiaryEntry
 	query := filter.Apply(r.db.WithContext(ctx)).
 		Preload("MoodRecords", func(db *gorm.DB) *gorm.DB {
-			return db.Order("created_at DESC")
+			return db.
+				Where("mood_records.deleted_at IS NULL").
+				Order("created_at DESC")
 		})
 	if err := query.First(&entry).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

@@ -2,10 +2,11 @@ package logging
 
 import (
 	"log/slog"
+	"os"
 )
 
 func Setup(config Config) {
-	handler := config.Format.NewSLogHandler(&slog.HandlerOptions{
+	handler := config.Format.NewSLogHandler(os.Stdout, &slog.HandlerOptions{
 		Level:       config.Level,
 		AddSource:   true,
 		ReplaceAttr: ReplaceSourceAttr,

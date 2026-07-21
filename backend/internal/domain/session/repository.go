@@ -20,7 +20,7 @@ func NewRepository(db *gorm.DB) *Repository {
 
 func (r *Repository) GetRefreshToken(ctx context.Context, tokenString string) (*RefreshToken, error) {
 	var token RefreshToken
-	err := r.db.WithContext(ctx).Where("value = ?", tokenString).First(&token).Error
+	err := r.db.WithContext(ctx).Where("value = ?", hashRefreshToken(tokenString)).First(&token).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, core.ErrItemNotFound

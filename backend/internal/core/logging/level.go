@@ -11,14 +11,6 @@ const (
 	LevelError
 )
 
-func (l Level) IsValid() bool {
-	switch l {
-	case LevelDebug, LevelInfo, LevelWarn, LevelError:
-		return true
-	}
-	return false
-}
-
 func (l Level) Level() slog.Level {
 	switch l {
 	case LevelDebug:

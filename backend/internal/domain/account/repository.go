@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/azaviyalov/null3/backend/internal/core"
 	"github.com/azaviyalov/null3/backend/internal/domain/session"
@@ -94,13 +93,6 @@ func (r *Repository) GetPasswordResetTokenByHash(ctx context.Context, tokenHash 
 	return &token, nil
 }
 
-func (r *Repository) DeletePasswordResetToken(ctx context.Context, token *PasswordResetToken) error {
-	if err := r.db.WithContext(ctx).Delete(token).Error; err != nil {
-		return fmt.Errorf("delete password reset token: %w", err)
-	}
-	return nil
-}
-
 func (r *Repository) DeletePasswordResetTokensByUser(ctx context.Context, userID uint) error {
 	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Delete(&PasswordResetToken{}).Error; err != nil {
 		return fmt.Errorf("delete password reset tokens for user %d: %w", userID, err)
@@ -131,8 +123,4 @@ func (r *Repository) SaveInvite(ctx context.Context, invite *Invite) error {
 		return fmt.Errorf("save invite %d: %w", invite.ID, err)
 	}
 	return nil
-}
-
-func isUniqueConstraintError(err error) bool {
-	return strings.Contains(strings.ToLower(err.Error()), "unique constraint failed")
 }
