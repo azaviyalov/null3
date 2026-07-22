@@ -9,15 +9,16 @@ $(FRONTEND_DEPS): frontend/package.json frontend/package-lock.json
 	npm --prefix frontend ci
 
 run: $(FRONTEND_DEPS)
-	@set -m; \
-	(cd backend && exec go run ./cmd/server) & backend_pid=$$!; \
+	@set -e -m; \
+	(cd backend && exec go tool air -c .air.toml) & backend_pid=$$!; \
 	(cd frontend && exec npm start) & frontend_pid=$$!; \
 	cleanup() { \
 		trap - EXIT INT TERM; \
 		kill -- "-$$backend_pid" "-$$frontend_pid" 2>/dev/null || true; \
 		wait "$$backend_pid" "$$frontend_pid" 2>/dev/null || true; \
 	}; \
-	trap cleanup EXIT INT TERM; \
+	trap cleanup EXIT; \
+	trap 'exit 0' INT TERM; \
 	wait -n "$$backend_pid" "$$frontend_pid"
 
 build: $(FRONTEND_DEPS)

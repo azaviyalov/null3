@@ -22,6 +22,7 @@ null3.db
 
 # Go
 backend/bin/
+backend/tmp/
 backend/internal/core/frontend/fs/*
 !backend/internal/core/frontend/fs/.gitkeep
 backend/null3.db

@@ -31,11 +31,11 @@ This is a project built just for fun. It is not intended for production use.
 ## Running the Application
 
 ### Development
-1. Start the backend and frontend development servers:
+1. Start the backend and frontend development servers with live reload:
    ```bash
    make run
    ```
-2. Open `http://localhost:4200`. Press `Ctrl+C` to stop both servers.
+2. Open `http://localhost:4200`. Angular reloads frontend changes, and Air rebuilds and restarts the backend after Go changes. Press `Ctrl+C` to stop both servers.
 
 ### Production Build
 1. Build the binary
@@ -51,7 +51,7 @@ This is a project built just for fun. It is not intended for production use.
 3. Open `http://localhost:8080`.
 
 ## Configuration
-Environment variables can be set in `.env`.
+Environment variables can be set in `.env` at the repository root. `make run` loads this file.
 
 - `ADDRESS`: backend listen address. Default: `localhost:8080`.
 - `ENABLE_CORS`: enable CORS. Default: `false`.
@@ -109,8 +109,7 @@ The admin access token lasts 30 minutes and has no refresh token. After expirati
 The optional helper below generates `JWT_SECRET` and `ADMIN_PASSWORD` and writes them to the specified env file:
 
 ```bash
-cd backend
-go run ./cmd/generate-secrets .env
+go -C backend run ./cmd/generate-secrets ../.env
 ```
 
 The command creates the file if needed. It exits without changing the file if either variable is already present. The helper uses only the Go standard library and is not included in the release binary.
