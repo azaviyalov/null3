@@ -151,6 +151,13 @@ func TestServiceDiaryAssociationsAndOwnership(t *testing.T) {
 	if _, err := environment.service.DeleteMoodRecord(t.Context(), owner.ID, secondMood.ID); err != nil {
 		t.Fatalf("delete referenced mood record: %v", err)
 	}
+	entryWithDeletedMood, err := environment.service.GetDiaryEntry(t.Context(), owner.ID, entry.ID)
+	if err != nil {
+		t.Fatalf("GetDiaryEntry() with deleted mood record error = %v", err)
+	}
+	if len(entryWithDeletedMood.MoodRecords) != 1 || entryWithDeletedMood.MoodRecords[0].ID != secondMood.ID || !entryWithDeletedMood.MoodRecords[0].DeletedAt.Valid {
+		t.Fatal("GetDiaryEntry() did not retain the deleted mood record association")
+	}
 	if _, err := environment.service.RestoreDiaryEntry(t.Context(), owner.ID, entry.ID); !errors.Is(err, core.ErrInvalidItem) {
 		t.Fatalf("RestoreDiaryEntry() with deleted mood error = %v, want ErrInvalidItem", err)
 	}

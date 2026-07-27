@@ -188,7 +188,7 @@ func normalizeDiaryRequest(req DiaryEditEntryRequest) (string, string, time.Time
 func (s *Service) resolveDiaryMoodRecords(ctx context.Context, userID uint, markdown string) ([]MoodRecord, error) {
 	ids, err := ExtractMoodRecordIDs(markdown)
 	if err != nil {
-		return nil, fmt.Errorf("%w: invalid mood references", core.ErrInvalidItem)
+		return nil, fmt.Errorf("%w: invalid mood record references", core.ErrInvalidItem)
 	}
 
 	moodRecords, err := s.repo.ListMoodRecordsByIDs(ctx, userID, ids)

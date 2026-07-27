@@ -84,9 +84,11 @@ func (r *Repository) GetDiaryEntry(ctx context.Context, filter *DiaryEntryFilter
 	var entry DiaryEntry
 	query := filter.Apply(r.db.WithContext(ctx)).
 		Preload("MoodRecords", func(db *gorm.DB) *gorm.DB {
-			return db.
-				Where("mood_records.deleted_at IS NULL").
-				Order("created_at DESC")
+			db = db.Unscoped().Order("created_at DESC")
+			if filter.UserID != nil {
+				db = db.Where("mood_records.user_id = ?", *filter.UserID)
+			}
+			return db
 		})
 	if err := query.First(&entry).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -126,7 +128,7 @@ func (r *Repository) SaveDiaryEntry(ctx context.Context, entry *DiaryEntry) (*Di
 			return fmt.Errorf("save diary entry: %w", err)
 		}
 		if err := tx.Model(entry).Association("MoodRecords").Replace(entry.MoodRecords); err != nil {
-			return fmt.Errorf("replace diary mood links: %w", err)
+			return fmt.Errorf("replace diary mood record links: %w", err)
 		}
 		return nil
 	})
