@@ -1,13 +1,8 @@
 import { Component, computed, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { MoodRecord } from "../models/mood-record";
+import type { MoodRecord } from "../models/mood-record";
+import { type DateGroup, groupEntriesByDate } from "../utils/date-grouping";
 import { feelingLabel } from "../utils/feeling-presenter";
-
-interface EntryGroup {
-  readonly key: string;
-  readonly label: string;
-  readonly entries: MoodRecord[];
-}
 
 @Component({
   selector: "app-mood-record-history",
@@ -26,14 +21,15 @@ export class MoodRecordHistory {
   readonly showDeletedStubs = input(false);
   readonly emptyMessage = input("No mood records found.");
 
-  readonly groupedEntries = computed<EntryGroup[]>(() =>
+  protected readonly groupedEntries = computed<DateGroup<MoodRecord>[]>(() =>
     groupEntriesByDate(
       (this.entries() ?? []).filter(
         (entry) => !entry.deletedAt || this.showDeletedStubs(),
       ),
+      (entry) => entry.createdAt,
     ),
   );
-  readonly skeletonRows = computed(() =>
+  protected readonly skeletonRows = computed(() =>
     Array.from({ length: this.skeletonCount() }, (_, index) => index),
   );
 
@@ -41,73 +37,8 @@ export class MoodRecordHistory {
   readonly edit = output<MoodRecord>();
   readonly delete = output<MoodRecord>();
 
-  readonly showActions = computed(
+  protected readonly showActions = computed(
     () => this.showOpen() || this.showEdit() || this.showDelete(),
   );
-  readonly feelingLabel = feelingLabel;
-
-  trackByGroup = (_: number, group: EntryGroup): string => group.key;
-  trackByEntry = (_: number, entry: MoodRecord): number => entry.id;
-}
-
-function groupEntriesByDate(entries: MoodRecord[]): EntryGroup[] {
-  const groups = new Map<string, EntryGroup>();
-
-  for (const entry of entries) {
-    const key = dateKey(entry.createdAt);
-    const existingGroup = groups.get(key);
-
-    if (existingGroup) {
-      existingGroup.entries.push(entry);
-      continue;
-    }
-
-    groups.set(key, {
-      key,
-      label: formatGroupLabel(entry.createdAt),
-      entries: [entry],
-    });
-  }
-
-  return Array.from(groups.values());
-}
-
-function dateKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function formatGroupLabel(date: Date): string {
-  const today = startOfDay(new Date());
-  const target = startOfDay(date);
-  const diffInDays = Math.round(
-    (today.getTime() - target.getTime()) / 86400000,
-  );
-
-  if (diffInDays === 0) {
-    return "Today";
-  }
-
-  if (diffInDays === 1) {
-    return "Yesterday";
-  }
-
-  if (diffInDays >= 0 && diffInDays < 7) {
-    return new Intl.DateTimeFormat(undefined, {
-      weekday: "long",
-    }).format(date);
-  }
-
-  const sameYear = today.getFullYear() === target.getFullYear();
-  return new Intl.DateTimeFormat(undefined, {
-    month: "long",
-    day: "numeric",
-    ...(sameYear ? {} : { year: "numeric" }),
-  }).format(date);
-}
-
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  protected readonly feelingLabel = feelingLabel;
 }

@@ -28,13 +28,13 @@
   </div>
 } @else {
   <div class="record-groups">
-    @for (group of groupedEntries(); track trackByGroup($index, group)) {
+    @for (group of groupedEntries(); track group.key) {
       <section class="record-group">
         <h2 class="group-title">{{ group.label }}</h2>
 
         <div class="list-surface">
           <ul class="record-list">
-            @for (entry of group.entries; track trackByEntry($index, entry)) {
+            @for (entry of group.entries; track entry.id) {
               <li class="entry-row record-row">
                 <div class="min-w-0">
                   <div
