@@ -1,11 +1,14 @@
-import { Component, computed, inject, signal } from "@angular/core";
-import { EditMoodRecordRequest, MoodRecord } from "../models/mood-record";
+import { Component, DestroyRef, computed, inject, signal } from "@angular/core";
+import {
+  rxResource,
+  takeUntilDestroyed,
+  toSignal,
+} from "@angular/core/rxjs-interop";
+import type { EditMoodRecordRequest } from "../models/mood-record";
 import { ActivatedRoute, Router } from "@angular/router";
+import { finalize, map } from "rxjs";
 import { MoodRecordApi } from "../services/mood-record-api";
 import { MoodRecordForm } from "../components/mood-record-form";
-import { map } from "rxjs";
-import { toWritableStateSignal } from "../../../core/utils/signal-helpers";
-import { stateError } from "../../../core/utils/state";
 
 @Component({
   selector: "app-mood-record-update",
@@ -15,43 +18,57 @@ import { stateError } from "../../../core/utils/state";
   styleUrl: "./mood-record-update.scss",
 })
 export class MoodRecordUpdate {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly moodRecordApi = inject(MoodRecordApi);
+  readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
+  readonly #moodRecordApi = inject(MoodRecordApi);
+  readonly #destroyRef = inject(DestroyRef);
 
-  readonly isSubmitting = signal(false);
-
-  private readonly entryState = toWritableStateSignal({
-    trigger: this.route.params.pipe(map((params) => Number(params["id"]))),
-    project: (id) => this.moodRecordApi.getById(id),
+  readonly #entryId = toSignal(
+    this.#route.paramMap.pipe(map((params) => Number(params.get("id")))),
+  );
+  readonly #entryResource = rxResource({
+    params: () => this.#entryId(),
+    stream: ({ params: id }) => this.#moodRecordApi.getById(id),
   });
+  readonly #submissionError = signal<string | null>(null);
 
-  readonly entry = computed(() => this.entryState().value);
-  readonly isLoading = computed(() => this.entryState().isLoading);
-  readonly errorMessage = computed(() => this.entryState().error);
+  protected readonly entry = computed(() =>
+    this.#entryResource.hasValue() ? this.#entryResource.value() : null,
+  );
+  protected readonly isLoading = this.#entryResource.isLoading;
+  protected readonly errorMessage = computed(
+    () =>
+      this.#submissionError() ?? this.#entryResource.error()?.message ?? null,
+  );
+  protected readonly isSubmitting = signal(false);
 
-  submit(payload: EditMoodRecordRequest): void {
+  protected submit(payload: EditMoodRecordRequest): void {
     const entry = this.entry();
     if (!entry) {
       return;
     }
 
     this.isSubmitting.set(true);
+    this.#submissionError.set(null);
 
-    this.moodRecordApi.update(entry.id, payload).subscribe({
-      next: (entry: MoodRecord) => this.handleSuccess(entry),
-      error: (err) => this.handleError(err),
-    });
-  }
-
-  private handleSuccess(entry: MoodRecord): void {
-    this.isSubmitting.set(false);
-    this.router.navigate(["/mood-records", entry.id]);
-  }
-
-  private handleError(err: unknown): void {
-    this.isSubmitting.set(false);
-    this.entryState.set(stateError(err));
-    console.error(err);
+    this.#moodRecordApi
+      .update(entry.id, payload)
+      .pipe(
+        takeUntilDestroyed(this.#destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: (updatedEntry) => {
+          void this.#router.navigate(["/mood-records", updatedEntry.id]);
+        },
+        error: (error: unknown) => {
+          this.#submissionError.set(
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+          );
+          console.error(error);
+        },
+      });
   }
 }

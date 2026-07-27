@@ -1,11 +1,14 @@
-import { Component, computed, inject } from "@angular/core";
+import { Component, DestroyRef, computed, inject, signal } from "@angular/core";
+import {
+  rxResource,
+  takeUntilDestroyed,
+  toSignal,
+} from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
+import { map, type Observable } from "rxjs";
 import { MoodRecordApi } from "../services/mood-record-api";
 import { MoodRecordDetail } from "../components/mood-record-detail";
-import { map } from "rxjs";
-import { toWritableStateSignal } from "../../../core/utils/signal-helpers";
-import { stateError, stateSuccess } from "../../../core/utils/state";
-import { DiaryEntryLink } from "../models/mood-record";
+import type { DiaryEntryLink, MoodRecord } from "../models/mood-record";
 
 @Component({
   selector: "app-mood-record-view",
@@ -15,68 +18,80 @@ import { DiaryEntryLink } from "../models/mood-record";
   styleUrl: "./mood-record-view.scss",
 })
 export class MoodRecordView {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly moodRecordApi = inject(MoodRecordApi);
+  readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
+  readonly #moodRecordApi = inject(MoodRecordApi);
+  readonly #destroyRef = inject(DestroyRef);
 
-  private readonly entryState = toWritableStateSignal({
-    trigger: this.route.params.pipe(map((params) => Number(params["id"]))),
-    project: (id) => this.moodRecordApi.getById(id),
+  readonly #entryId = toSignal(
+    this.#route.paramMap.pipe(map((params) => Number(params.get("id")))),
+  );
+  readonly #entryResource = rxResource({
+    params: () => this.#entryId(),
+    stream: ({ params: id }) => this.#moodRecordApi.getById(id),
   });
+  readonly #actionError = signal<string | null>(null);
 
-  readonly entry = computed(() => this.entryState().value);
-  readonly isLoading = computed(() => this.entryState().isLoading);
-  readonly errorMessage = computed(() => this.entryState().error);
+  protected readonly entry = computed(() =>
+    this.#entryResource.hasValue() ? this.#entryResource.value() : null,
+  );
+  protected readonly isLoading = this.#entryResource.isLoading;
+  protected readonly errorMessage = computed(
+    () => this.#actionError() ?? this.#entryResource.error()?.message ?? null,
+  );
 
-  editEntry(): void {
+  protected editEntry(): void {
     const entry = this.entry();
     if (!entry || entry.deletedAt) {
-      this.entryState.set(stateError("Cannot edit a deleted entry"));
+      this.#actionError.set("Cannot edit a deleted entry");
       return;
     }
 
-    this.router.navigate(["/mood-records", entry.id, "update"]);
+    void this.#router.navigate(["/mood-records", entry.id, "update"]);
   }
 
-  deleteEntry(): void {
+  protected deleteEntry(): void {
     const entry = this.entry();
     if (!entry || entry.deletedAt) {
-      this.entryState.set(stateError("Cannot delete a deleted entry"));
+      this.#actionError.set("Cannot delete a deleted entry");
       return;
     }
 
-    this.moodRecordApi.delete(entry.id).subscribe({
-      next: (deletedEntry) => this.entryState.set(stateSuccess(deletedEntry)),
-      error: (err) => this.entryState.set(stateError(err)),
-    });
+    this.#applyMutation(this.#moodRecordApi.delete(entry.id));
   }
 
-  restoreEntry(): void {
+  protected restoreEntry(): void {
     const entry = this.entry();
     if (!entry?.deletedAt) {
-      this.entryState.set(stateError("Cannot restore an active entry"));
+      this.#actionError.set("Cannot restore an active entry");
       return;
     }
 
-    this.moodRecordApi.restore(entry.id).subscribe({
-      next: (restoredEntry) => {
-        this.entryState.set(stateSuccess(restoredEntry));
-      },
-      error: (err) => {
-        this.entryState.set(stateError(err));
+    this.#applyMutation(this.#moodRecordApi.restore(entry.id));
+  }
+
+  protected openDiaryEntry(entry: DiaryEntryLink): void {
+    void this.#router.navigate(["/diary-entries", entry.id]);
+  }
+
+  protected createDiaryEntry(): void {
+    void this.#router.navigate(["/diary-entries/create"]);
+  }
+
+  protected goBack(): void {
+    history.back();
+  }
+
+  #applyMutation(request: Observable<MoodRecord>): void {
+    this.#actionError.set(null);
+
+    request.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
+      next: (entry) => this.#entryResource.set(entry),
+      error: (error: unknown) => {
+        this.#actionError.set(
+          error instanceof Error ? error.message : "An unknown error occurred",
+        );
       },
     });
-  }
-
-  openDiaryEntry(entry: DiaryEntryLink): void {
-    this.router.navigate(["/diary-entries", entry.id]);
-  }
-
-  createDiaryEntry(): void {
-    this.router.navigate(["/diary-entries/create"]);
-  }
-
-  goBack(): void {
-    history.back();
   }
 }

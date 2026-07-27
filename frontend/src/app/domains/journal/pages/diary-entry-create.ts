@@ -1,7 +1,9 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, DestroyRef, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Router } from "@angular/router";
+import { finalize } from "rxjs";
 import { DiaryEntryApi } from "../services/diary-entry-api";
-import { DiaryEntry, EditDiaryEntryRequest } from "../models/diary-entry";
+import type { EditDiaryEntryRequest } from "../models/diary-entry";
 import { DiaryEntryForm } from "../components/diary-entry-form";
 
 @Component({
@@ -12,30 +14,31 @@ import { DiaryEntryForm } from "../components/diary-entry-form";
   styleUrl: "./diary-entry-create.scss",
 })
 export class DiaryEntryCreate {
-  private readonly router = inject(Router);
-  private readonly diaryEntryApi = inject(DiaryEntryApi);
+  readonly #router = inject(Router);
+  readonly #diaryEntryApi = inject(DiaryEntryApi);
+  readonly #destroyRef = inject(DestroyRef);
 
-  readonly isSubmitting = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+  protected readonly isSubmitting = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
 
-  submit(payload: EditDiaryEntryRequest): void {
+  protected submit(payload: EditDiaryEntryRequest): void {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    this.diaryEntryApi.create(payload).subscribe({
-      next: (entry: DiaryEntry) => this.handleSuccess(entry),
-      error: (err) => this.handleError(err),
-    });
-  }
-
-  private handleSuccess(entry: DiaryEntry): void {
-    this.isSubmitting.set(false);
-    this.router.navigate(["/diary-entries", entry.id]);
-  }
-
-  private handleError(err: unknown): void {
-    this.isSubmitting.set(false);
-    this.errorMessage.set("Could not create the diary entry.");
-    console.error(err);
+    this.#diaryEntryApi
+      .create(payload)
+      .pipe(
+        takeUntilDestroyed(this.#destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: (entry) => {
+          void this.#router.navigate(["/diary-entries", entry.id]);
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set("Could not create the diary entry.");
+          console.error(error);
+        },
+      });
   }
 }

@@ -1,10 +1,9 @@
 import { Component, computed, inject, signal } from "@angular/core";
-import { MoodRecord } from "../models/mood-record";
+import { rxResource } from "@angular/core/rxjs-interop";
+import type { MoodRecord } from "../models/mood-record";
 import { MoodRecordApi } from "../services/mood-record-api";
 import { Router } from "@angular/router";
 import { MoodRecordHistory } from "../components/mood-record-history";
-import { toWritableStateSignal } from "../../../core/utils/signal-helpers";
-import { toObservable } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-mood-record-list",
@@ -14,50 +13,51 @@ import { toObservable } from "@angular/core/rxjs-interop";
   styleUrl: "./mood-record-list.scss",
 })
 export class MoodRecordList {
-  readonly defaultPageSize = 10;
+  readonly #router = inject(Router);
+  readonly #moodRecordApi = inject(MoodRecordApi);
 
-  private readonly router = inject(Router);
-  private readonly moodRecordApi = inject(MoodRecordApi);
+  protected readonly defaultPageSize = 10;
 
-  readonly pageOffset = signal(0);
-
-  private readonly pageState = toWritableStateSignal({
-    trigger: toObservable(this.pageOffset),
-    project: (offset) =>
-      this.moodRecordApi.getPaged(this.defaultPageSize, offset),
+  readonly #pageOffset = signal(0);
+  readonly #pageResource = rxResource({
+    params: () => ({
+      limit: this.defaultPageSize,
+      offset: this.#pageOffset(),
+    }),
+    stream: ({ params }) =>
+      this.#moodRecordApi.getPaged(params.limit, params.offset),
   });
-
-  readonly page = computed(() => this.pageState().value);
-  readonly isLoading = computed(() => this.pageState().isLoading);
-  readonly totalCount = computed(() => this.page()?.totalCount ?? 0);
-  readonly canGoPrevious = computed(() => this.pageOffset() > 0);
-  readonly canGoNext = computed(
-    () => this.pageOffset() + this.defaultPageSize < this.totalCount(),
+  protected readonly page = computed(() =>
+    this.#pageResource.hasValue() ? this.#pageResource.value() : null,
+  );
+  protected readonly isLoading = this.#pageResource.isLoading;
+  protected readonly canGoPrevious = computed(() => this.#pageOffset() > 0);
+  protected readonly canGoNext = computed(
+    () =>
+      this.#pageResource.hasValue() &&
+      this.#pageOffset() + this.defaultPageSize <
+        this.#pageResource.value().totalCount,
   );
 
-  openEntry(entry: MoodRecord): void {
-    this.router.navigate(["/mood-records", entry.id]);
+  protected openEntry(entry: MoodRecord): void {
+    void this.#router.navigate(["/mood-records", entry.id]);
   }
 
-  createEntry(): void {
-    this.router.navigate(["/mood-records/create"]);
+  protected createEntry(): void {
+    void this.#router.navigate(["/mood-records/create"]);
   }
 
-  goToPreviousPage(): void {
-    if (!this.canGoPrevious()) {
-      return;
+  protected goToPreviousPage(): void {
+    if (this.canGoPrevious()) {
+      this.#pageOffset.update((offset) =>
+        Math.max(0, offset - this.defaultPageSize),
+      );
     }
-
-    this.pageOffset.update((value) =>
-      Math.max(0, value - this.defaultPageSize),
-    );
   }
 
-  goToNextPage(): void {
-    if (!this.canGoNext()) {
-      return;
+  protected goToNextPage(): void {
+    if (this.canGoNext()) {
+      this.#pageOffset.update((offset) => offset + this.defaultPageSize);
     }
-
-    this.pageOffset.update((value) => value + this.defaultPageSize);
   }
 }

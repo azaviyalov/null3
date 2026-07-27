@@ -1,7 +1,9 @@
-import { Component, inject, signal } from "@angular/core";
-import { EditMoodRecordRequest, MoodRecord } from "../models/mood-record";
+import { Component, DestroyRef, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import type { EditMoodRecordRequest } from "../models/mood-record";
 import { MoodRecordApi } from "../services/mood-record-api";
 import { Router } from "@angular/router";
+import { finalize } from "rxjs";
 import { MoodRecordForm } from "../components/mood-record-form";
 
 @Component({
@@ -12,30 +14,31 @@ import { MoodRecordForm } from "../components/mood-record-form";
   styleUrl: "./mood-record-create.scss",
 })
 export class MoodRecordCreate {
-  private readonly router = inject(Router);
-  private readonly moodRecordApi = inject(MoodRecordApi);
+  readonly #router = inject(Router);
+  readonly #moodRecordApi = inject(MoodRecordApi);
+  readonly #destroyRef = inject(DestroyRef);
 
-  readonly isSubmitting = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+  protected readonly isSubmitting = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
 
-  submit(payload: EditMoodRecordRequest): void {
+  protected submit(payload: EditMoodRecordRequest): void {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    this.moodRecordApi.create(payload).subscribe({
-      next: (entry: MoodRecord) => this.handleSuccess(entry),
-      error: (err) => this.handleError(err),
-    });
-  }
-
-  private handleSuccess(entry: MoodRecord): void {
-    this.isSubmitting.set(false);
-    this.router.navigate(["/mood-records", entry.id]);
-  }
-
-  private handleError(err: unknown): void {
-    this.isSubmitting.set(false);
-    this.errorMessage.set("Could not create the mood record.");
-    console.error(err);
+    this.#moodRecordApi
+      .create(payload)
+      .pipe(
+        takeUntilDestroyed(this.#destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: (entry) => {
+          void this.#router.navigate(["/mood-records", entry.id]);
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set("Could not create the mood record.");
+          console.error(error);
+        },
+      });
   }
 }

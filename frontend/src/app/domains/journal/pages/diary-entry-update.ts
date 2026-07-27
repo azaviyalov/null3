@@ -1,9 +1,12 @@
-import { Component, computed, inject, signal } from "@angular/core";
+import { Component, DestroyRef, computed, inject, signal } from "@angular/core";
+import {
+  rxResource,
+  takeUntilDestroyed,
+  toSignal,
+} from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
-import { map } from "rxjs";
-import { toWritableStateSignal } from "../../../core/utils/signal-helpers";
-import { stateError } from "../../../core/utils/state";
-import { DiaryEntry, EditDiaryEntryRequest } from "../models/diary-entry";
+import { finalize, map } from "rxjs";
+import type { EditDiaryEntryRequest } from "../models/diary-entry";
 import { DiaryEntryApi } from "../services/diary-entry-api";
 import { DiaryEntryForm } from "../components/diary-entry-form";
 
@@ -15,43 +18,57 @@ import { DiaryEntryForm } from "../components/diary-entry-form";
   styleUrl: "./diary-entry-update.scss",
 })
 export class DiaryEntryUpdate {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly diaryEntryApi = inject(DiaryEntryApi);
+  readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
+  readonly #diaryEntryApi = inject(DiaryEntryApi);
+  readonly #destroyRef = inject(DestroyRef);
 
-  readonly isSubmitting = signal(false);
-
-  private readonly entryState = toWritableStateSignal({
-    trigger: this.route.params.pipe(map((params) => Number(params["id"]))),
-    project: (id) => this.diaryEntryApi.getById(id),
+  readonly #entryId = toSignal(
+    this.#route.paramMap.pipe(map((params) => Number(params.get("id")))),
+  );
+  readonly #entryResource = rxResource({
+    params: () => this.#entryId(),
+    stream: ({ params: id }) => this.#diaryEntryApi.getById(id),
   });
+  readonly #submissionError = signal<string | null>(null);
 
-  readonly entry = computed(() => this.entryState().value);
-  readonly isLoading = computed(() => this.entryState().isLoading);
-  readonly errorMessage = computed(() => this.entryState().error);
+  protected readonly entry = computed(() =>
+    this.#entryResource.hasValue() ? this.#entryResource.value() : null,
+  );
+  protected readonly isLoading = this.#entryResource.isLoading;
+  protected readonly errorMessage = computed(
+    () =>
+      this.#submissionError() ?? this.#entryResource.error()?.message ?? null,
+  );
+  protected readonly isSubmitting = signal(false);
 
-  submit(payload: EditDiaryEntryRequest): void {
+  protected submit(payload: EditDiaryEntryRequest): void {
     const entry = this.entry();
     if (!entry) {
       return;
     }
 
     this.isSubmitting.set(true);
+    this.#submissionError.set(null);
 
-    this.diaryEntryApi.update(entry.id, payload).subscribe({
-      next: (updatedEntry: DiaryEntry) => this.handleSuccess(updatedEntry),
-      error: (err) => this.handleError(err),
-    });
-  }
-
-  private handleSuccess(entry: DiaryEntry): void {
-    this.isSubmitting.set(false);
-    this.router.navigate(["/diary-entries", entry.id]);
-  }
-
-  private handleError(err: unknown): void {
-    this.isSubmitting.set(false);
-    this.entryState.set(stateError(err));
-    console.error(err);
+    this.#diaryEntryApi
+      .update(entry.id, payload)
+      .pipe(
+        takeUntilDestroyed(this.#destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: (updatedEntry) => {
+          void this.#router.navigate(["/diary-entries", updatedEntry.id]);
+        },
+        error: (error: unknown) => {
+          this.#submissionError.set(
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+          );
+          console.error(error);
+        },
+      });
   }
 }
