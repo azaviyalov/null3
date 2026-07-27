@@ -1,4 +1,4 @@
-<section class="page-shell-wide space-y-8">
+<section class="page-shell-wide page-layout">
   <header class="page-intro">
     <h1 class="page-title">Diary entries</h1>
     <p class="page-copy">
@@ -12,74 +12,7 @@
     </div>
   </header>
 
-  <section class="surface-panel space-y-6">
-    <div
-      class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
-    >
-      <div class="filter-switch" aria-label="Diary entry status filter">
-        <button
-          type="button"
-          class="filter-switch-button"
-          [class.filter-switch-button-active]="!showDeleted()"
-          (click)="setDeletedState('active')"
-        >
-          Active
-        </button>
-        <button
-          type="button"
-          class="filter-switch-button"
-          [class.filter-switch-button-active]="showDeleted()"
-          (click)="setDeletedState('deleted')"
-        >
-          Deleted
-        </button>
-      </div>
-
-      @if (totalCount()) {
-        <div class="flex flex-col gap-3 sm:items-end">
-          <p class="m-0 text-sm text-base-content/55">
-            {{ pageStart() }}-{{ pageEnd() }} of {{ totalCount() }}
-            @if (totalPages()) {
-              <span> • {{ currentPage() }}/{{ totalPages() }}</span>
-            }
-          </p>
-
-          <div class="flex flex-wrap items-center gap-2">
-            <label class="text-sm text-base-content/55" for="page-size">
-              Per page
-            </label>
-            <select
-              id="page-size"
-              class="field-select page-size-select"
-              [value]="pageSize()"
-              (change)="changePageSize($any($event.target).value)"
-            >
-              @for (size of pageSizeOptions; track size) {
-                <option [value]="size">{{ size }}</option>
-              }
-            </select>
-
-            <button
-              type="button"
-              class="quiet-action"
-              [disabled]="!canGoPrevious()"
-              (click)="goToPreviousPage()"
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              class="quiet-action"
-              [disabled]="!canGoNext()"
-              (click)="goToNextPage()"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-
+  <section class="surface-panel surface-stack">
     <app-diary-entry-feed
       [skeleton]="isLoading()"
       [skeletonCount]="defaultPageSize"
@@ -88,5 +21,28 @@
       emptyMessage="No diary entries found."
       (open)="openEntry($event)"
     />
+
+    @if (canGoPrevious() || canGoNext()) {
+      <nav class="collection-pagination" aria-label="Diary entry pages">
+        @if (canGoPrevious()) {
+          <button
+            type="button"
+            class="collection-page-link"
+            (click)="goToPreviousPage()"
+          >
+            ← Newer entries
+          </button>
+        }
+        @if (canGoNext()) {
+          <button
+            type="button"
+            class="collection-page-link collection-page-link-next"
+            (click)="goToNextPage()"
+          >
+            Older entries →
+          </button>
+        }
+      </nav>
+    }
   </section>
 </section>

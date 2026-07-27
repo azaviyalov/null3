@@ -21,42 +21,28 @@
   </article>
 } @else if (entry(); as e) {
   <article class="surface-panel" [class.detail-deleted]="deleted()">
-    <header
-      class="flex flex-col gap-6 border-b border-base-300/80 pb-6 sm:flex-row sm:justify-between"
-    >
+    <header class="detail-header">
       <div class="space-y-3">
-        <div
-          class="flex flex-wrap items-center gap-2 text-sm text-base-content/55"
-        >
+        <div class="entry-meta flex flex-wrap items-center gap-2">
           <span>{{ e.createdAt | date: "EEEE, MMMM d" }}</span>
-          <span class="hidden sm:inline text-base-content/30">•</span>
+          <span class="hidden sm:inline">•</span>
           <span>{{ e.createdAt | date: "shortTime" }}</span>
 
           @if (deleted()) {
-            <span
-              class="badge badge-ghost badge-sm border-error/20 bg-error/10 text-error"
-            >
-              Deleted
-            </span>
+            <span class="status-badge status-badge-error"> Deleted </span>
           } @else if (updated()) {
-            <span
-              class="badge badge-ghost badge-sm border-base-300/80 bg-base-100/80"
-            >
-              Updated
-            </span>
+            <span class="status-badge"> Updated </span>
           }
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="detail-heading">
           @if (e.emoji) {
-            <span class="text-4xl leading-none sm:text-5xl">{{ e.emoji }}</span>
+            <span class="text-4xl leading-none" aria-hidden="true">{{
+              e.emoji
+            }}</span>
           }
 
-          <h1
-            class="m-0 font-serif text-4xl leading-tight tracking-tight text-base-content"
-          >
-            {{ feelingLabel(e.feeling) }}
-          </h1>
+          <h1 class="detail-title">{{ feelingLabel(e.feeling) }}</h1>
         </div>
       </div>
 
@@ -74,7 +60,7 @@
           @if (showDelete()) {
             <button
               type="button"
-              class="quiet-action text-error hover:bg-error/10"
+              class="quiet-action danger-action"
               (click)="delete.emit()"
             >
               Delete
@@ -93,26 +79,24 @@
       }
     </header>
 
-    <div class="space-y-4 pt-6">
+    <div class="detail-body">
       @if (e.note) {
-        <p
-          class="m-0 whitespace-pre-wrap text-lg leading-8 text-base-content/85"
-        >
+        <p class="m-0 whitespace-pre-wrap text-base leading-7">
           {{ e.note }}
         </p>
       } @else {
-        <p class="m-0 text-base leading-7 text-base-content/55">
-          No additional notes
-        </p>
+        <p class="entry-meta">No additional notes</p>
       }
 
-      <section class="space-y-4 pt-2">
+      <section class="section-stack">
         <div
           class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
         >
           <div class="space-y-2">
-            <h2 class="section-title text-3xl">Related diary entries</h2>
-            <p class="section-copy">Diary entries that mention this mood.</p>
+            <h2 class="section-title">Related diary entries</h2>
+            <p class="section-copy">
+              Diary entries that mention this mood record.
+            </p>
           </div>
 
           <button
@@ -125,44 +109,40 @@
         </div>
 
         @if (e.diaryEntryLinks.length) {
-          <div class="grid gap-3">
+          <div class="backlink-list">
             @for (backlink of e.diaryEntryLinks; track backlink.id) {
               <button
                 type="button"
                 class="backlink-card text-left"
                 (click)="openDiaryEntry.emit(backlink)"
               >
-                <p class="m-0 text-sm text-base-content/55">
+                <p class="entry-meta">
                   {{ backlink.occurredAt | date: "EEEE, MMM d, y" }}
-                  <span class="mx-2 text-base-content/24">•</span>
+                  <span class="mx-2">•</span>
                   {{ backlink.occurredAt | date: "shortTime" }}
                 </p>
 
-                <h3
-                  class="m-0 font-serif text-2xl leading-tight tracking-tight text-base-content"
-                >
-                  {{ backlink.headline }}
-                </h3>
+                <h3 class="entry-title">{{ backlink.headline }}</h3>
 
                 @if (backlink.title && backlink.preview) {
-                  <p class="m-0 text-base leading-7 text-base-content/72">
+                  <p class="m-0 text-base leading-7">
                     {{ backlink.preview }}
                   </p>
                 }
 
-                <span class="quiet-action mt-1 w-fit">Open diary entry</span>
+                <span class="backlink-open">Open diary entry →</span>
               </button>
             }
           </div>
         } @else {
-          <p class="m-0 text-sm leading-6 text-base-content/55">
-            No diary entries mention this mood yet.
+          <p class="entry-meta">
+            No diary entries mention this mood record yet.
           </p>
         }
       </section>
 
       @if (showFooter()) {
-        <p class="m-0 text-sm leading-6 secondary-meta">
+        <p class="entry-meta">
           @if (deleted()) {
             Deleted at {{ e.deletedAt | date: "medium" }}
           } @else if (updated()) {

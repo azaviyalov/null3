@@ -1,12 +1,12 @@
-<section class="page-shell space-y-6">
+<section class="page-shell page-layout">
   <header class="page-intro">
-    <h1 class="page-title">Admin Login</h1>
+    <h1 class="page-title">Admin login</h1>
     <p class="page-copy">
       Enter the configured admin password to create one-time invite links.
     </p>
   </header>
 
-  <section class="surface-panel">
+  <section class="surface-panel surface-stack">
     <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack">
       <div class="form-field">
         <label class="field-label" for="admin-password">Password</label>

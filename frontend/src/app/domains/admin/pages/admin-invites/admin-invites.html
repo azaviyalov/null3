@@ -1,12 +1,12 @@
-<section class="page-shell space-y-6">
+<section class="page-shell page-layout">
   <header class="page-intro">
-    <h1 class="page-title">Invite Links</h1>
+    <h1 class="page-title">Invite links</h1>
     <p class="page-copy">
       Generate a one-time registration link for a new user account.
     </p>
   </header>
 
-  <section class="surface-panel space-y-5">
+  <section class="surface-panel surface-stack">
     <button
       type="button"
       class="primary-action"
@@ -17,9 +17,7 @@
     </button>
 
     @if (invite(); as generatedInvite) {
-      <div
-        class="space-y-4 rounded-[1.5rem] border border-base-300/80 bg-base-100/70 p-4"
-      >
+      <div class="inset-panel section-stack">
         <div class="form-field">
           <label class="field-label" for="invite-url">Invite URL</label>
           <input
@@ -30,7 +28,7 @@
           />
         </div>
 
-        <p class="m-0 text-sm leading-6 text-base-content/60">
+        <p class="entry-meta">
           Expires {{ generatedInvite.expires_at | date: "medium" }}
         </p>
 
@@ -40,9 +38,7 @@
           </button>
 
           @if (copyMessage()) {
-            <span class="text-sm text-base-content/55">{{
-              copyMessage()
-            }}</span>
+            <span class="entry-meta">{{ copyMessage() }}</span>
           }
         </div>
       </div>

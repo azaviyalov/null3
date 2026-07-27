@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="handleSubmit()" class="diary-form-stack">
-  <div class="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+  <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
     <div class="form-stack">
       <div class="form-field">
         <label class="field-label" for="title">Title (optional)</label>
@@ -35,23 +35,19 @@
         }
       </div>
 
-      <section class="surface-panel diary-helper-panel">
+      <section class="inset-panel diary-helper-panel">
         <div class="space-y-2">
-          <h3 class="m-0 font-serif text-2xl tracking-tight text-base-content">
-            Link mood records
-          </h3>
-          <p class="m-0 text-sm leading-6 text-base-content/60">
+          <h3 class="group-title">Link mood records</h3>
+          <p class="section-copy">
             Select text below, then choose a mood record to link it. The saved
             syntax is <code>[[mood:42|your text]]</code>.
           </p>
         </div>
 
         @if (recentMoodRecordsPage() === null) {
-          <p class="m-0 text-sm text-base-content/55">
-            Loading recent mood records...
-          </p>
+          <p class="entry-meta">Loading recent mood records...</p>
         } @else if (!recentMoodRecords().length) {
-          <p class="m-0 text-sm text-base-content/55">
+          <p class="entry-meta">
             Create a mood record first and it will appear here.
           </p>
         } @else {
@@ -76,12 +72,10 @@
       </section>
     </div>
 
-    <section class="surface-panel diary-preview-panel">
+    <section class="inset-panel diary-preview-panel">
       <div class="space-y-2">
-        <h3 class="m-0 font-serif text-2xl tracking-tight text-base-content">
-          Preview
-        </h3>
-        <p class="m-0 text-sm leading-6 text-base-content/60">
+        <h3 class="group-title">Preview</h3>
+        <p class="section-copy">
           Mood record links work here and in the saved entry.
         </p>
       </div>
@@ -102,7 +96,7 @@
       formControlName="markdown"
       rows="16"
       [disabled]="disabled()"
-      placeholder="Write in Markdown. Link a mood with [[mood:42|this moment]]."
+      placeholder="Write in Markdown. Link a mood record with [[mood:42|this moment]]."
     ></textarea>
     @if (
       form.controls["markdown"].hasError("required") &&

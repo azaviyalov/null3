@@ -16,15 +16,8 @@ export class MoodRecordApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/journal/mood-records`;
 
-  getPaged(
-    limit = 10,
-    offset = 0,
-    deleted = false,
-  ): Observable<Page<MoodRecord>> {
-    const params = new HttpParams()
-      .set("limit", limit)
-      .set("offset", offset)
-      .set("deleted", deleted);
+  getPaged(limit = 10, offset = 0): Observable<Page<MoodRecord>> {
+    const params = new HttpParams().set("limit", limit).set("offset", offset);
     return this.http
       .get<PageResponse<MoodRecordResponse>>(this.baseUrl, { params })
       .pipe(map((data) => Page.fromResponse(data, MoodRecord.fromResponse)));

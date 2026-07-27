@@ -1,4 +1,4 @@
-<section class="page-shell space-y-6">
+<section class="page-shell page-layout">
   <header class="page-intro">
     <h1 class="page-title">Edit mood record</h1>
   </header>
@@ -8,10 +8,10 @@
   }
 
   @if (isLoading()) {
-    <section class="surface-panel space-y-4">
+    <section class="surface-panel surface-stack">
       <div class="skeleton h-5 w-40"></div>
       <div class="skeleton h-12 w-full rounded-2xl"></div>
-      <div class="skeleton h-40 w-full rounded-[1.5rem]"></div>
+      <div class="skeleton h-40 w-full rounded-2xl"></div>
     </section>
   } @else {
     <section class="surface-panel">

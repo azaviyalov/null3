@@ -1,10 +1,9 @@
 .detail-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
-  justify-content: flex-end;
+  gap: var(--space-3);
 }
 
 .detail-deleted {
-  opacity: 0.92;
+  opacity: 0.72;
 }

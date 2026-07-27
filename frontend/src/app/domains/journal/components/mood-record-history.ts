@@ -23,11 +23,15 @@ export class MoodRecordHistory {
   readonly showOpen = input(false);
   readonly showEdit = input(false);
   readonly showDelete = input(false);
-  readonly showRestore = input(false);
+  readonly showDeletedStubs = input(false);
   readonly emptyMessage = input("No mood records found.");
 
   readonly groupedEntries = computed<EntryGroup[]>(() =>
-    groupEntriesByDate(this.entries() ?? []),
+    groupEntriesByDate(
+      (this.entries() ?? []).filter(
+        (entry) => !entry.deletedAt || this.showDeletedStubs(),
+      ),
+    ),
   );
   readonly skeletonRows = computed(() =>
     Array.from({ length: this.skeletonCount() }, (_, index) => index),
@@ -36,14 +40,9 @@ export class MoodRecordHistory {
   readonly open = output<MoodRecord>();
   readonly edit = output<MoodRecord>();
   readonly delete = output<MoodRecord>();
-  readonly restore = output<MoodRecord>();
 
   readonly showActions = computed(
-    () =>
-      this.showOpen() ||
-      this.showEdit() ||
-      this.showDelete() ||
-      this.showRestore(),
+    () => this.showOpen() || this.showEdit() || this.showDelete(),
   );
   readonly feelingLabel = feelingLabel;
 

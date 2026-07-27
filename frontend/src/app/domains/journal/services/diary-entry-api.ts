@@ -16,15 +16,8 @@ export class DiaryEntryApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/journal/diary-entries`;
 
-  getPaged(
-    limit = 10,
-    offset = 0,
-    deleted = false,
-  ): Observable<Page<DiaryEntry>> {
-    const params = new HttpParams()
-      .set("limit", limit)
-      .set("offset", offset)
-      .set("deleted", deleted);
+  getPaged(limit = 10, offset = 0): Observable<Page<DiaryEntry>> {
+    const params = new HttpParams().set("limit", limit).set("offset", offset);
 
     return this.http
       .get<PageResponse<DiaryEntryResponse>>(this.baseUrl, { params })

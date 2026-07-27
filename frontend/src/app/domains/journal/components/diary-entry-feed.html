@@ -1,16 +1,11 @@
 @if (skeleton()) {
-  <div class="space-y-8">
-    <section class="space-y-3">
+  <div class="record-groups">
+    <section class="record-group">
       <div class="skeleton h-3 w-20"></div>
 
-      <div
-        class="overflow-hidden rounded-[1.75rem] border border-base-300/80 bg-base-100/70"
-      >
+      <div class="list-surface">
         @for (row of skeletonRows(); track row) {
-          <div
-            class="flex gap-4 border-base-300/70 px-4 py-5 sm:px-5"
-            [class.border-t]="row > 0"
-          >
+          <div class="record-row" [class.border-t]="row > 0">
             <div class="min-w-0 flex-1 space-y-3">
               <div class="flex gap-2">
                 <div class="skeleton h-3 w-20"></div>
@@ -28,67 +23,43 @@
     </section>
   </div>
 } @else if (!groupedEntries().length) {
-  <section class="surface-panel text-center">
-    <h2 class="font-serif text-2xl tracking-tight text-base-content">
-      {{ emptyMessage() }}
-    </h2>
-  </section>
+  <div class="empty-state">
+    <p class="m-0">{{ emptyMessage() }}</p>
+  </div>
 } @else {
-  <div class="space-y-8">
+  <div class="record-groups">
     @for (group of groupedEntries(); track trackByGroup($index, group)) {
-      <section class="space-y-3">
-        <h2
-          class="font-serif text-xl tracking-tight text-base-content/82 sm:text-2xl"
-        >
-          {{ group.label }}
-        </h2>
+      <section class="record-group">
+        <h2 class="group-title">{{ group.label }}</h2>
 
-        <div
-          class="overflow-hidden rounded-[1.75rem] border border-base-300/80 bg-base-100/78"
-        >
-          <ul class="divide-y divide-base-300/75">
+        <div class="list-surface">
+          <ul class="record-list">
             @for (entry of group.entries; track trackByEntry($index, entry)) {
-              <li class="entry-row flex gap-4 px-4 py-5 sm:px-5">
-                <div class="min-w-0 flex-1 rounded-2xl">
+              <li class="entry-row record-row">
+                <div class="min-w-0">
                   <div
-                    class="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-base-content/52"
+                    class="entry-meta mb-2 flex flex-wrap items-center gap-x-2 gap-y-1"
                   >
-                    <span class="font-medium text-base-content/62">
+                    <span class="font-medium">
                       {{ entry.occurredAt | date: "shortTime" }}
                     </span>
-                    <span class="text-base-content/22" aria-hidden="true"
-                      >•</span
-                    >
-                    <span>Diary Entry</span>
+                    <span aria-hidden="true">•</span>
+                    <span>Diary entry</span>
 
-                    @if (entry.deletedAt) {
-                      <span
-                        class="rounded-full border border-error/18 bg-error/8 px-2 py-0.5 text-[0.72rem] font-medium text-error"
-                      >
-                        Deleted
-                      </span>
-                    } @else if (
+                    @if (
                       entry.updatedAt.getTime() !== entry.createdAt.getTime()
                     ) {
-                      <span
-                        class="rounded-full border border-base-300/80 bg-base-100/86 px-2 py-0.5 text-[0.72rem] font-medium text-base-content/52"
-                      >
-                        Updated
-                      </span>
+                      <span class="status-badge"> Updated </span>
                     }
                   </div>
 
-                  <h3
-                    class="m-0 font-serif text-2xl leading-tight tracking-tight text-base-content"
-                  >
-                    {{ entry.headline }}
-                  </h3>
+                  <h3 class="entry-title">{{ entry.headline }}</h3>
 
-                  <p class="mt-3 text-[1.01rem] leading-7 text-base-content/78">
+                  <p class="entry-copy">
                     {{ entry.excerpt }}
                   </p>
 
-                  <p class="mt-3 text-sm leading-6 secondary-meta">
+                  <p class="entry-meta mt-3">
                     Recorded {{ entry.createdAt | date: "MMM d, h:mm a" }}
                   </p>
                 </div>
@@ -100,7 +71,7 @@
                     @if (showOpen()) {
                       <button
                         type="button"
-                        class="quiet-action"
+                        class="row-action"
                         (click)="open.emit(entry)"
                       >
                         Open
@@ -109,7 +80,7 @@
                     @if (showEdit()) {
                       <button
                         type="button"
-                        class="quiet-action"
+                        class="row-action"
                         (click)="edit.emit(entry)"
                       >
                         Edit
@@ -118,19 +89,10 @@
                     @if (showDelete()) {
                       <button
                         type="button"
-                        class="quiet-action text-error hover:bg-error/10"
+                        class="row-action danger-action"
                         (click)="delete.emit(entry)"
                       >
                         Delete
-                      </button>
-                    }
-                    @if (showRestore()) {
-                      <button
-                        type="button"
-                        class="quiet-action"
-                        (click)="restore.emit(entry)"
-                      >
-                        Restore
                       </button>
                     }
                   </div>

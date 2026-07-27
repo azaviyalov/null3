@@ -3,5 +3,5 @@
 }
 
 .entry-row:hover {
-  background: color-mix(in oklab, var(--color-primary) 4%, white);
+  background: var(--ui-surface-muted);
 }

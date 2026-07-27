@@ -2,16 +2,16 @@
 
 (pronounced as nulls, *NUHLZ*)
 
-A small personal journal for quick mood notes and longer diary entries. The API is written in Go; the browser app uses Angular.
+A small personal journal for mood records and longer diary entries. The API is written in Go; the browser app uses Angular.
 
 This is a project built just for fun. It is not intended for production use.
 
 ## Features
 - Track mood records
 - Write diary entries in Markdown
-- Link diary entries to moods with `[[mood:<id>|label]]` or `/mood-records/<id>` links
-- Ignore mood-like references inside Markdown code spans and fenced code blocks
-- Follow links in either direction
+- Link diary entries to mood records with `[[mood:<id>|label]]` or `/mood-records/<id>` links
+- Ignore mood-record references inside Markdown code spans and fenced code blocks
+- Follow links in either direction, with placeholders for deleted mood records and no deleted diary-entry backlinks
 - Invite-only user registration
 - Admin page for creating one-time invite links
 - Cookie-based sessions with hashed refresh-token storage and password resets
@@ -115,7 +115,7 @@ go -C backend run ./cmd/generate-secrets ../.env
 The command creates the file if needed. It exits without changing the file if either variable is already present. The helper uses only the Go standard library and is not included in the release binary.
 
 ## TODOs
-- [ ] Add more home page features (e.g., mood statistics, charts)
+- [ ] Add more home page features (e.g., mood record statistics, charts)
 - [ ] Improve error handling and logging
 
 ## License

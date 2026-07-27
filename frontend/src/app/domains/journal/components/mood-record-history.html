@@ -1,16 +1,11 @@
 @if (skeleton()) {
-  <div class="space-y-8">
-    <section class="space-y-3">
+  <div class="record-groups">
+    <section class="record-group">
       <div class="skeleton h-3 w-20"></div>
 
-      <div
-        class="overflow-hidden rounded-[1.75rem] border border-base-300/80 bg-base-100/70"
-      >
+      <div class="list-surface">
         @for (row of skeletonRows(); track row) {
-          <div
-            class="flex gap-4 border-base-300/70 px-4 py-4 sm:px-5"
-            [class.border-t]="row > 0"
-          >
+          <div class="record-row" [class.border-t]="row > 0">
             <div class="min-w-0 flex-1 space-y-3">
               <div class="flex gap-2">
                 <div class="skeleton h-3 w-16"></div>
@@ -27,121 +22,98 @@
     </section>
   </div>
 } @else if (!groupedEntries().length) {
-  <section class="surface-panel text-center">
-    <h2 class="font-serif text-2xl tracking-tight text-base-content">
-      {{ emptyMessage() }}
-    </h2>
-  </section>
+  <div class="empty-state">
+    <p class="m-0">{{ emptyMessage() }}</p>
+  </div>
 } @else {
-  <div class="space-y-8">
+  <div class="record-groups">
     @for (group of groupedEntries(); track trackByGroup($index, group)) {
-      <section class="space-y-3">
-        <h2
-          class="font-serif text-xl tracking-tight text-base-content/82 sm:text-2xl"
-        >
-          {{ group.label }}
-        </h2>
+      <section class="record-group">
+        <h2 class="group-title">{{ group.label }}</h2>
 
-        <div
-          class="overflow-hidden rounded-[1.75rem] border border-base-300/80 bg-base-100/78"
-        >
-          <ul class="divide-y divide-base-300/75">
+        <div class="list-surface">
+          <ul class="record-list">
             @for (entry of group.entries; track trackByEntry($index, entry)) {
-              <li class="entry-row flex gap-4 px-4 py-4 sm:px-5">
-                <div class="min-w-0 flex-1 rounded-2xl">
-                  <div
-                    class="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-base-content/52"
-                  >
-                    <span class="font-medium text-base-content/62">
-                      {{ entry.createdAt | date: "shortTime" }}
+              <li class="entry-row record-row">
+                @if (entry.deletedAt) {
+                  <div class="deleted-reference min-w-0">
+                    <span class="status-badge status-badge-error">
+                      Deleted
                     </span>
-                    <span class="text-base-content/22" aria-hidden="true"
-                      >•</span
+                    <p class="entry-copy">Deleted mood record</p>
+                    <p class="entry-meta mt-2">
+                      This mood record is no longer available.
+                    </p>
+                  </div>
+                } @else {
+                  <div class="min-w-0">
+                    <div
+                      class="entry-meta mb-2 flex flex-wrap items-center gap-x-2 gap-y-1"
                     >
-                    @if (entry.emoji) {
-                      <span class="text-base leading-none" aria-hidden="true">
-                        {{ entry.emoji }}
+                      <span class="font-medium">
+                        {{ entry.createdAt | date: "shortTime" }}
                       </span>
-                    }
-                    <span>{{ feelingLabel(entry.feeling) }}</span>
+                      <span aria-hidden="true">•</span>
+                      @if (entry.emoji) {
+                        <span class="text-base leading-none" aria-hidden="true">
+                          {{ entry.emoji }}
+                        </span>
+                      }
+                      <span>{{ feelingLabel(entry.feeling) }}</span>
 
-                    @if (entry.deletedAt) {
-                      <span
-                        class="rounded-full border border-error/18 bg-error/8 px-2 py-0.5 text-[0.72rem] font-medium text-error"
-                      >
-                        Deleted
-                      </span>
-                    } @else if (
+                      @if (
+                        entry.updatedAt.getTime() !== entry.createdAt.getTime()
+                      ) {
+                        <span class="status-badge"> Updated </span>
+                      }
+                    </div>
+
+                    <p class="entry-row-copy entry-copy">
+                      {{ entry.note || feelingLabel(entry.feeling) }}
+                    </p>
+
+                    @if (
                       entry.updatedAt.getTime() !== entry.createdAt.getTime()
                     ) {
-                      <span
-                        class="rounded-full border border-base-300/80 bg-base-100/86 px-2 py-0.5 text-[0.72rem] font-medium text-base-content/52"
-                      >
-                        Updated
-                      </span>
+                      <p class="entry-meta mt-2">
+                        Updated at {{ entry.updatedAt | date: "MMM d, h:mm a" }}
+                      </p>
                     }
                   </div>
 
-                  <p
-                    class="entry-row-copy text-[1.01rem] leading-7 text-base-content/85"
-                  >
-                    {{ entry.note || feelingLabel(entry.feeling) }}
-                  </p>
-
-                  @if (entry.deletedAt) {
-                    <p class="mt-2 text-sm leading-6 secondary-meta">
-                      Deleted at {{ entry.deletedAt | date: "MMM d, h:mm a" }}
-                    </p>
-                  } @else if (
-                    entry.updatedAt.getTime() !== entry.createdAt.getTime()
-                  ) {
-                    <p class="mt-2 text-sm leading-6 secondary-meta">
-                      Updated at {{ entry.updatedAt | date: "MMM d, h:mm a" }}
-                    </p>
+                  @if (showActions()) {
+                    <div
+                      class="entry-row-actions flex shrink-0 items-center gap-1 self-start"
+                    >
+                      @if (showOpen()) {
+                        <button
+                          type="button"
+                          class="row-action"
+                          (click)="open.emit(entry)"
+                        >
+                          Open
+                        </button>
+                      }
+                      @if (showEdit()) {
+                        <button
+                          type="button"
+                          class="row-action"
+                          (click)="edit.emit(entry)"
+                        >
+                          Edit
+                        </button>
+                      }
+                      @if (showDelete()) {
+                        <button
+                          type="button"
+                          class="row-action danger-action"
+                          (click)="delete.emit(entry)"
+                        >
+                          Delete
+                        </button>
+                      }
+                    </div>
                   }
-                </div>
-
-                @if (showActions()) {
-                  <div
-                    class="entry-row-actions flex shrink-0 items-center gap-1 self-start"
-                  >
-                    @if (showOpen()) {
-                      <button
-                        type="button"
-                        class="quiet-action"
-                        (click)="open.emit(entry)"
-                      >
-                        Open
-                      </button>
-                    }
-                    @if (showEdit()) {
-                      <button
-                        type="button"
-                        class="quiet-action"
-                        (click)="edit.emit(entry)"
-                      >
-                        Edit
-                      </button>
-                    }
-                    @if (showDelete()) {
-                      <button
-                        type="button"
-                        class="quiet-action text-error hover:bg-error/10"
-                        (click)="delete.emit(entry)"
-                      >
-                        Delete
-                      </button>
-                    }
-                    @if (showRestore()) {
-                      <button
-                        type="button"
-                        class="quiet-action"
-                        (click)="restore.emit(entry)"
-                      >
-                        Restore
-                      </button>
-                    }
-                  </div>
                 }
               </li>
             }

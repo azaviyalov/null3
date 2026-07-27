@@ -1,23 +1,12 @@
-<section class="page-shell-wide space-y-10">
+<section class="page-shell-wide page-layout">
   <header class="page-intro">
     <h1 class="page-title">Welcome to null3</h1>
     <p class="page-copy">
-      Keep quick mood notes and longer diary entries in one place.
+      Keep mood records and longer diary entries in one place.
     </p>
   </header>
 
-  <section class="space-y-4">
-    <h2 class="section-title">Latest mood records</h2>
-
-    <app-mood-record-history
-      [entries]="moodRecordsPage()?.items ?? null"
-      [showOpen]="true"
-      emptyMessage="No mood records yet."
-      (open)="openMoodRecord($event)"
-    />
-  </section>
-
-  <section class="space-y-4">
+  <section class="section-stack">
     <h2 class="section-title">Latest diary entries</h2>
 
     <app-diary-entry-feed
@@ -25,6 +14,17 @@
       [showOpen]="true"
       emptyMessage="No diary entries yet."
       (open)="openDiaryEntry($event)"
+    />
+  </section>
+
+  <section class="section-stack">
+    <h2 class="section-title">Latest mood records</h2>
+
+    <app-mood-record-history
+      [entries]="moodRecordsPage()?.items ?? null"
+      [showOpen]="true"
+      emptyMessage="No mood records yet."
+      (open)="openMoodRecord($event)"
     />
   </section>
 </section>

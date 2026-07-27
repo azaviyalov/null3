@@ -3,6 +3,7 @@
     <div class="app-header-inner">
       <div class="brand-block">
         <a routerLink="/" class="brand-link">null3</a>
+        <span class="brand-caption">Personal journal</span>
       </div>
 
       <div class="nav-stack">
@@ -27,20 +28,20 @@
               Home
             </a>
             <a
+              routerLink="/diary-entries"
+              routerLinkActive="nav-link-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="nav-link"
+            >
+              Diary entries
+            </a>
+            <a
               routerLink="/mood-records"
               routerLinkActive="nav-link-active"
               [routerLinkActiveOptions]="{ exact: true }"
               class="nav-link"
             >
               Mood records
-            </a>
-            <a
-              routerLink="/diary-entries"
-              routerLinkActive="nav-link-active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              class="nav-link"
-            >
-              Diary Entries
             </a>
           }
 
@@ -66,7 +67,7 @@
               routerLinkActive="nav-link-active"
               class="nav-link nav-link-muted"
             >
-              Admin Login
+              Admin login
             </a>
           } @else {
             <a
@@ -74,14 +75,14 @@
               routerLinkActive="nav-link-active"
               class="nav-link nav-link-muted"
             >
-              Admin Area
+              Admin area
             </a>
             <button
               type="button"
               class="nav-link nav-link-muted"
               (click)="logoutAdmin()"
             >
-              Admin Logout
+              Admin logout
             </button>
           }
         </nav>

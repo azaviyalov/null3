@@ -22,27 +22,23 @@ export class DiaryEntryFeed {
   readonly showOpen = input(false);
   readonly showEdit = input(false);
   readonly showDelete = input(false);
-  readonly showRestore = input(false);
   readonly emptyMessage = input("No diary entries found.");
 
   readonly groupedEntries = computed<EntryGroup[]>(() =>
-    groupEntriesByDate(this.entries() ?? []),
+    groupEntriesByDate(
+      (this.entries() ?? []).filter((entry) => !entry.deletedAt),
+    ),
   );
   readonly skeletonRows = computed(() =>
     Array.from({ length: this.skeletonCount() }, (_, index) => index),
   );
   readonly showActions = computed(
-    () =>
-      this.showOpen() ||
-      this.showEdit() ||
-      this.showDelete() ||
-      this.showRestore(),
+    () => this.showOpen() || this.showEdit() || this.showDelete(),
   );
 
   readonly open = output<DiaryEntry>();
   readonly edit = output<DiaryEntry>();
   readonly delete = output<DiaryEntry>();
-  readonly restore = output<DiaryEntry>();
 
   trackByGroup = (_: number, group: EntryGroup): string => group.key;
   trackByEntry = (_: number, entry: DiaryEntry): number => entry.id;

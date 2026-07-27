@@ -1,13 +1,11 @@
-<section class="page-shell space-y-6">
+<section class="page-shell page-layout">
   <header class="page-intro">
-    <h1 class="page-title">Accept Invite</h1>
+    <h1 class="page-title">Accept invite</h1>
   </header>
 
   @if (isLoadingInvite()) {
-    <section class="surface-panel">
-      <p class="m-0 text-base leading-7 text-base-content/60">
-        Checking your invite link...
-      </p>
+    <section class="surface-panel surface-stack">
+      <p class="section-copy">Checking your invite link...</p>
     </section>
   } @else if (error() && !inviteExpiresAt()) {
     <div class="status-message error">{{ error() }}</div>
@@ -15,13 +13,13 @@
       <a routerLink="/login">Back to login</a>
     </div>
   } @else {
-    <section class="surface-panel">
-      <p class="m-0 text-base leading-7 text-base-content/65">
+    <section class="surface-panel surface-stack">
+      <p class="section-copy">
         Create your account. This invite link expires on
         {{ inviteExpiresAt() | date: "medium" }}.
       </p>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack mt-6">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack">
         <div class="form-field">
           <label class="field-label" for="invite-login">Login</label>
           <input
