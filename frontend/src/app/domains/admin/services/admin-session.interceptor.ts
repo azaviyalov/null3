@@ -28,7 +28,9 @@ export class AdminSessionInterceptor implements HttpInterceptor {
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
           this.adminSession.clearSession();
-          void this.router.navigate(["/admin/login"]);
+          if (!req.url.endsWith("/admin/auth/me")) {
+            void this.router.navigate(["/admin/login"]);
+          }
         }
         return throwError(() => error);
       }),
